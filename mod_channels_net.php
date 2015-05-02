@@ -35,7 +35,7 @@ require_once "config.php";
 			<td colspan="5">			
 				<h1>YTDT Channel Network</h1>
 
-				<p>This module crawls a network of channels connected via the "featured channels" tab from a list of seeds. Seeds can be channels retrieved from a search or a via manual input of channel ids.</p>
+				<p>This module crawls a network of channels connected via the "featured channels" tab from a list of seeds. Seeds can be channels retrieved from a search or via manual input of channel ids.</p>
 				
 				<p>Crawl depth specifies how far from the seeds the script should go. Crawl depth 0 will get only the relations between seeds. Using many seeds and the maximum crawl depth (2) can take a very long time or the script might run out of memory. Start small.</p>
 			</td>
