@@ -1,18 +1,19 @@
-html,body {
-	font-family: Arial,Helvetica,sans-serif;
-	font-size: 12px;
-}
+html,body { font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height: 18px; }
 
-table { width: 800px; }
-td { padding: 5px; }
+table { width:800px; }
+td { padding:5px; }
+
+p { margin:7px 0px 7px 0px; }
+
+a { text-decoration:none; color:#000; border:1px solid #ddd; padding:0px 3px 0px 3px; background:#efefef; }
 
 textarea { width:380px; height:80px; font-size:11px; }
 
-pre { font-size: 11px; }
+pre { font-size:11px; }
 
-hr { border: none; height: 1px; background-color: #999; }
+hr { border:none; height:1px; background-color:#999; margin:3px 0px 3px 0px; }
 
-h1 { font-size: 18px; }
-h2 { font-size: 16px; }
+h1 { font-size:18px; }
+h2 { font-size:15px; }
 
-.navlink { padding:2px 4px 2px 4px; border-left:1px solid #999; border-bottom:1px solid #999; margin:0px 10px 0px 0px; color:#000;	text-decoration:none; }
+.navlink { padding:2px 4px 2px 4px; margin:0px 10px 0px 0px; }
