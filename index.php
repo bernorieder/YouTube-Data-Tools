@@ -27,10 +27,15 @@
 <tr>
 	<td colspan="2">
 		<h1>YouTube Data Tools</h1>
-		<p>This is a collection of simple tools for extracting data from the YouTube platform via the YouTube API v3.</p>
-		<p>YTDT is written and maintained by <a href="http://rieder.polsys.net">Bernhard Rieder</a>, Associate Professor in Media Studies at the
+		
+		<p>This is a collection of simple tools for extracting data from the YouTube platform via the <a href="https://developers.google.com/youtube/v3/" target="_blank">YouTube API v3.</a></p>
+		
+		<p>This is "as is" software, no support is provided. Source code is available on <a href="https://github.com/bernorieder/YouTube-Data-Tools" target="_blank">github</a>.
+		High quality bug reports are appreciated. If you have no experience with reporting bugs effectively, please read <a href="http://www.chiark.greenend.org.uk/~sgtatham/bugs.html" target="_blank">this piece</a> at least twice.
+		Send bug reports to <a href="mailto:tools@polsys.net">tools@polsys.net</a> only.<p>
+		
+		<p>YTDT is written and maintained by <a href="http://rieder.polsys.net">Bernhard Rieder</a>, Associate Professor in <a href="http://mediastudies.nl" target="_blank">Media Studies</a> at the
 		<a href="http://www.uva.nl">University of Amsterdam</a> and researcher at the <a href="https://www.digitalmethods.net" target="_blank">Digital Methods Initiative</a>.</p>
-		<p>Source 
 	</td>
 </tr>
 <tr>
@@ -39,7 +44,7 @@
 <tr>
 	<td><h2>Channel Info</h2></td>
 	<td>
-		<p>This module retrieves a maximum of information for a channel from a specified channel id.</p>
+		<p>This module retrieves different kinds of information for a channel from a specified channel id.</p>
 		<p><a href="mod_channel_info.php">launch</a></p>
 	</td>
 </tr>
@@ -49,7 +54,7 @@
 <tr>
 	<td><h2>Channel Network</h2></td>
 	<td>
-		<p>Maps a network of channels via the "featured channels" feature. Start from a search or a list of channel ids.</p>
+		<p>This module crawls a network of channels connected via the "featured channels" tab from a list of seeds. Seeds can be channels retrieved from a search or via manual input of channel ids.</p>
 		<p><a href="mod_channels_net.php">launch</a></p>
 	</td>
 </tr>
@@ -68,9 +73,9 @@
 	<td colspan="2"><hr /></td>
 </tr>
 <tr>
-	<td><h2>Video Info and Comments</h2></td>
+	<td><h2>Video Info and Comments (WIP)</h2></td>
 	<td>
-		<p>Retrieves statistics and comments from a video via a video id.</p>
+		<p>Retrieves statistics and comments for a video from a video id. An older script that needs some reworking.</p>
 		<p><a href="mod_video_comments.php">launch</a></p>
 	</td>
 </tr>
