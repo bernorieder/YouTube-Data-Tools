@@ -101,7 +101,7 @@ require_once "config.php";
 		</tr>
 		<tr>
 			<td><input type="radio" name="mode" value="seeds" <?php if($_POST["mode"] == "seeds") { echo "checked"; } ?> /></td>
-			<td>seeds:</td>
+			<td>manual selection:</td>
 			<td colspan="2">
 				<textarea name="seeds"><?php if($_POST["mode"] == "seeds") { echo $_POST["seeds"]; } ?></textarea>
 			</td>
