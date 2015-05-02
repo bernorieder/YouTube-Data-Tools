@@ -35,7 +35,7 @@ require_once "config.php";
 			<td colspan="3">			
 				<h1>YTDT Channel Info</h1>
 
-				<p>This module retrieves a maximum of information for a channel from the <a href="https://developers.google.com/youtube/v3/docs/channels/list" target="_blank">channels/list</a> API endpoint
+				<p>This module retrieves different kinds of information for a channel from the <a href="https://developers.google.com/youtube/v3/docs/channels/list" target="_blank">channels/list</a> API endpoint
 				from a specified channel id. The following resources are requested: brandingSettings, status, id, snippet, contentDetails, contentOwnerDetails, statistics, topicDetails, invideoPromotion.</p>
 				<p>Output is a direct print of the API response.</p>
 			</td>
