@@ -75,7 +75,7 @@ function getInfo() {
 	//$restquery = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=".$hash."&maxResults=50&key=".$apikey;
 
 	
-	$reply = json_decode(file_get_contents($restquery));
+	$reply = doAPIRequest($restquery);
 
 	echo '<pre>';
 	print_r($reply->items[0]);
