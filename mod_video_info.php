@@ -18,7 +18,7 @@ require_once "config.php";
 <body>
 
 <table>
-	<form action="mod_video_comments.php" method="get">
+	<form action="mod_video_info.php" method="get">
 		<tr>
 			<td colspan="3">
 				<a href="index.php" class="navlink">Home</a>
@@ -77,7 +77,7 @@ function getInfo() {
 	//https://www.googleapis.com/youtube/v3/videos?part=statistics,player&id=bzsRsugCXII&key=AIzaSyDpPvVCPAUw53kwG1H45Dmqk3m_zOALYNQ
 	//https://developers.google.com/youtube/articles/changes_to_comments
 
-	$reply = json_decode(file_get_contents($restquery));
+	$reply = doAPIRequest($restquery);
 
 	//print_r($reply); exit;
 
@@ -140,7 +140,7 @@ function getChunk($currentPos) {
 			 	 '&start-index='.$currentPos.
 			 	 '&alt=json';
 
-	$reply = json_decode(file_get_contents($restquery));
+	$reply = doAPIRequest($restquery);
 
 	//print_r($reply);
 
@@ -166,7 +166,7 @@ function getReplies() {
 	$restquery = 'http://gdata.youtube.com/feeds/api/videos/'.$videohash.'/responses?v=2'.
 			 	 '&alt=json';
 
-	$reply = json_decode(file_get_contents($restquery));
+	$reply = doAPIRequest($restquery);
 
 	$feed["totalvideoreplies"] = $reply->feed->{'openSearch$totalResults'}->{'$t'};
 
