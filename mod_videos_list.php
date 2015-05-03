@@ -184,7 +184,7 @@ function getIdsFromChannel($channel) {
 
 	$restquery = "https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=".$channel."&key=".$apikey;
 	
-	$reply = json_decode(file_get_contents($restquery));
+	$reply = doAPIRequest($restquery);
 	
 	if(isset($reply->items[0]->contentDetails->relatedPlaylists->uploads)) {
 		
@@ -203,7 +203,7 @@ function getIdsFromChannel($channel) {
 				$restquery .= "&pageToken=".$nextpagetoken;
 			}
 			
-			$reply = json_decode(file_get_contents($restquery));
+			$reply = doAPIRequest($restquery);
 
 			//print_r($reply); //exit;
 			
@@ -247,7 +247,7 @@ function getIdsFromPlaylist($uplistid) {
 			$restquery .= "&pageToken=".$nextpagetoken;
 		}
 		
-		$reply = json_decode(file_get_contents($restquery));
+		$reply = doAPIRequest($restquery);
 
 		//print_r($reply); exit;
 		
@@ -278,13 +278,13 @@ function getIdsFromSearch($query,$iterations,$rankby) {
 
 	for($i = 0; $i < $iterations; $i++) {
 		
-		$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=".$query."&type=video&order=".$rankby."&key=".$apikey;
+		$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=". urlencode($query)."&type=video&order=".$rankby."&key=".$apikey;
 		
 		if($nextpagetoken != null) {
 			$restquery .= "&pageToken=".$nextpagetoken;
 		}
 		
-		$reply = json_decode(file_get_contents($restquery));
+		$reply = doAPIRequest($restquery);
 		$nextpagetoken = $reply->nextPageToken;
 		
 		//print_r($reply);
@@ -314,7 +314,7 @@ function makeStatsFromIds($ids) {
 		
 		$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet&id=".$vid."&key=".$apikey;
 
-		$reply = json_decode(file_get_contents($restquery));
+		$reply = doAPIRequest($restquery);
 		
 		$vid = $reply->items[0];
 		
