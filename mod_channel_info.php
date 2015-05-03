@@ -1,6 +1,7 @@
 <?php
 
 require_once "config.php";
+require_once "common.php";
 
 ?>
 
@@ -10,7 +11,7 @@ require_once "config.php";
 <head>
 	<meta charset="utf-8">
 	
-	<title>YouTube Tool Collection</title>
+	<title>YouTube Data Tools</title>
 	
 	<link rel="stylesheet" type="text/css" href="main.css" />
 </head>
