@@ -49,7 +49,7 @@ require_once "config.php";
 		<tr>
 			<td><input type="radio" name="mode" value="search" <?php if($_POST["mode"] != "seeds") { echo "checked"; } ?> /></td>
 			<td>search query:</td>
-			<td><input type="text" name="query" value="" /></td>
+			<td><input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; } ?>" /></td>
 			<td>(this is passed to the search endpoint)</td>
 			<td></td>
 		</tr>
@@ -165,13 +165,14 @@ function getIdsFromSearch($query,$iterations,$rankby) {
 
 	for($i = 0; $i < $iterations; $i++) {
 		
-		$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=".$query."&type=channel&order=".$rankby."&key=".$apikey;
+		$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=".urlencode($query)."&type=channel&order=".$rankby."&key=".$apikey;
 		
 		if($nextpagetoken != null) {
 			$restquery .= "&pageToken=".$nextpagetoken;
 		}
 		
-		$reply = json_decode(file_get_contents($restquery));
+		$reply = doAPIRequest($restquery);
+
 		$nextpagetoken = $reply->nextPageToken;
 		
 		foreach($reply->items as $item) {
@@ -200,8 +201,8 @@ function makeNetworkFromIds($depth) {
 			$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails,invideoPromotion&id=".$chid."&key=".$apikey;
 			$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,id,snippet,statistics&id=".$chid."&key=".$apikey;
 	
-			$reply = json_decode(file_get_contents($restquery));
-			
+			$reply = doAPIRequest($restquery);
+	
 		} catch(Exception $e) {
 			
 			print_r($e);
