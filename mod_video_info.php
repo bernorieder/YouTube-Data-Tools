@@ -40,6 +40,17 @@ require_once "common.php";
 				
 				<p>The number of comments the script is able to retrieve can vary wildly. In some cases, only a relatively small percentage is made available, while in others well over
 				100.000 comments have been successfully retrieved. This seems to be mainly related to the age of the video in question.</p>
+				
+				<p>The module creates the following outputs:
+					<ul>
+						<li>a tabular file containing basic info and statistics about the video;</li>
+						<li>a tabular file containing all retrievable comments, both top level and replies;</li>
+						<li>a tabular file containing comment authors and their comment count;</li>
+						<li>a network file (gdf format) that maps interactions between users in the comment section;</li>
+					</ul>
+				</p>
+				
+				<p>The first three elements can be shown directly in the browser by enabling HTML output.</p>
 			</td>
 		</tr>
 		<tr>
@@ -54,6 +65,9 @@ require_once "common.php";
 			<td>HTML output:</td>
 			<td><input type="checkbox" name="htmloutput" <?php if($_GET["htmloutput"] == "on") { echo "checked"; } ?> /></td>
 			<td>(adds HTML result tables in addition to the file exports)</td>
+		</tr>
+		<tr>
+			<td colspan="3"><hr /></td>
 		</tr>
 		<tr>
 			<td colspan="3"><input type="submit" /></td>
