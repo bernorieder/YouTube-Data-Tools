@@ -234,8 +234,15 @@ function makeNetworkFromIds($depth) {
 			} 
 		}
 		
+		echo $i . " "; flush(); ob_flush();
+	}
 		//print_r($nodes); exit;
 		
+	echo "<br />getting related videos for ".count($ids)." videos at depth ".$depth.": ";
+	
+	for($i = 0; $i < count($ids); $i++) {
+		
+		$vid = $ids[$i];
 		
 		// get related videos
 		$run = true;
