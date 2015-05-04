@@ -210,7 +210,7 @@ function makeNetworkFromIds($depth) {
 			
 			$row = array();
 			$row["channelId"] = $video->snippet->channelId;
-			$row["channelTitle"] = $video->snippet->channelTitle;
+			$row["channelTitle"] = preg_replace("/\s+/", " ",$video->snippet->channelTitle);
 			$row["videoId"] = $video->id;
 			$row["publishedAt"] = $video->snippet->publishedAt;
 			$row["videoTitle"] = preg_replace("/\s+/", " ",$video->snippet->title);
@@ -317,7 +317,7 @@ function renderNetwork() {
 	
 	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,channelTitle VARCHAR,channelId VARCHAR,viewCount INT,likeCount INT,dislikeCount INT,favoriteCount INT,commentCount INT\n";
 	foreach($nodes as $nodeid => $nodedata) {
-		$nodegdf .= $nodeid . "," . preg_replace("/,/"," ",$nodedata["videoTitle"]) . "," . $nodedata["isSeed"] . "," . $nodedata["seedRank"] . "," . preg_replace("/,/"," ",$nodedata["channelTitle"]) . "," . $nodedata["channelId"] . "," . 
+		$nodegdf .= $nodeid . "," . preg_replace("/,|\"/"," ",$nodedata["videoTitle"]) . "," . $nodedata["isSeed"] . "," . $nodedata["seedRank"] . "," . preg_replace("/,|\"/"," ",$nodedata["channelTitle"]) . "," . $nodedata["channelId"] . "," . 
 					$nodedata["viewCount"] . "," . $nodedata["likeCount"] . "," . $nodedata["dislikeCount"] . "," . $nodedata["favoriteCount"] . "," . $nodedata["commentCount"] . "," . "\n";
 	}
 	
