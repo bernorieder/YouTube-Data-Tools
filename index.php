@@ -73,9 +73,9 @@
 	<td colspan="2"><hr /></td>
 </tr>
 <tr>
-	<td><h2>Video Info and Comments (WIP)</h2></td>
+	<td><h2>Video Info and Comments</h2></td>
 	<td>
-		<p>Retrieves statistics and comments for a video from a video id. An older script that needs some reworking.</p>
+		<p>This module starts from a video id and retrieves basic info for the video in question and provides a number of analyses of the comment section.</p>
 		<p><a href="mod_video_comments.php">launch</a></p>
 	</td>
 </tr>
