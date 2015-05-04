@@ -36,7 +36,10 @@ require_once "common.php";
 			<td colspan="3">			
 				<h1>YTDT Video Info and Comments</h1>
 
-				<p>some explanation</p>
+				<p>This module starts from a video id and retrieves basic info for the video in question and provides a number of analyses of the comment section.</p>
+				
+				<p>The number of comments the script is able to retrieve can vary wildly. In some cases, only a relatively small percentage is made available, while in others well over
+				100.000 comments have been successfully retrieved. This seems to be mainly related to the age of the video in question.</p>
 			</td>
 		</tr>
 		<tr>
@@ -44,8 +47,13 @@ require_once "common.php";
 		</tr>
 		<tr>
 			<td>video id:</td>
-			<td><input type="text" name="videohash" value="" /></td>
-			<td>(video ids can be found in URLs, e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ)</td>
+			<td><input type="text" name="videohash" value="<?php if(isset($_GET["videohash"])) { echo $_GET["videohash"]; } ?>" /></td>
+			<td>(video ids can be found in URLs, e.g. https://www.youtube.com/watch?v=aXnaHh40xnM)</td>
+		</tr>
+		<tr>
+			<td>HTML output:</td>
+			<td><input type="checkbox" name="htmloutput" <?php if($_GET["htmloutput"] == "on") { echo "checked"; } ?> /></td>
+			<td>(adds HTML result tables in addition to the file exports)</td>
 		</tr>
 		<tr>
 			<td colspan="3"><input type="submit" /></td>
@@ -55,6 +63,8 @@ require_once "common.php";
 
 <?php
 
+// blocked video example: https://www.youtube.com/watch?v=pLN59ZOweUE
+
 $feed = array();
 $feed["comments"] = array();
 
@@ -63,263 +73,341 @@ $video = array();
 if(isset($_GET["videohash"])) {
 
 	$videohash = $_GET["videohash"];
+	$html = $_GET["htmloutput"];
+	$filename = "videoinfo_".$videohash."_".date("Y_m_d-H_i_s");
 
-	getInfo();
-	getReplies();
-	getChunk(1);	// though shallst start counting at 1 in the Googleverse
-}
+	$video = getInfo($videohash);
+	$nodecomments = getComments($videohash);
+	$commenters = getCommenters($nodecomments);
+	makeNetwork($nodecomments);
+	
+	echo '<br /><br />The following files have been generated:<br />';
+	echo '<a href="./data/'.$filename.'_basicinfo.tab">'.$filename.'_basicinfo.tab</a><br />';
+	echo '<a href="./data/'.$filename.'_comments.tab">'.$filename.'_comments.tab</a><br />';
+	echo '<a href="./data/'.$filename.'_authors.tab">'.$filename.'_authors.tab</a><br />';
+	echo '<a href="./data/'.$filename.'_commentnetwork.gdf">'.$filename.'_commentnetwork.gdf</a><br />';
+	echo '<br />';
+	
 
-function getInfo() {
-
-	global $video,$videohash;
-
-	$restquery = 'https://gdata.youtube.com/feeds/api/videos/'.$videohash.'?v=2&alt=json';
-	//https://www.googleapis.com/youtube/v3/videos?id=bzsRsugCXII&key=AIzaSyDpPvVCPAUw53kwG1H45Dmqk3m_zOALYNQ
-	//https://www.googleapis.com/youtube/v3/videos?part=statistics,player&id=bzsRsugCXII&key=AIzaSyDpPvVCPAUw53kwG1H45Dmqk3m_zOALYNQ
-	//https://developers.google.com/youtube/articles/changes_to_comments
-
-	$reply = doAPIRequest($restquery);
-
-	//print_r($reply); exit;
-
-	$video["published"] = date("Y-m-d H:i:s", strtotime($reply->entry->published->{'$t'}));
-	$video["title"] = $reply->entry->title->{'$t'};
-	$video["uploader"] = $reply->entry->author[0]->name->{'$t'};
-	$video["duration"] = $reply->entry->{'media$group'}->{'media$content'}[0]->duration;
-	$video["user_type"] = $reply->entry->{'media$group'}->{'media$credit'}[0]->{'yt$type'};
-
-	$video["favoriteCount"] = $reply->entry->{'yt$statistics'}->favoriteCount;
-	$video["viewCount"] = $reply->entry->{'yt$statistics'}->viewCount;
-
-	$video["numDislikes"] = $reply->entry->{'yt$rating'}->numDislikes;
-	$video["numLikes"] = $reply->entry->{'yt$rating'}->numLikes;
-	if($video["numDislikes"] == 0 && $video["numLikes"] == 0) {
-		$video["likebalance"] = 0;
-	} else if ($video["numDislikes"] == 0) {
-		$video["likebalance"] = $video["numLikes"];
-	} else if ($video["numLikes"] == 0) {
-		$video["likebalance"] = -$video["numDislikes"];
-	} else {
-		$video["likebalance"] = $video["numLikes"] / $video["numDislikes"];
-	}
-
-	$video["keywords"] = $reply->entry->{'media$group'}->{'media$keywords'}->{'$t'};
-
-	$perms = $reply->entry->{'yt$accessControl'};
-	$video["permissions"] = array();
-
-	print_r($video["perms"]);
-
-	foreach($perms as $perm) {
-		$video["permissions"][$perm->action] = $perm->permission;
-	}
-
-
-	// published data, tags, title, author, accesscontrol, favorite count, view count, likes/dislikes
-	// "yt$type": "partner"???
-}
-
-function getChunk($currentPos) {
-
-	global $feed,$videohash;
-
-	$stop = false;
-
-	if($currentPos + 50 >= 1000) { // replace with 1000!!!!
-
-		$noresults = 1000 - $currentPos;		// here also
-		$stop = true;
-
-	} else {
-
-		$noresults = 50;
-	}
-
-
-	$restquery = 'http://gdata.youtube.com/feeds/api/videos/'.$videohash.'/comments?v=2'.
-			 	 '&max-results='.$noresults.
-			 	 '&start-index='.$currentPos.
-			 	 '&alt=json';
-
-	$reply = doAPIRequest($restquery);
-
-	//print_r($reply);
-
-	$feed["totalcomments"] = $reply->feed->{'openSearch$totalResults'}->{'$t'};
-
-	if(!isset($reply->feed->entry)) {
-		$stop = true;
-	} else {
-		$feed["comments"] = array_merge($feed["comments"], $reply->feed->entry);
-	}
-
-	if($stop == false) {
-		getChunk($currentPos + 50);
-	} else {
-		processComments();
-	}
-}
-
-function getReplies() {
-
-	global $feed,$videohash;
-
-	$restquery = 'http://gdata.youtube.com/feeds/api/videos/'.$videohash.'/responses?v=2'.
-			 	 '&alt=json';
-
-	$reply = doAPIRequest($restquery);
-
-	$feed["totalvideoreplies"] = $reply->feed->{'openSearch$totalResults'}->{'$t'};
-
-	//print_r($reply);
-}
-
-function processComments() {
-
-	global $feed,$video,$stopwords,$punctuation;
-
-	//file_put_contents("data.json", json_encode($feed));
-	//$feed = array();
-	//$json = json_decode(file_get_contents("data.json"));
-	//$feed["comments"] = $json->comments;
-
-	//print_r($feed);
-
-	$spamcounter = 0;
-	$updatecounter = 0;
-	$userlist = array();
-	$mentionlist = array();
-	$wordlist = array();
-	$hidate = 0;
-	$lodate = 1000000000000000;
-
-	$feed["nicecomments"] = array();
-
-	for($i = 0; $i < count($feed["comments"]); $i++) {
-
-		$nice = array();
-		$nice["pubdate"] = date("Y-m-d H:i:s", strtotime($feed["comments"][$i]->published->{'$t'}));
-		$nice["author"] = $feed["comments"][$i]->author[0]->name->{'$t'};
-		//$nice["title"] = $feed["comments"][$i]->title->{'$t'};
-		$nice["content"] = $feed["comments"][$i]->content->{'$t'};
-
-		$feed["nicecomments"][] = $nice;
-
-		// check for Spam
-		if(isset($feed["comments"][$i]->{'yt$spam'})) {
-			$spamcounter++;
+	if($html == "on") {
+	
+		echo "<hr /><br />";
+	
+		// output basic video info table
+		echo '<table class="resulttable">';
+		foreach($video as $key => $data) {
+			echo '<tr class="resulttable">';
+			echo '<td class="resulttableHi"><b>'.$key.'</b></td>';
+			echo '<td class="resulttable">'.$data.'</td>';
+			echo '</tr>';
 		}
+		echo '</table>';
 
-		// collect authornames
-		$username = $feed["comments"][$i]->author[0]->name->{'$t'};
-		if(!isset($userlist[$username])) {
-			$userlist[$username] = 1;
+		echo "<br /><br />";
+	
+	
+		// output author list
+		echo '<table class="resulttable">';
+		foreach($commenters as $username => $count) {
+			echo '<tr class="resulttable">';
+			echo '<td class="resulttableHi"><b>'.$username.'</b></td>';
+			echo '<td class="resulttable">'.$count.'</td>';
+			echo '</tr>';
+		}
+		echo '</table>';
+
+		echo "<br /><br />";
+	
+	
+		// output full comment table
+		echo '<table class="resulttable">';
+		echo '<tr class="resulttable">';
+		foreach(array_keys($nodecomments[0]) as $key) {
+			echo '<td class="resulttableHi"><b>'.$key.'</b></td>';
+		}		
+		echo '</tr>';
+		foreach($nodecomments as $comment) {
+			$style = ($comment["isReply"] == 0) ? "resulttable":"resulttableHi";
+
+			echo '<tr class="resulttable">';
+			foreach($comment as $element) {
+				echo '<td class="'.$style.'">'.$element.'</td>';
+			}	
+			echo '</tr>';
+		}
+		echo '</tr>';
+		echo '</table>';
+		
+	}
+}
+
+
+function getInfo($videohash) {
+
+	global $apikey,$html,$filename;
+
+	// forbidden: fileDetails,processingDetails,suggestions
+	$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet,status,topicDetails&id=".$videohash."&key=".$apikey;
+
+	$reply = doAPIRequest($restquery);
+	$reply = $reply->items[0];
+	
+	$video = array();
+
+	$video["id"] = $reply->id;
+	
+	$video["published"] = date("Y-m-d H:i:s", strtotime($reply->snippet->publishedAt));
+	$video["published_unix"] = strtotime($reply->snippet->publishedAt);
+	$video["title"] = preg_replace("/\s+/", " ",$reply->snippet->title);
+	$video["description"] = preg_replace("/\s+/", " ",$reply->snippet->description);
+	$video["channelId"] = $reply->snippet->channelId;
+	$video["channelTitle"] = $reply->snippet->channelTitle;
+	
+	$video["duration"] = $reply->contentDetails->duration;
+    $video["dimension"] = $reply->contentDetails->dimension;
+    $video["definition"] = $reply->contentDetails->definition;
+    $video["caption"] = $reply->contentDetails->caption;
+    $video["allowedIn"] = (isset($reply->contentDetails->regionRestriction->allowed)) ? implode(",",$reply->contentDetails->regionRestriction->allowed):"";
+    $video["blockedIn"] = (isset($reply->contentDetails->regionRestriction->blocked)) ? implode(",",$reply->contentDetails->regionRestriction->blocked):"";
+    
+    $video["licensedContent"] = $reply->contentDetails->licensedContent;
+    $video["viewCount"] = $reply->statistics->viewCount;
+    $video["likeCount"] = $reply->statistics->likeCount;
+    $video["dislikeCount"] = $reply->statistics->dislikeCount;
+    $video["favoriteCount"] = $reply->statistics->favoriteCount;
+    $video["commentCount"] = $reply->statistics->commentCount;
+    
+    $video["uploadStatus"] = $reply->status->uploadStatus;
+    $video["privacyStatus"] = $reply->status->privacyStatus;
+    $video["license"] = $reply->status->license;
+    $video["embeddable"] = $reply->status->embeddable;
+    $video["publicStatsViewable"] = $reply->status->publicStatsViewable;
+	
+	
+	$content = "";
+	foreach($video as $key => $data) {
+		$content .= $key."\t".$data."\n";
+	}
+	file_put_contents("./data/".$filename."_basicinfo.tab",$content);
+	
+	return $video;
+}
+
+
+function getComments($videohash) {
+	
+	global $apikey,$html,$filename;
+
+	
+	// get toplevel comments first
+
+	$nextpagetoken = null;
+	$run = true;
+	$comments = array();
+	
+	echo "<br />getting comments: "; flush(); ob_flush();
+
+	while($run == true) {
+		
+		$restquery = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&maxResults=100&videoId=".$videohash."&key=".$apikey;
+		
+		if($nextpagetoken != null) {
+			$restquery .= "&pageToken=".$nextpagetoken;
+		}
+		
+		$reply = doAPIRequest($restquery);
+		
+		foreach($reply->items as $item) {
+			$comments[] = $item;
+		}
+		
+		echo " " . count($comments); flush(); ob_flush();
+		
+		if(isset($reply->nextPageToken) && $reply->nextPageToken != "") {
+			$nextpagetoken = $reply->nextPageToken;				
 		} else {
-			$userlist[$username]++;
+			$run = false;
 		}
-
-		// collect mentions
-		$content = $feed["comments"][$i]->content->{'$t'};
-		preg_match_all("/\@(.+?)\s/",$content,$find);
-
-		if(count($find[1]) > 0) {
-			for($j = 0; $j < count($find[1]); $j++) {
-				if(!isset($mentionlist[$find[1][$j]])) {
-					$mentionlist[$find[1][$j]] = 1;
+	}	
+	
+	
+	// work through top level comments and get replies
+	
+	$nodecomments = array();
+	$counter = 0;
+	
+	echo "<br /><br/>digging into thread structure: "; flush(); ob_flush();
+	
+	foreach($comments as $comment) {
+		
+		echo " " . $counter;
+		$counter++;
+		
+		$tmp = array();
+		$tmp["id"] = $comment->id;
+		$tmp["replyCount"] = $comment->snippet->totalReplyCount;
+		$tmp["likeCount"] = $comment->snippet->topLevelComment->snippet->likeCount;
+		$tmp["publishedAt"] = date("Y-m-d H:i:s", strtotime($comment->snippet->topLevelComment->snippet->publishedAt));
+		$tmp["authorName"] = preg_replace("/\s+/", " ",$comment->snippet->topLevelComment->snippet->authorDisplayName);
+		$tmp["text"] = preg_replace("/\s+/", " ",$comment->snippet->topLevelComment->snippet->textDisplay);
+		$tmp["authorChannelId"] = $comment->snippet->topLevelComment->snippet->authorChannelId->value;
+		$tmp["authorChannelUrl"] = $comment->snippet->topLevelComment->snippet->authorChannelUrl;
+		$tmp["isReply"] = 0;
+		$tmp["isReplyTo"] = "";
+		$tmp["isReplyToName"] = "";
+		
+		//print_r($tmp);
+		
+		$nodecomments[] = $tmp;
+		
+		if($tmp["replyCount"] > 0) {
+			
+			$replies = array();
+			$nextpagetoken = null;
+			$run = true;
+		
+			while($run == true) {
+				
+				$restquery = "https://www.googleapis.com/youtube/v3/comments?part=snippet&maxResults=100&parentId=".$tmp["id"]."&key=".$apikey;
+				
+				if($nextpagetoken != null) {
+					$restquery .= "&pageToken=".$nextpagetoken;
+				}
+				
+				$reply = doAPIRequest($restquery);
+				
+			
+				foreach($reply->items as $item) {
+					$replies[] = $item;
+				}
+								
+				if(isset($reply->nextPageToken) && $reply->nextPageToken != "") {
+					$nextpagetoken = $reply->nextPageToken;				
 				} else {
-					$mentionlist[$find[1][$j]]++;
+					$run = false;
 				}
 			}
-		}
-		//print_r($find);
-
-		// collect updates published
-		if($feed["comments"][$i]->published->{'$t'} != $feed["comments"][$i]->updated->{'$t'}) {
-			$updatecounter++;
-		}
-
-		// collect words
-		$content = preg_replace("/[".implode("|",$punctuation)."]/"," ", strtolower($content));
-		$content = preg_replace("/\s+/"," ", $content);
-		$tmpwords = explode(" ",$content);
-		foreach ($tmpwords as $word) {
-			if(strlen($word) > 2 && !in_array($word, $stopwords)) {
-				if(!isset($wordlist[$word])) {
-					$wordlist[$word] = 1;
-				} else {
-					$wordlist[$word]++;
-				}
-			}
-		}
-		//print_r($tmpwords);
-
-		// dates
-		$date = strtotime($feed["comments"][$i]->published->{'$t'});
-		//echo $date;
-		if($date < $lodate) { $lodate = $date; }
-		if($date > $hidate) { $hidate = $date; }
+			
+			foreach($replies as $reply) {
+				
+				$tmp2 = array();
+				$tmp2["id"] = $reply->id;
+				$tmp2["replyCount"] = "";
+				$tmp2["likeCount"] = $reply->snippet->likeCount;
+				$tmp2["publishedAt"] = date("Y-m-d H:i:s", strtotime($reply->snippet->publishedAt));
+				$tmp2["authorName"] = preg_replace("/\s+/", " ",$reply->snippet->authorDisplayName);
+				$tmp2["text"] = preg_replace("/\s+/", " ",$reply->snippet->textDisplay);
+				$tmp2["authorChannelId"] = $reply->snippet->authorChannelId->value;
+				$tmp2["authorChannelUrl"] = $reply->snippet->authorChannelUrl;
+				$tmp2["isReply"] = 1;
+				$tmp2["isReplyToId"] = $tmp["id"];
+				$tmp2["isReplyToName"] = $tmp["authorName"];
+				
+				$nodecomments[] = $tmp2;	
+			}	
+		}		
 	}
+	
+	echo '<br /><br/>The script retrieved '.count($nodecomments).' comments from '.count($comments).' top level comments.'; 
+	
+	
+	$content = implode("\t",array_keys($nodecomments[0])) . "\n";
+	foreach($nodecomments as $comment) {
+		$content .= implode("\t",$comment) . "\n";
+	}
+	file_put_contents("./data/".$filename."_comments.tab",$content);
+	
+	
+	return $nodecomments;
+}
 
-	arsort($userlist);
-	arsort($mentionlist);
-	arsort($wordlist);
 
-	$timedist = $hidate - $lodate;
-	$timedist_full = $hidate - strtotime($video["published"]);
-	$timedist = $timedist / (60 * 60 * 24);
-	$timedist_full = $timedist_full / (60 * 60 * 24);;
+function getCommenters($nodecomments) {
+	
+	global $filename;
+	
+	$authors = array();
+	
+	foreach($nodecomments as $comment) {
+		if(!isset($authors[$comment["authorName"]])) {
+			$authors[$comment["authorName"]] = 0;
+		}
+		$authors[$comment["authorName"]]++;
+	}
+	
+	arsort($authors);
+	
+	$content = "";
+	foreach($authors as $key => $data) {
+		$content .= $key."\t".$data."\n";
+	}
+	file_put_contents("./data/".$filename."_authors.tab",$content);
+	
+	return $authors;
+}
 
-	$feed["commentsretrieved"] = count($feed["comments"]);
-	$feed["spamcounter"] = $spamcounter;
-	$feed["updatecounter"] = $updatecounter;
-	$feed["firstcommentretrieved"] = date("Y-m-d H:i:s", $lodate);
-	$feed["lastcommentretrieved"] = date("Y-m-d H:i:s", $hidate);
-	$feed["timedist_retrieved_days"] = $timedist;
-	$feed["comments_per_day_retrieved"] = $feed["commentsretrieved"] / $timedist;
-	$feed["timedist_full_days"] = $timedist_full;
-	$feed["comments_per_day_full"] = $feed["totalcomments"] / $timedist_full;
-	$feed["uploadercomments"] = (isset($userlist[$video["uploader"]])) ? $userlist[$video["uploader"]] : 0;
-	$feed["uploadermentions"] = (isset($mentionlist[$video["uploader"]])) ? $mentionlist[$video["uploader"]] : 0;
-	$feed["userlist"] = $userlist;
-	$feed["mentionlist"] = $mentionlist;
-	$feed["wordlist"] = $wordlist;
 
-	$feed["comments"] = array();
-
-	$csv = "Hash,published,title,uploader,user_type,duration,viewCount,favoriteCount,numLikes,numDislikes,likebalance,keywords,permissions_comment,permissions_videoRespond,";
-	$csv .= "permissions_embed,totalVideoReplies,totalcomments,spamcounter,comments_per_day_full,uploadercomments,uploadermentions\n";
-	$csv .= $_GET["videohash"] .",";
-	$csv .= $video["published"] .",";
-	$csv .= $video["title"] .",";
-	$csv .= $video["uploader"] .",";
-	$csv .= $video["user_type"] .",";
-	$csv .= $video["duration"] .",";
-	$csv .= $video["viewCount"] .",";
-	$csv .= $video["favoriteCount"] .",";
-	$csv .= $video["numLikes"] .",";
-	$csv .= $video["numDislikes"] .",";
-	$csv .= $video["likebalance"] .",";
-	$csv .= '"'.$video["keywords"] .'",';
-	$csv .= $video["permissions"]["comment"] .",";
-	$csv .= $video["permissions"]["videoRespond"] .",";
-	$csv .= $video["permissions"]["embed"] .",";
-	$csv .= $feed["totalvideoreplies"] .",";
-	$csv .= $feed["totalcomments"] .",";
-	$csv .= $feed["spamcounter"] .",";
-	$csv .= $feed["comments_per_day_full"] .",";
-	$csv .= $feed["uploadercomments"] .",";
-	$csv .= $feed["uploadermentions"] .",";
-
-	$filename = $_GET["videohash"].".csv";
-
-	file_put_contents($filename, $csv);
-
-	echo '<p><a href="'.$filename.'">'.$filename.'</a>';
-
-	echo '<pre>';
-	print_r($video);
-	print_r($feed);
-	echo '</pre>';
+function makeNetwork($nodecomments) {
+	
+	global $filename;
+	
+	$nodes = array();
+	$edges = array();
+	
+	foreach($nodecomments as $nodecomment) {
+		
+		if(!isset($nodes[$nodecomment["authorName"]])) {
+			$nodes[$nodecomment["authorName"]] = 0;
+		}
+		$nodes[$nodecomment["authorName"]]++;
+		
+		$tmp = preg_match_all("/oid=\"\d+\">(.*)<\/a>/U",$nodecomment["text"],$out);
+		
+		if(count($out[1]) > 0) {
+			
+			foreach($out[1] as $ref) {
+				if(!isset($nodes[$ref])) {
+					$nodes[$ref] = 0;
+				}
+				
+				$edgeid = $nodecomment["authorName"] . "_|_|X|_|_" . $ref;
+				if(!isset($edges[$edgeid])) {
+					$edges[$edgeid] = 0;
+				}
+				$edges[$edgeid]++;
+			}
+			
+		} else if ($nodecomment["isReply"] == 1) {
+			
+			if(!isset($nodes[$nodecomment["isReplyToName"]])) {
+				$nodes[$nodecomment["isReplyToName"]] = 0;
+			}
+			
+			$edgeid = $nodecomment["authorName"] . "_|_|X|_|_" . $nodecomment["isReplyToName"];
+			if(!isset($edges[$edgeid])) {
+				$edges[$edgeid] = 0;
+			}
+			$edges[$edgeid]++;
+		}		
+	}
+	
+	
+	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,commentCount INT\n";
+	foreach($nodes as $nodeid => $nodedata) {
+		$nodeid = preg_replace("/,/", " ", $nodeid);
+		$nodegdf .= $nodeid . "," . $nodeid  . "," . $nodedata . "\n";
+	}
+	
+	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR,weight INT\n";
+	foreach($edges as $edgeid => $edgedata) {
+		$tmp = explode("_|_|X|_|_",$edgeid);
+		
+		$edgegdf .= $tmp[0] . "," . $tmp[1] . "," . $edgedata . "\n";
+	}
+	
+	$gdf = $nodegdf . $edgegdf;
+	
+	file_put_contents("./data/".$filename."_commentnetwork.gdf",$gdf);
 }
 
 ?>
