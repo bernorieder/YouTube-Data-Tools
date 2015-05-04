@@ -18,6 +18,7 @@
 		<a href="mod_channel_info.php" class="navlink">Channel Info</a>
 		<a href="mod_channels_net.php" class="navlink">Channel Network</a>
 		<a href="mod_videos_list.php" class="navlink">Video List</a>
+		<a href="mod_videos_net.php" class="navlink">Video Network</a>
 		<a href="mod_video_info.php" class="navlink">Video Info</a>
 	</td>
 </tr>
@@ -67,6 +68,16 @@
 		<p>This module creates a list of video infos and statistics from one of four sources: the videos uploaded to a specified channel,
 		a playlist, the videos retrieved by a particular search query, or the videos specified by a list of ids.</p>
 		<p><a href="mod_videos_list.php">launch</a></p>
+	</td>
+</tr>
+<tr>
+	<td colspan="2"><hr /></td>
+</tr>
+<tr>
+	<td><h2>Video Network</h2></td>
+	<td>
+		<p>This module creates a network of relations between videos via YouTube's "related videos" feature, starting from a search or a list of video ids.</p>
+		<p><a href="mod_videos_net.php">launch</a></p>
 	</td>
 </tr>
 <tr>
