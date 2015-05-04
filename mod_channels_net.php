@@ -275,7 +275,7 @@ function makeNetworkFromIds($depth) {
 
 function renderNetwork() {
 	
-	global $nodes,$edges,$lookup,$no_seeds;
+	global $nodes,$edges,$lookup,$no_seeds,$mode;
 	
 	//print_r($nodes); exit;
 	
@@ -293,7 +293,7 @@ function renderNetwork() {
 	}
 	
 	$gdf = $nodegdf . $edgegdf;
-	$filename = "channelnet_seeds" . $no_seeds . "_nodes" . count($nodes) . "_" . date("Y_m_d-H_i_s");
+	$filename = "channelnet_" . $mode . $no_seeds . "_nodes" . count($nodes) . "_" . date("Y_m_d-H_i_s");
 
 	file_put_contents("./data/".$filename.".gdf", $gdf);
 	
