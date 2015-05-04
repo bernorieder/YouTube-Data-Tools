@@ -46,8 +46,11 @@ require_once "common.php";
 		</tr>
 		<tr>
 			<td>channel id:</td>
-			<td><input type="text" name="hash" value="UCiDJtJKMICpb9B1qf7qjEOA" /></td>
+			<td><input type="text" name="hash" value="<?php if(isset($_GET["hash"])) { echo $_GET["hash"]; } ?>" /></td>
 			<td>(channel ids can be found in URLs, e.g. https://www.youtube.com/channel/UCiDJtJKMICpb9B1qf7qjEOA)</td>
+		</tr>
+		<tr>
+			<td colspan="3"><hr /></td>
 		</tr>
 		<tr>
 			<td colspan="3"><input type="submit" /></td>
