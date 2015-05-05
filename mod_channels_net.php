@@ -217,9 +217,12 @@ function makeNetworkFromIds($depth) {
 			$nodes[$chid] = $reply->items[0];
 			
 			if($depth == 0) {
-				$nodes[$chid]->isSeed = 1;
+				$nodes[$chid]->isSeed = "yes";
 				$nodes[$chid]->seedRank = ($i + 1);
-			} 
+			} else {
+				$nodes[$chid]->isSeed = "no";
+				$nodes[$chid]->seedRank = "";
+			}
 		}
 		
 		echo $i . " "; flush(); ob_flush();
@@ -281,7 +284,7 @@ function renderNetwork() {
 	
 	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,subscriberCount INT,videoCount INT,viewCount INT\n";
 	foreach($nodes as $nodeid => $nodedata) {
-		$nodegdf .= $nodeid . "," . preg_replace("/,/"," ",$nodedata->snippet->title) . "," . $nodedata->isSeed . "," . $nodedata->seedRank . "," . $nodedata->statistics->subscriberCount . "," . $nodedata->statistics->videoCount . "," . $nodedata->statistics->viewCount . "\n";
+		$nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata->snippet->title) . "," . $nodedata->isSeed . "," . $nodedata->seedRank . "," . $nodedata->statistics->subscriberCount . "," . $nodedata->statistics->videoCount . "," . $nodedata->statistics->viewCount . "\n";
 	}
 	
 	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR\n";
