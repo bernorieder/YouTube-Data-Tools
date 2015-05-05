@@ -29,10 +29,10 @@
 	<td colspan="2">
 		<h1>YouTube Data Tools</h1>
 		
-		<p>This is a collection of simple tools for extracting data from the YouTube platform via the <a href="https://developers.google.com/youtube/v3/" target="_blank">YouTube API v3.</a></p>
+		<p>This is a collection of simple tools for extracting data from the YouTube platform via the <a href="https://developers.google.com/youtube/v3/" target="_blank">YouTube API v3</a>.</p>
 		
 		<p>This is "as is" software, no support is provided. Source code is available on <a href="https://github.com/bernorieder/YouTube-Data-Tools" target="_blank">github</a>.
-		High quality bug reports are appreciated. If you have no experience with reporting bugs effectively, please read <a href="http://www.chiark.greenend.org.uk/~sgtatham/bugs.html" target="_blank">this piece</a> at least twice.
+		High quality bug reports are much appreciated. If you have no experience with reporting bugs effectively, please read <a href="http://www.chiark.greenend.org.uk/~sgtatham/bugs.html" target="_blank">this piece</a> at least twice.
 		Send bug reports to <a href="mailto:tools@polsys.net">tools@polsys.net</a> only.<p>
 		
 		<p>YTDT is written and maintained by <a href="http://rieder.polsys.net">Bernhard Rieder</a>, Associate Professor in <a href="http://mediastudies.nl" target="_blank">Media Studies</a> at the
