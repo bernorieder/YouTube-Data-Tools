@@ -229,9 +229,12 @@ function makeNetworkFromIds($depth) {
 			$nodes[$vid] = $row;
 			
 			if($depth == 0) {
-				$nodes[$vid]["isSeed"] = 1;
+				$nodes[$vid]["isSeed"] = "yes";
 				$nodes[$vid]["seedRank"] = ($i + 1);
-			} 
+			} else {
+				$nodes[$vid]["isSeed"] = "no";
+				$nodes[$vid]["seedRank"] = "";
+			}
 		}
 		
 		echo $i . " "; flush(); ob_flush();
@@ -324,7 +327,7 @@ function renderNetwork() {
 	
 	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,channelTitle VARCHAR,channelId VARCHAR,viewCount INT,likeCount INT,dislikeCount INT,favoriteCount INT,commentCount INT\n";
 	foreach($nodes as $nodeid => $nodedata) {
-		$nodegdf .= $nodeid . "," . preg_replace("/,|\"/"," ",$nodedata["videoTitle"]) . "," . $nodedata["isSeed"] . "," . $nodedata["seedRank"] . "," . preg_replace("/,|\"/"," ",$nodedata["channelTitle"]) . "," . $nodedata["channelId"] . "," . 
+		$nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata["videoTitle"]) . "," . $nodedata["isSeed"] . "," . $nodedata["seedRank"] . "," . preg_replace("/,|\"|\'/"," ",$nodedata["channelTitle"]) . "," . $nodedata["channelId"] . "," . 
 					$nodedata["viewCount"] . "," . $nodedata["likeCount"] . "," . $nodedata["dislikeCount"] . "," . $nodedata["favoriteCount"] . "," . $nodedata["commentCount"] . "," . "\n";
 	}
 	
