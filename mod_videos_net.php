@@ -39,7 +39,7 @@ require_once "common.php";
 				
 				<p>This module creates a network of relations between videos, starting from a search or a list of video ids.</p>
 				
-				<p>It retrieves "related videos" from the <a href="https://developers.google.com/youtube/v3/docs/search/list#relatedToVideoId">search/list#relatedToVideoId</a> API endpoint and creates a graph file in GDF format.</p>
+				<p>It retrieves "related videos" from the <a href="https://developers.google.com/youtube/v3/docs/search/list#relatedToVideoId" target="_blank">search/list#relatedToVideoId</a> API endpoint and creates a graph file in GDF format.</p>
 				
 				<p>Crawl depth specifies how far from the seeds the script should go. Crawl depth 0 will get only the relations between seeds. Using many seeds and the maximum crawl depth (2) can take a very long time or the script might run out of memory. Start small.</p>
 			</td>
@@ -87,7 +87,7 @@ require_once "common.php";
 			<td colspan="2">
 				<textarea name="seeds"><?php if($_POST["mode"] == "seeds") { echo $_POST["seeds"]; } ?></textarea>
 			</td>
-			<td>(channel ids, comma separated)</td>
+			<td>(video ids, comma separated)</td>
 		</tr>
 		<tr>
 			<td colspan="5"><hr /></td>
