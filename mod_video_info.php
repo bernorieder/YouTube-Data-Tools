@@ -165,8 +165,10 @@ function getInfo($videohash) {
 	$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet,status,topicDetails&id=".$videohash."&key=".$apikey;
 
 	$reply = doAPIRequest($restquery);
+	if(count($reply->items) == 0) {
+		echo "No results found. You are probably not using a valid video id"; exit;
+	}
 	$reply = $reply->items[0];
-	
 	$video = array();
 
 	$video["id"] = $reply->id;
