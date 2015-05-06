@@ -63,15 +63,18 @@
 		understanding of YouTube's basic architecture is required. The <a href="https://developers.google.com/youtube/v3/"  target="_blank">
 		documentation</a> for YouTube's API has comprehensive descriptions of entities and metrics.</p>
 		
-		<p>Almost all of the modules require a video or channel id as input. These can normally be found in the respective YouTube URLs. For example, in the URL https://www.youtube.com/watch?v=BNM4kEUEcp8 the strange code after the "=" sign is the video id.
-		For further information, there's a lot of great information available on these things through a simple Google query.</p>
-		
 		<p>If you would like to learn more about this kind of research, you may want to consider joining the Digital Methods Initiative's
 		<a href="https://wiki.digitalmethods.net/Dmi/DmiSummerSchool" target="_blank">summer</a> or
 		<a href="https://wiki.digitalmethods.net/Dmi/WinterSchool" target="_blank">winter</a> school, or even enrol in our M.A. program in
 		<a href="http://studiegids.uva.nl/xmlpages/page/2014-2015-en/search-programme/programme/741" target="_blank">New Media and Digital Culture</a> or our two-year
 		<a href="hhttp://studiegids.uva.nl/xmlpages/page/2014-2015-en/search-programme/programme/554" target="_blank">research MA</a>.
 		In these programs, we combine training in analytical techniques with critical conceptual interrogation about new media.</p>
+		
+		
+		<h2>What are channel or video ids and how can I find them?</h2>
+		
+		<p>Almost all of the modules require a video or channel id as input. These can normally be found in the respective YouTube URLs. For example, in the URL https://www.youtube.com/watch?v=BNM4kEUEcp8 the strange code after the "=" sign is the video id.
+		For further information, there's a lot of great information available on these things through a simple Google query.</p>
 		
 		
 		<h2>The tool does not work (correctly)!</h2>
