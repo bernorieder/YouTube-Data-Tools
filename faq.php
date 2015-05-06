@@ -74,7 +74,7 @@
 		In these programs, we combine training in analytical techniques with critical conceptual interrogation about new media.</p>
 		
 		
-		<h2>The tool does not work!</h2>
+		<h2>The tool does not work (correctly)!</h2>
 
 		<p>While this is very simple software, this can happen for various reasons.</p>
 
