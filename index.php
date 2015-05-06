@@ -20,6 +20,7 @@
 		<a href="mod_videos_list.php" class="navlink">Video List</a>
 		<a href="mod_videos_net.php" class="navlink">Video Network</a>
 		<a href="mod_video_info.php" class="navlink">Video Info</a>
+		<a href="faq.php" class="navlink">FAQ</a>
 	</td>
 </tr>
 <tr>
@@ -31,12 +32,9 @@
 		
 		<p>This is a collection of simple tools for extracting data from the YouTube platform via the <a href="https://developers.google.com/youtube/v3/" target="_blank">YouTube API v3</a>.</p>
 		
-		<p>This is "as is" software, no support is provided. Source code is available on <a href="https://github.com/bernorieder/YouTube-Data-Tools" target="_blank">github</a>.
-		High quality bug reports are much appreciated. If you have no experience with reporting bugs effectively, please read <a href="http://www.chiark.greenend.org.uk/~sgtatham/bugs.html" target="_blank">this piece</a> at least twice.
-		Send bug reports to <a href="mailto:tools@polsys.net">tools@polsys.net</a> only.<p>
+		<p>For some context and a small introduction, please check out this <a href="http://thepoliticsofsystems.net/2015/05/exploring-youtube/">blog post</a>.
 		
-		<p>YTDT is written and maintained by <a href="http://rieder.polsys.net">Bernhard Rieder</a>, Associate Professor in <a href="http://mediastudies.nl" target="_blank">Media Studies</a> at the
-		<a href="http://www.uva.nl">University of Amsterdam</a> and researcher at the <a href="https://www.digitalmethods.net" target="_blank">Digital Methods Initiative</a>.</p>
+		<p>Each of the modules has a basic description of how it works and there is a <a href="faq.php">FAQ</a> section with additional information.</p>
 	</td>
 </tr>
 <tr>
