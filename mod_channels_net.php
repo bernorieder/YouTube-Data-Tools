@@ -28,6 +28,7 @@ require_once "common.php";
 				<a href="mod_videos_list.php" class="navlink">Video List</a>
 				<a href="mod_videos_net.php" class="navlink">Video Network</a>
 				<a href="mod_video_info.php" class="navlink">Video Info</a>
+				<a href="faq.php" class="navlink">FAQ</a>
 			</td>
 		</tr>
 		<tr>
