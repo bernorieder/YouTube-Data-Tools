@@ -88,6 +88,12 @@
 		<p>Please send bug reports to <a href="mailto:tools@polsys.net">tools@polsys.net</a>. I do not react to reports sent through any other channel.</p>
 		
 		
+		<h2>I want to make crawls with higher crawl depth!</h2>
+		
+		<p>Since the public version of the script runs on a server that does a bunch of things, this is not possible. But you can always get the source code (see below) and remove the line of code that checks for crawl depth. You may still run out of RAM, but networks with > 100K nodes should
+		be easily doable.</p>
+		
+		
 		<h2>Can you add feature X to YTDT?</h2>
 		
 		<p>I cannot make any guarantees, but if you send a feature request to <a href="mailto:tools@polsys.net">tools@polsys.net</a>, I will definitely consider it.</p>
@@ -95,7 +101,7 @@
 		
 		<h2>Can I have the source code?</h2>
 		
-		<p>Yes, you can. The full source code is available on <a href="https://github.com/bernorieder/YouTube-Data-Tools" target="_blank">github</a>.</p>
+		<p>Yes, you can. The full source code is available on <a href="https://github.com/bernorieder/YouTube-Data-Tools" target="_blank">github</a>. You'll also find installation instructions there.</p>
 	</td>
 </tr>
 </table>
