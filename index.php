@@ -34,7 +34,7 @@
 		
 		<p>For some context and a small introduction, please check out this <a href="http://thepoliticsofsystems.net/2015/05/exploring-youtube/">blog post</a>.
 		
-		<p>Each of the modules has a basic description of how it works and there is a <a href="faq.php">FAQ</a> section with additional information.</p>
+		<p>Each of the modules has a basic description of how it works, there is a <a href="faq.php">FAQ</a> section with additional information, and an <a href="https://www.youtube.com/watch?v=sbErTW2MzCY" target="_blank">introductory video</a>.</p>
 	</td>
 </tr>
 <tr>
