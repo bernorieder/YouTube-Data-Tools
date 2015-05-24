@@ -78,6 +78,13 @@
 		For further information, there's a lot of great material available on these things through a simple Google query.</p>
 		
 		
+		
+		<h2>How can I cite YTDT?</h2>
+		
+		<p>There is currently no publication on YTDT. But the different citation standards provide guidelines for how to cite software, e.g. MLA:
+		Rieder, Bernhard. YouTube Data Tools. Computer software. Vers. 1.0. N.p., 5 May 2015. Web. &lt;https://tools.digitalmethods.net/netvizz/youtube/&gt;.</p>
+		
+		
 		<h2>The tool does not work (correctly)!</h2>
 
 		<p>While this is very simple software, this can happen for all kinds of reasons.</p>
