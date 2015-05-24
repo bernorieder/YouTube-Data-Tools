@@ -88,6 +88,17 @@
 		<p><a href="mod_video_info.php">launch</a></p>
 	</td>
 </tr>
+<tr>
+	<td colspan="2"><hr /></td>
+</tr>
+<tr>
+	<td colspan="2">
+		<h2>Version History</h2>
+		<p>
+			v1.0 - 04/05/2015 - Initial Resease
+		</p>
+	</td>
+</tr>
 </table>
 
 </body>
