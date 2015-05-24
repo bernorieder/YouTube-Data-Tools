@@ -321,6 +321,17 @@ function makeStatsFromIds($ids) {
 		
 		$vid = $reply->items[0];
 		
+		// convert YT duraction format to seconds
+		preg_match_all('/(\d+)/',$vid->contentDetails->duration,$parts);
+		$tmptime = array_reverse($parts[0]);
+		$smulti = 1;
+		$seconds = 0;
+		for($j = 0;  $j < count($tmptime); $j++) {
+			$seconds += $tmptime[$j] * $smulti;
+			$smulti = $smulti * 60; 
+		}
+		
+		
 		$row = array();
 		$row["channelId"] = $vid->snippet->channelId;
 		$row["channelTitle"] = $vid->snippet->channelTitle;
@@ -329,6 +340,7 @@ function makeStatsFromIds($ids) {
 		$row["videoTitle"] = preg_replace("/\s+/", " ",$vid->snippet->title);
 		$row["videoDescription"] = preg_replace("/\s+/", " ",$vid->snippet->description);
 		$row["duration"] = $vid->contentDetails->duration;
+		$row["durationSec"] = $seconds;
         $row["dimension"] = $vid->contentDetails->dimension;
         $row["definition"] = $vid->contentDetails->definition;
         $row["caption"] = $vid->contentDetails->caption;
