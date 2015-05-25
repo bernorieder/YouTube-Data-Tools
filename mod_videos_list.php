@@ -307,6 +307,7 @@ function makeStatsFromIds($ids) {
 	
 	$vids = array();
 	$lookup = array();
+	$categoryIds = array();
 	
 	echo "<br />Getting video details (".count($ids)."): ";
 	
@@ -321,6 +322,8 @@ function makeStatsFromIds($ids) {
 		
 		$vid = $reply->items[0];
 		
+		//print_r($vid); exit;
+		
 		// convert YT duraction format to seconds
 		preg_match_all('/(\d+)/',$vid->contentDetails->duration,$parts);
 		$tmptime = array_reverse($parts[0]);
@@ -331,6 +334,9 @@ function makeStatsFromIds($ids) {
 			$smulti = $smulti * 60; 
 		}
 		
+		// collect categories
+		if(!in_array($vid->snippet->categoryId,$categoryIds)) { $categoryIds[] = $vid->snippet->categoryId; }
+		
 		
 		$row = array();
 		$row["channelId"] = $vid->snippet->channelId;
@@ -339,6 +345,8 @@ function makeStatsFromIds($ids) {
 		$row["publishedAt"] = $vid->snippet->publishedAt;
 		$row["videoTitle"] = preg_replace("/\s+/", " ",$vid->snippet->title);
 		$row["videoDescription"] = preg_replace("/\s+/", " ",$vid->snippet->description);
+		$row["videoCategoryId"] = $vid->snippet->categoryId;
+		$row["videoCategoryLabel"] = "";
 		$row["duration"] = $vid->contentDetails->duration;
 		$row["durationSec"] = $seconds;
         $row["dimension"] = $vid->contentDetails->dimension;
@@ -357,7 +365,24 @@ function makeStatsFromIds($ids) {
 		
 		echo $i . " "; flush(); ob_flush();
 	}
+	
+	
+	// get category labels and assign to videos
+	$restquery = "https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&id=".urlencode(implode(",", $categoryIds))."&key=".$apikey;
 
+	$reply = doAPIRequest($restquery);
+
+	$categoryTrans = array();
+	foreach($reply->items as $cat) {
+		$categoryTrans[$cat->id] = $cat->snippet->title;
+	}
+	
+	for($i = 0; $i < count($vids); $i++) {
+		$vids[$i]["videoCategoryLabel"] = $categoryTrans[$vids[$i]["videoCategoryId"]];
+	}
+	
+	
+	// create TSV file
 	$content_tsv = implode("\t", array_keys($vids[0])) . "\n";
 	
 	for($i = 0; $i < count($vids); $i++) {
