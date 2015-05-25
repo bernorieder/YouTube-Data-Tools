@@ -196,6 +196,7 @@ function makeNetworkFromIds($depth) {
 	echo "<br /><br />getting details for ".count($ids)." videos at depth ".$depth.": ";
 	
 	$newids = array();
+	$categoryIds = array();
 	
 	for($i = 0; $i < count($ids); $i++) {
 		
@@ -209,13 +210,18 @@ function makeNetworkFromIds($depth) {
 			
 			$video = $reply->items[0];
 			
+			// collect categories
+			if(!in_array($video->snippet->categoryId,$categoryIds)) { $categoryIds[] = $video->snippet->categoryId; }
+			
 			$row = array();
 			$row["channelId"] = $video->snippet->channelId;
 			$row["channelTitle"] = preg_replace("/\s+/", " ",$video->snippet->channelTitle);
 			$row["videoId"] = $video->id;
-			$row["publishedAt"] = $video->snippet->publishedAt;
+			$row["publishedAt"] = strtotime($video->snippet->publishedAt);
 			$row["videoTitle"] = preg_replace("/\s+/", " ",$video->snippet->title);
 			$row["videoDescription"] = preg_replace("/\s+/", " ",$video->snippet->description);
+			$row["videoCategoryId"] = $video->snippet->categoryId;
+			$row["videoCategoryLabel"] = "";
 			$row["duration"] = $video->contentDetails->duration;
 	        $row["dimension"] = $video->contentDetails->dimension;
 	        $row["definition"] = $video->contentDetails->definition;
@@ -240,7 +246,22 @@ function makeNetworkFromIds($depth) {
 		
 		echo $i . " "; flush(); ob_flush();
 	}
-		//print_r($nodes); exit;
+
+
+	// get category labels and assign to videos
+	$restquery = "https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&id=".urlencode(implode(",", $categoryIds))."&key=".$apikey;
+
+	$reply = doAPIRequest($restquery);
+
+	$categoryTrans = array();
+	foreach($reply->items as $cat) {
+		$categoryTrans[$cat->id] = $cat->snippet->title;
+	}
+		
+	foreach ($nodes as $key => $node) {
+		$nodes[$key]["videoCategoryLabel"] = $categoryTrans[$node["videoCategoryId"]];
+	}
+
 		
 	echo "<br />getting related videos for ".count($ids)." videos at depth ".$depth.": ";
 	
@@ -326,10 +347,10 @@ function renderNetwork() {
 	
 	//print_r($nodes); exit;
 	
-	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,channelTitle VARCHAR,channelId VARCHAR,viewCount INT,likeCount INT,dislikeCount INT,favoriteCount INT,commentCount INT\n";
+	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,publishedAt INT,channelTitle VARCHAR,channelId VARCHAR,videoCategoryLabel VARCHAR,viewCount INT,likeCount INT,dislikeCount INT,favoriteCount INT,commentCount INT\n";
 	foreach($nodes as $nodeid => $nodedata) {
-		$nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata["videoTitle"]) . "," . $nodedata["isSeed"] . "," . $nodedata["seedRank"] . "," . preg_replace("/,|\"|\'/"," ",$nodedata["channelTitle"]) . "," . $nodedata["channelId"] . "," . 
-					$nodedata["viewCount"] . "," . $nodedata["likeCount"] . "," . $nodedata["dislikeCount"] . "," . $nodedata["favoriteCount"] . "," . $nodedata["commentCount"] . "," . "\n";
+		$nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata["videoTitle"]) . "," . $nodedata["isSeed"] . "," . $nodedata["seedRank"] . "," . $nodedata["publishedAt"] . "," . preg_replace("/,|\"|\'/"," ",$nodedata["channelTitle"]) . "," . $nodedata["channelId"] . "," . 
+					 preg_replace("/,|\"|\'/"," ",$nodedata["videoCategoryLabel"]) . "," .$nodedata["viewCount"] . "," . $nodedata["likeCount"] . "," . $nodedata["dislikeCount"] . "," . $nodedata["favoriteCount"] . "," . $nodedata["commentCount"] . "," . "\n";
 	}
 	
 	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR\n";
