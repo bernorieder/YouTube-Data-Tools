@@ -94,9 +94,10 @@
 <tr>
 	<td colspan="2">
 		<h2>Version History</h2>
-		<p>
-			v1.0 - 04/05/2015 - Initial Resease
-		</p>
+		<ul>
+			<li>v1.01 - 26/05/2015 - Bug fix for video network, video category added to several modules</li>
+			<li>v1.0 - 04/05/2015 - Initial Resease</li>
+		</ul>
 	</td>
 </tr>
 </table>
