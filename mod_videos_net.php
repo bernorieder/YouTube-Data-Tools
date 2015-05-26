@@ -110,6 +110,10 @@ require_once "common.php";
 <p>
 <?php
 
+// allow for direct URL parameters and command line for cron
+if(isset($argv)) { parse_str(implode('&', array_slice($argv, 1)), $_GET); }
+if(isset($_GET["mode"])) { $_POST = $_GET; }
+
 if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 
 	$mode = $_POST["mode"];
@@ -271,6 +275,7 @@ function makeNetworkFromIds($depth) {
 		
 		// get related videos
 		$run = true;
+		$nextpagetoken = null;
 		
 		while($run == true) {
 	
@@ -281,8 +286,7 @@ function makeNetworkFromIds($depth) {
 			}
 			
 			$reply = doAPIRequest($restquery);
-	
-					
+								
 			foreach($reply->items as $item) {
 				
 				$featid = $item->id->videoId;
@@ -290,13 +294,13 @@ function makeNetworkFromIds($depth) {
 				if(!isset($nodes[$featid])) {
 					
 					if(!in_array($featid, $newids)) {
-						
+
 						$newids[] = $featid;
-						
-						if($depth < $crawldepth) {
-							$edgeid = $vid . "_|_|X|_|_" . $featid;
-							$edges[$edgeid] = true;
-						}
+					}
+					
+					if($depth < $crawldepth) {
+						$edgeid = $vid . "_|_|X|_|_" . $featid;
+						$edges[$edgeid] = true;
 					}
 					
 				} else {
@@ -363,6 +367,7 @@ function renderNetwork() {
 	
 	$gdf = $nodegdf . $edgegdf;
 	$filename = "videonet_" . $mode . $no_seeds . "_nodes" . count($nodes) . "_" . date("Y_m_d-H_i_s");
+	if(isset($_POST["filename"])) { $filename = $_POST["filename"] . "_" . $filename; }
 
 	file_put_contents("./data/".$filename.".gdf", $gdf);
 	
