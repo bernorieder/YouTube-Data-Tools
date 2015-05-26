@@ -201,7 +201,7 @@ function makeNetworkFromIds($depth) {
 		
 		try {
 			
-			$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails,invideoPromotion&id=".$chid."&key=".$apikey;
+			//$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails,invideoPromotion&id=".$chid."&key=".$apikey;
 			$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,id,snippet,statistics&id=".$chid."&key=".$apikey;
 	
 			$reply = doAPIRequest($restquery);
@@ -243,11 +243,11 @@ function makeNetworkFromIds($depth) {
 					if(!in_array($featid, $newids)) {
 						
 						$newids[] = $featid;
-						
-						if($depth < $crawldepth) {
-							$edgeid = $nodeid . "_|_|X|_|_" . $featid;
-							$edges[$edgeid] = true;
-						}
+					}
+					
+					if($depth < $crawldepth) {
+						$edgeid = $nodeid . "_|_|X|_|_" . $featid;
+						$edges[$edgeid] = true;
 					}
 					
 				} else {
