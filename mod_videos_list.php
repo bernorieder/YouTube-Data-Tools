@@ -121,7 +121,13 @@ require_once "common.php";
 
 <?php
 
-if(isset($_POST["channel"]) || isset($_POST["seeds"])) {
+// allow for direct URL parameters and command line for cron
+if(isset($argv)) { parse_str(implode('&', array_slice($argv, 1)), $_GET); }
+if(isset($_GET["mode"])) { $_POST = $_GET; }
+
+//print_r($_POST); exit;
+
+if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"])) {
 
 	$mode = $_POST["mode"];
 
@@ -390,6 +396,7 @@ function makeStatsFromIds($ids) {
 	}
 
 	$filename = "videolist_" . $mode . count($vids) . "_" . date("Y_m_d-H_i_s");
+	if(isset($_POST["filename"])) { $filename = $_POST["filename"] . "_" . $filename; }
 
 	file_put_contents("./data/".$filename.".tab", $content_tsv);
 	
