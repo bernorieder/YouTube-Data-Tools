@@ -53,7 +53,7 @@
 <tr>
 	<td><h2>Channel Network</h2></td>
 	<td>
-		<p>This module crawls a network of channels connected via the "featured channels" tab from a list of seeds. Seeds can be channels retrieved from a search or via manual input of channel ids.</p>
+		<p>This module crawls a network of channels connected via the "featured channels" (and via subscriptions) tab from a list of seeds. Seeds can be channels retrieved from a search or via manual input of channel ids.</p>
 		<p><a href="mod_channels_net.php">launch</a></p>
 	</td>
 </tr>
@@ -95,6 +95,7 @@
 	<td colspan="2">
 		<h2>Version History</h2>
 		<ul>
+			<li>v1.02 - 05/06/2015 - Added subscriptions to channel network</li>
 			<li>v1.01 - 26/05/2015 - Bug fix for video network, video category added to several modules</li>
 			<li>v1.0 - 04/05/2015 - Initial Resease</li>
 		</ul>
