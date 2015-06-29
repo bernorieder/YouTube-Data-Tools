@@ -38,7 +38,7 @@ require_once "common.php";
 			<td colspan="5">			
 				<h1>YTDT Channel Network</h1>
 
-				<p>This module crawls a network of channels connected via the "featured channels" tab from a list of seeds. Seeds can be channels retrieved from a search or via manual input of channel ids.</p>
+				<p>This module crawls a network of channels connected via the "featured channels" (and via subscriptions) tab from a list of seeds. Seeds can be channels retrieved from a search or via manual input of channel ids.</p>
 				
 				<p>Crawl depth specifies how far from the seeds the script should go. Crawl depth 0 will get only the relations between seeds. Using many seeds and the maximum crawl depth (2) can take a very long time or the script might run out of memory. Start small.</p>
 			</td>
@@ -92,7 +92,15 @@ require_once "common.php";
 			<td colspan="5"><hr /></td>
 		</tr>
 		<tr>
-			<td colspan="2">2) set crawl depth:</td>
+			<td colspan="2">2) add subscriptions:</td>
+			<td><input type="checkbox" name="subscriptions" <?php if($_POST["subscriptions"] == "on") { echo "checked"; } ?> /></td>
+			<td colspan="2">(use both featured channels and channel subscriptions for linking)</td>
+		</tr>
+		<tr>
+			<td colspan="5"><hr /></td>
+		</tr>
+		<tr>
+			<td colspan="2">3) set crawl depth:</td>
 			<td><input type="text" name="crawldepth" max="2" value="<?php echo (isset($_POST["crawldepth"])) ? $_POST["crawldepth"]:1; ?>" /></td>
 			<td colspan="2">(values are 0, 1 or 2)</td>
 		</tr>
@@ -112,6 +120,7 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 
 	$mode = $_POST["mode"];
 	$crawldepth = $_POST["crawldepth"];
+	$subscriptions = $_POST["subscriptions"];
 	$nodes = array();
 	$edges = array();
 	
@@ -189,7 +198,7 @@ function getIdsFromSearch($query,$iterations,$rankby) {
 	
 function makeNetworkFromIds($depth) {
 	
-	global $apikey,$nodes,$edges,$ids,$crawldepth;
+	global $apikey,$nodes,$edges,$ids,$crawldepth,$subscriptions;
 	
 	echo "<br /><br />getting details for ".count($ids)." channels at depth ".$depth.": ";
 	
@@ -198,24 +207,18 @@ function makeNetworkFromIds($depth) {
 	for($i = 0; $i < count($ids); $i++) {
 		
 		$chid = $ids[$i];
+			
+		//$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails,invideoPromotion&id=".$chid."&key=".$apikey;
+		$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,id,snippet,statistics&id=".$chid."&key=".$apikey;
+	
+		$reply = doAPIRequest($restquery);
 		
-		try {
-			
-			//$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails,invideoPromotion&id=".$chid."&key=".$apikey;
-			$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,id,snippet,statistics&id=".$chid."&key=".$apikey;
-	
-			$reply = doAPIRequest($restquery);
-	
-		} catch(Exception $e) {
-			
-			print_r($e);
-			$i--;
-			continue;
-		}
+		//print_r($reply);
 
 		if(isset($reply->items[0])) {
 			
 			$nodes[$chid] = $reply->items[0];
+			$nodes[$chid]->done = false;
 			
 			if($depth == 0) {
 				$nodes[$chid]->isSeed = "yes";
@@ -230,7 +233,12 @@ function makeNetworkFromIds($depth) {
 	}
 
 
-	//print_r(array_keys($nodes));
+	//print_r($nodes);
+
+	if($subscriptions == "on") {
+		echo "<br />getting subscriptions for ".count($ids)." channels at depth ".$depth.": ";
+		$counter = 0;
+	}
 	
 	foreach($nodes as $nodeid => $nodedata) {
 
@@ -257,6 +265,73 @@ function makeNetworkFromIds($depth) {
 				}
 			}	
 		}
+		
+		
+		
+		if($subscriptions == "on" && $nodedata->done == false) {
+	
+			$run = true;
+			$nextpagetoken = null;
+			
+			echo $counter . " "; flush(); ob_flush();
+			$counter++;
+			
+			while($run == true) {
+		
+				$restquery = "https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&channelId=".$nodedata->id."&maxResults=50&key=".$apikey;
+				
+				if($nextpagetoken != null) {
+					$restquery .= "&pageToken=".$nextpagetoken;
+				}
+				
+				$reply = doAPIRequest($restquery);
+				
+				
+				
+				//print_r($reply); exit;
+									
+				foreach($reply->items as $item) {
+					
+					$featid = $item->snippet->resourceId->channelId;
+					
+					//print_r($item);
+										
+					if(!isset($nodes[$featid])) {
+						
+						if(!in_array($featid, $newids)) {
+							
+							$newids[] = $featid;
+						}
+						
+						if($depth < $crawldepth) {
+							$edgeid = $nodeid . "_|_|X|_|_" . $featid;
+							$edges[$edgeid] = true;
+						}
+						
+					} else {
+		
+						$edgeid = $nodeid . "_|_|X|_|_" . $featid;
+						$edges[$edgeid] = true;
+					}
+
+				}
+			
+				
+				if(isset($reply->nextPageToken) && $reply->nextPageToken != "") {
+					
+					$nextpagetoken = $reply->nextPageToken;
+						
+				} else {
+					
+					$run = false;
+				}
+			}
+			
+			$nodes[$nodeid]->done = true;
+		}
+		
+		//print_r($newids);
+		
 	}
 	
 	
@@ -281,7 +356,6 @@ function renderNetwork() {
 	
 	global $nodes,$edges,$lookup,$no_seeds,$mode;
 	
-	//print_r($nodes); exit;
 	
 	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,subscriberCount INT,videoCount INT,viewCount INT\n";
 	foreach($nodes as $nodeid => $nodedata) {
