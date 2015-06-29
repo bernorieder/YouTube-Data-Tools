@@ -86,6 +86,83 @@ function getInfo() {
 	echo '<pre>';
 	print_r($reply->items[0]);
 	echo '</pre>';
+	
+	
+		
+		/*
+		foreach(array_keys($nodecomments[0]) as $key) {
+			echo '<td class="resulttableHi"><b>'.$key.'</b></td>';
+		}		
+		echo '</tr>';
+		foreach($nodecomments as $comment) {
+			$style = ($comment["isReply"] == 0) ? "resulttable":"resulttableHi";
+
+			echo '<tr class="resulttable">';
+			foreach($comment as $element) {
+				echo '<td class="'.$style.'">'.$element.'</td>';
+			}	
+			echo '</tr>';
+		}
+		*/
+
+
+	echo '<table class="resulttable">';
+	foreach($reply->items[0] as $key => $var) {
+		echo '<tr class="resulttable">';
+		echo '<td class="resulttableHi"><b>'.$key.'</b></td>';
+		if(gettype($var) != "object" && gettype($var2) != "array") { 
+			echo '<td class="resulttable">'.$var.'</td>';
+		} else {
+			
+			echo '<td class="resulttable">';
+			echo '<table style="display:inline">';
+			foreach($var as $key2 => $var2) {
+				echo '<tr>';
+				echo '<td><b>'.$key2.'</b></td>';
+				if(gettype($var2) != "object" && gettype($var2) != "array") {
+					echo '<td>'.$var2.'</td>';
+				} else {
+					
+					echo '<td class="resulttable">';
+					echo '<table style="display:inline">';
+					foreach($var2 as $key3 => $var3) {
+						echo '<tr>';
+						echo '<td><b>'.$key3.'</b></td>';
+						if(gettype($var3) != "object" && gettype($var3) != "array") {
+							echo '<td>'.$var3.'</td>';
+						} else {
+							
+							echo '<td class="resulttable">';
+							echo '<table style="display:inline">';
+							foreach($var3 as $key4 => $var4) {
+								echo '<tr>';
+								echo '<td><b>'.$key4.'</b></td>';
+								if(gettype($var4) != "object" && gettype($var) != "array") {
+									echo '<td>'.$var4.'</td>';
+								} else {
+									echo '<td>'.$var4.'</td>';	
+								}
+								echo '</tr>';
+							}
+							echo '</table>';
+							echo '</td>';
+
+						}
+						echo '</tr>';
+					}
+					echo '</table>';
+					echo '</td>';
+					
+				}
+				echo '</tr>';
+			}
+			echo '</table>';
+			echo '</td>';
+			
+		}
+		echo '</tr>';
+	}
+	echo '</table>';
 }
 
 ?>
