@@ -81,8 +81,8 @@ require_once "common.php";
 		<tr>
 			<td></td>
 			<td>Iterations:</td>
-			<td><input type="text" name="iterations" max="20" value="<?php echo (isset($_POST["iterations"])) ? $_POST["iterations"]:1; ?>" /></td>
-			<td>(max. 20, one iteration gets 50 items)</td>
+			<td><input type="text" name="iterations" max="10" value="<?php echo (isset($_POST["iterations"])) ? $_POST["iterations"]:1; ?>" /></td>
+			<td>(max. 10, one iteration gets 50 items)</td>
 			<td></td>
 		</tr>
 		<tr>
@@ -156,7 +156,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 			exit;
 		}
 		
-		if($_POST["iterations"] > 20 || preg_match("/\D/", $_POST["iterations"])) {
+		if($_POST["iterations"] > 10 || preg_match("/\D/", $_POST["iterations"])) {
 			echo "Wrong iteration parameter.";
 			exit;
 		}
@@ -389,10 +389,10 @@ function makeStatsFromIds($ids) {
 	
 	
 	// create TSV file
-	$content_tsv = implode("\t", array_keys($vids[0])) . "\n";
+	$content_tsv = "position\t".implode("\t", array_keys($vids[0])) . "\n";
 	
 	for($i = 0; $i < count($vids); $i++) {
-		$content_tsv .= implode("\t",$vids[$i]) . "\n";
+		$content_tsv .=  ($i + 1) . "\t". implode("\t",$vids[$i]) . "\n";
 	}
 
 	$filename = "videolist_" . $mode . count($vids) . "_" . date("Y_m_d-H_i_s");
