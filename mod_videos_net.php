@@ -61,8 +61,8 @@ require_once "common.php";
 		<tr>
 			<td></td>
 			<td>Iterations:</td>
-			<td><input type="text" name="iterations" max="20" value="<?php echo (isset($_POST["iterations"])) ? $_POST["iterations"]:1; ?>" /></td>
-			<td>(max. 20, one iteration gets 50 items)</td>
+			<td><input type="text" name="iterations" max="10" value="<?php echo (isset($_POST["iterations"])) ? $_POST["iterations"]:1; ?>" /></td>
+			<td>(max. 10, one iteration gets 50 items)</td>
 			<td></td>
 		</tr>
 		<tr>
@@ -130,6 +130,11 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		
 		if($_POST["query"] == "") {
 			echo "Missing query.";
+			exit;
+		}
+		
+		if($_POST["iterations"] > 10 || preg_match("/\D/", $_POST["iterations"])) {
+			echo "Wrong iteration parameter.";
 			exit;
 		}
 		
