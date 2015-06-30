@@ -83,28 +83,13 @@ function getInfo() {
 	
 	$reply = doAPIRequest($restquery);
 
+	/*
 	echo '<pre>';
 	print_r($reply->items[0]);
 	echo '</pre>';
+	*/
 	
-	
-		
-		/*
-		foreach(array_keys($nodecomments[0]) as $key) {
-			echo '<td class="resulttableHi"><b>'.$key.'</b></td>';
-		}		
-		echo '</tr>';
-		foreach($nodecomments as $comment) {
-			$style = ($comment["isReply"] == 0) ? "resulttable":"resulttableHi";
-
-			echo '<tr class="resulttable">';
-			foreach($comment as $element) {
-				echo '<td class="'.$style.'">'.$element.'</td>';
-			}	
-			echo '</tr>';
-		}
-		*/
-
+	echo "<hr /><br />";
 
 	echo '<table class="resulttable">';
 	foreach($reply->items[0] as $key => $var) {
