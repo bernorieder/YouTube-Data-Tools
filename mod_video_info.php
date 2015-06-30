@@ -420,7 +420,7 @@ function makeNetwork($nodecomments) {
 	foreach($edges as $edgeid => $edgedata) {
 		$tmp = explode("_|_|X|_|_",$edgeid);
 		
-		$edgegdf .= $tmp[0] . "," . $tmp[1] . "," . $edgedata . "\n";
+		$edgegdf .= preg_replace("/,/", " ", $tmp[0]) . "," . preg_replace("/,/", " ", $tmp[1]) . "," . $edgedata . "\n";
 	}
 	
 	$gdf = $nodegdf . $edgegdf;
