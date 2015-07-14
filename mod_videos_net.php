@@ -376,7 +376,7 @@ function renderNetwork() {
 
 	file_put_contents("./data/".$filename.".gdf", $gdf);
 	
-	echo '<br /><br />The script has created a net with  '.count($nodes).' channels from '.$no_seeds.' seeds.<br /><br />
+	echo '<br /><br />The script has created a net with  '.count($nodes).' videos from '.$no_seeds.' seeds.<br /><br />
 
 	your files:<br />
 	<a href="./data/'.$filename.'.gdf">'.$filename.'.gdf</a><br />';
