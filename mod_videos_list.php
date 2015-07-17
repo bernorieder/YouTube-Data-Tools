@@ -56,7 +56,7 @@ require_once "common.php";
 			<td><input type="radio" name="mode" value="channel" <?php if($_POST["mode"] != "seeds" && $_POST["mode"] != "search") { echo "checked"; } ?> /></td>
 			<td>channel id:</td>
 			<td><input type="text" name="channel" value="<?php if(isset($_POST["channel"])) { echo $_POST["channel"]; }; ?>" /></td>
-			<td colspan="2">(channel ids can be found in URLs, e.g. https://www.youtube.com/channel/UCiDJtJKMICpb9B1qf7qjEOA)</td>
+			<td colspan="2">(channel ids can be found in URLs, e.g. https://www.youtube.com/channel/<b>UCiDJtJKMICpb9B1qf7qjEOA</b>)</td>
 		</tr>
 		<tr>
 			<td colspan="5"><hr /></td>
@@ -65,7 +65,7 @@ require_once "common.php";
 			<td><input type="radio" name="mode" value="playlist" <?php if($_POST["mode"] == "playlist") { echo "checked"; } ?> /></td>
 			<td>playlist id:</td>
 			<td><input type="text" name="playlist" value="<?php if(isset($_POST["playlist"])) { echo $_POST["playlist"]; }; ?>" /></td>
-			<td colspan="2">(playlist ids can be found in URLs, e.g. https://www.youtube.com/playlist?list=PLJtitKU0CAehMmiSI9oCIv3WCJrZqMWZ0)</td>
+			<td colspan="2">(playlist ids can be found in URLs, e.g. https://www.youtube.com/playlist?list=<b>PLJtitKU0CAehMmiSI9oCIv3WCJrZqMWZ0</b>)</td>
 		</tr>
 		
 		<tr>
