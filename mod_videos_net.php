@@ -216,12 +216,14 @@ function makeNetworkFromIds($depth) {
 		$reply = doAPIRequest($restquery);
 
 		if(isset($reply->items[0])) {
-			
+
 			$video = $reply->items[0];
-			
+
 			// collect categories
-			if(!in_array($video->snippet->categoryId,$categoryIds)) { $categoryIds[] = $video->snippet->categoryId; }
-			
+			if(!in_array($video->snippet->categoryId,$categoryIds)) {
+				$categoryIds[] = $video->snippet->categoryId;
+			}
+
 			$row = array();
 			$row["channelId"] = $video->snippet->channelId;
 			$row["channelTitle"] = preg_replace("/\s+/", " ",$video->snippet->channelTitle);
@@ -232,18 +234,18 @@ function makeNetworkFromIds($depth) {
 			$row["videoCategoryId"] = $video->snippet->categoryId;
 			$row["videoCategoryLabel"] = "";
 			$row["duration"] = $video->contentDetails->duration;
-	        $row["dimension"] = $video->contentDetails->dimension;
-	        $row["definition"] = $video->contentDetails->definition;
-	        $row["caption"] = $video->contentDetails->caption;
-	        $row["licensedContent"] = $video->contentDetails->licensedContent;
-	        $row["viewCount"] = $video->statistics->viewCount;
-	        $row["likeCount"] = $video->statistics->likeCount;
-	        $row["dislikeCount"] = $video->statistics->dislikeCount;
-	        $row["favoriteCount"] = $video->statistics->favoriteCount;
-	        $row["commentCount"] = $video->statistics->commentCount;
-			
+			$row["dimension"] = $video->contentDetails->dimension;
+			$row["definition"] = $video->contentDetails->definition;
+			$row["caption"] = $video->contentDetails->caption;
+			$row["licensedContent"] = $video->contentDetails->licensedContent;
+			$row["viewCount"] = $video->statistics->viewCount;
+			$row["likeCount"] = $video->statistics->likeCount;
+			$row["dislikeCount"] = $video->statistics->dislikeCount;
+			$row["favoriteCount"] = $video->statistics->favoriteCount;
+			$row["commentCount"] = $video->statistics->commentCount;
+
 			$nodes[$vid] = $row;
-			
+
 			if($depth == 0) {
 				$nodes[$vid]["isSeed"] = "yes";
 				$nodes[$vid]["seedRank"] = ($i + 1);
@@ -252,7 +254,7 @@ function makeNetworkFromIds($depth) {
 				$nodes[$vid]["seedRank"] = "";
 			}
 		}
-		
+
 		echo $i . " "; flush(); ob_flush();
 	}
 
@@ -376,11 +378,10 @@ function renderNetwork() {
 
 	file_put_contents("./data/".$filename.".gdf", $gdf);
 	
-	echo '<br /><br />The script has created a net with  '.count($nodes).' channels from '.$no_seeds.' seeds.<br /><br />
+	echo '<br /><br />The script has created a net with  '.count($nodes).' videos from '.$no_seeds.' seeds.<br /><br />
 
 	your files:<br />
 	<a href="./data/'.$filename.'.gdf">'.$filename.'.gdf</a><br />';
-
 }
 
 ?>
