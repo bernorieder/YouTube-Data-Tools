@@ -61,7 +61,7 @@ require_once "common.php";
 		<tr>
 			<td>video id:</td>
 			<td><input type="text" name="videohash" value="<?php if(isset($_GET["videohash"])) { echo $_GET["videohash"]; } ?>" /></td>
-			<td>(video ids can be found in URLs, e.g. https://www.youtube.com/watch?v=aXnaHh40xnM)</td>
+			<td>(video ids can be found in URLs, e.g. https://www.youtube.com/watch?v=<b>aXnaHh40xnM</b>)</td>
 		</tr>
 		<tr>
 			<td>HTML output:</td>
