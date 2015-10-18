@@ -60,7 +60,7 @@ require_once "common.php";
 			<td></td>
 			<td>Iterations:</td>
 			<td><input type="text" name="iterations" max="20" value="<?php echo (isset($_POST["iterations"])) ? $_POST["iterations"]:1; ?>" /></td>
-			<td>(max. 10, one iteration gets 50 items)</td>
+			<td>(max. 20, one iteration gets 50 items)</td>
 			<td></td>
 		</tr>
 		<tr>
@@ -136,7 +136,7 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 			exit;
 		}
 		
-		if($_POST["iterations"] > 10 || preg_match("/\D/", $_POST["iterations"])) {
+		if($_POST["iterations"] > 20 || preg_match("/\D/", $_POST["iterations"])) {
 			echo "Wrong iteration count.";
 			exit;
 		}
@@ -194,6 +194,11 @@ function getIdsFromSearch($query,$iterations,$rankby) {
 		
 		foreach($reply->items as $item) {
 			$ids[] = $item->id->channelId;
+		}
+		
+		if($nextpagetoken == null && $i > 0) {
+			echo "<br /><br />maximum search results reached at " . count($ids) . " channels";
+			return $ids;
 		}
 	}
 	
