@@ -416,11 +416,11 @@ function makeNetwork($nodecomments) {
 		$nodegdf .= $nodeid . "," . $nodeid  . "," . $nodedata . "\n";
 	}
 	
-	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR,weight INT\n";
+	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR,weight INT,directed BOOLEAN\n";
 	foreach($edges as $edgeid => $edgedata) {
 		$tmp = explode("_|_|X|_|_",$edgeid);
 		
-		$edgegdf .= preg_replace("/,/", " ", $tmp[0]) . "," . preg_replace("/,/", " ", $tmp[1]) . "," . $edgedata . "\n";
+		$edgegdf .= preg_replace("/,/", " ", $tmp[0]) . "," . preg_replace("/,/", " ", $tmp[1]) . "," . $edgedata . ",true\n";
 	}
 	
 	$gdf = $nodegdf . $edgegdf;
