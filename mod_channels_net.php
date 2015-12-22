@@ -365,18 +365,21 @@ function makeNetworkFromIds($depth) {
 function renderNetwork() {
 	
 	global $nodes,$edges,$lookup,$no_seeds,$mode;
+
 	
-	
-	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,subscriberCount INT,videoCount INT,viewCount INT\n";
+	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,subscriberCount INT,videoCount INT,viewCount(100s) INT\n";
 	foreach($nodes as $nodeid => $nodedata) {
+		
+		$nodedata->statistics->viewCount = round($nodedata->statistics->viewCount / 100);
+		
 		$nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata->snippet->title) . "," . $nodedata->isSeed . "," . $nodedata->seedRank . "," . $nodedata->statistics->subscriberCount . "," . $nodedata->statistics->videoCount . "," . $nodedata->statistics->viewCount . "\n";
 	}
 	
-	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR\n";
+	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR,directed BOOLEAN\n";
 	foreach($edges as $edgeid => $edgedata) {
 		$tmp = explode("_|_|X|_|_",$edgeid);
 		if(isset($nodes[$tmp[0]]) && isset($nodes[$tmp[1]])) {
-			$edgegdf .= $tmp[0] . "," . $tmp[1] . "\n";
+			$edgegdf .= $tmp[0] . "," . $tmp[1] . ",true\n";
 		}
 	}
 	
