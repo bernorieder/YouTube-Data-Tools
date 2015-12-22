@@ -363,11 +363,11 @@ function renderNetwork() {
 					 preg_replace("/,|\"|\'/"," ",$nodedata["videoCategoryLabel"]) . "," .$nodedata["viewCount"] . "," . $nodedata["likeCount"] . "," . $nodedata["dislikeCount"] . "," . $nodedata["favoriteCount"] . "," . $nodedata["commentCount"] . "," . "\n";
 	}
 	
-	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR\n";
+	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR,directed BOOLEAN\n";
 	foreach($edges as $edgeid => $edgedata) {
 		$tmp = explode("_|_|X|_|_",$edgeid);
 		if(isset($nodes[$tmp[0]]) && isset($nodes[$tmp[1]])) {
-			$edgegdf .= $tmp[0] . "," . $tmp[1] . "\n";
+			$edgegdf .= $tmp[0] . "," . $tmp[1] . ",true\n";
 		}
 	}
 	
