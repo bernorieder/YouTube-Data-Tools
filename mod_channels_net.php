@@ -41,6 +41,8 @@ require_once "common.php";
 				<p>This module crawls a network of channels connected via the "featured channels" (and via subscriptions) tab from a list of seeds. Seeds can be channels retrieved from a search or via manual input of channel ids.</p>
 				
 				<p>Crawl depth specifies how far from the seeds the script should go. Crawl depth 0 will get only the relations between seeds. Using many seeds and the maximum crawl depth (2) can take a very long time or the script might run out of memory. Start small.</p>
+				
+				<p>NB: since graph analysis software can have difficulties with very large numbers, channel's viewcount is given in 100s</p>
 			</td>
 		</tr>
 		<tr>
