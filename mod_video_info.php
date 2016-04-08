@@ -38,7 +38,8 @@ require_once "common.php";
 			<td colspan="3">			
 				<h1>YTDT Video Info and Comments</h1>
 
-				<p>This module starts from a video id and retrieves basic info for the video in question and provides a number of analyses of the comment section.</p>
+				<p>This module starts from a video id and retrieves basic info for the video in question and provides a number of analyses of the comment section.
+				Comments are retrieved via the <a href="https://developers.google.com/youtube/v3/docs/commentThreads/list" target="_blank">commentThreads#list</a> API endpoint.</p>
 				
 				<p>The number of comments the script is able to retrieve can vary wildly. In some cases, only a relatively small percentage is made available, while in others well over
 				100.000 comments have been successfully retrieved. This seems to be mainly related to the age of the video in question.</p>
