@@ -240,6 +240,7 @@ function makeNetworkFromIds($depth) {
 			$row["viewCount"] = $video->statistics->viewCount;
 			$row["likeCount"] = $video->statistics->likeCount;
 			$row["dislikeCount"] = $video->statistics->dislikeCount;
+			$row["dislikeLikeRatio"] = $video->statistics->dislikeCount / $video->statistics->likeCount;
 			$row["favoriteCount"] = $video->statistics->favoriteCount;
 			$row["commentCount"] = $video->statistics->commentCount;
 
@@ -357,10 +358,10 @@ function renderNetwork() {
 	
 	//print_r($nodes); exit;
 	
-	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,publishedAt INT,channelTitle VARCHAR,channelId VARCHAR,videoCategoryLabel VARCHAR,viewCount INT,likeCount INT,dislikeCount INT,favoriteCount INT,commentCount INT\n";
+	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,publishedAt INT,channelTitle VARCHAR,channelId VARCHAR,videoCategoryLabel VARCHAR,viewCount INT,likeCount INT,dislikeCount INT,dislikeLikeRatio FLOAT,favoriteCount INT,commentCount INT\n";
 	foreach($nodes as $nodeid => $nodedata) {
 		$nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata["videoTitle"]) . "," . $nodedata["isSeed"] . "," . $nodedata["seedRank"] . "," . $nodedata["publishedAt"] . "," . preg_replace("/,|\"|\'/"," ",$nodedata["channelTitle"]) . "," . $nodedata["channelId"] . "," . 
-					 preg_replace("/,|\"|\'/"," ",$nodedata["videoCategoryLabel"]) . "," .$nodedata["viewCount"] . "," . $nodedata["likeCount"] . "," . $nodedata["dislikeCount"] . "," . $nodedata["favoriteCount"] . "," . $nodedata["commentCount"] . "," . "\n";
+					 preg_replace("/,|\"|\'/"," ",$nodedata["videoCategoryLabel"]) . "," .$nodedata["viewCount"] . "," . $nodedata["likeCount"] . "," . $nodedata["dislikeCount"] . "," . $nodedata["dislikeLikeRatio"] . "," . $nodedata["favoriteCount"] . "," . $nodedata["commentCount"] . "," . "\n";
 	}
 	
 	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR,directed BOOLEAN\n";
