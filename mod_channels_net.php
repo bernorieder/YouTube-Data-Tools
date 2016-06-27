@@ -394,7 +394,7 @@ function renderNetwork() {
 	echo '<br /><br />The script has created a net with  '.count($nodes).' channels from '.$no_seeds.' seeds.<br /><br />
 
 	your files:<br />
-	<a href="./data/'.$filename.'.gdf">'.$filename.'.gdf</a><br />';
+	<a href="./data/'.$filename.'.gdf" download>'.$filename.'.gdf</a><br />';
 
 }
 
