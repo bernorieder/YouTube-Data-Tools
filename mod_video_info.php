@@ -99,10 +99,10 @@ if(isset($_GET["videohash"])) {
 	makeNetwork($nodecomments);
 	
 	echo '<br /><br />The following files have been generated:<br />';
-	echo '<a href="./data/'.$filename.'_basicinfo.tab">'.$filename.'_basicinfo.tab</a><br />';
-	echo '<a href="./data/'.$filename.'_comments.tab">'.$filename.'_comments.tab</a><br />';
-	echo '<a href="./data/'.$filename.'_authors.tab">'.$filename.'_authors.tab</a><br />';
-	echo '<a href="./data/'.$filename.'_commentnetwork.gdf">'.$filename.'_commentnetwork.gdf</a><br />';
+	echo '<a href="./data/'.$filename.'_basicinfo.tab" download>'.$filename.'_basicinfo.tab</a><br />';
+	echo '<a href="./data/'.$filename.'_comments.tab" download>'.$filename.'_comments.tab</a><br />';
+	echo '<a href="./data/'.$filename.'_authors.tab" download>'.$filename.'_authors.tab</a><br />';
+	echo '<a href="./data/'.$filename.'_commentnetwork.gdf" download>'.$filename.'_commentnetwork.gdf</a><br />';
 	echo '<br />';
 	
 
@@ -287,7 +287,7 @@ function getComments($videohash) {
 		
 			while($run == true) {
 				
-				$restquery = "https://www.googleapis.com/youtube/v3/comments?part=snippet&maxResults=100&parentId=".$tmp["id"]."&key=".$apikey;
+				$restquery = "https://www.googleapis.com/youtube/v3/comments?part=snippet&textFormat=plainText&maxResults=100&parentId=".$tmp["id"]."&key=".$apikey;
 				
 				if($nextpagetoken != null) {
 					$restquery .= "&pageToken=".$nextpagetoken;
@@ -295,6 +295,7 @@ function getComments($videohash) {
 				
 				$reply = doAPIRequest($restquery);
 				
+				//print_r($reply);
 			
 				foreach($reply->items as $item) {
 					$replies[] = $item;
