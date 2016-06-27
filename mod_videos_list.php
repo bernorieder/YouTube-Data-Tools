@@ -75,8 +75,7 @@ require_once "common.php";
 			<td><input type="radio" name="mode" value="search" <?php if($_POST["mode"] == "search") { echo "checked"; } ?> /></td>
 			<td>search query:</td>
 			<td><input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; }; ?>" /></td>
-			<td>(this is passed to the search endpoint)</td>
-			<td></td>
+			<td colspan="2">(this is passed to the search endpoint) - optional <a href="http://www.loc.gov/standards/iso639-2/php/code_list.php" target="_blank">ISO 639-1</a> relevance language: <input type="text" name="language" style="width:20px;" value="<?php if(isset($_POST["language"])) { echo $_POST["language"]; }; ?>" /></td>
 		</tr>
 		<tr>
 			<td></td>
@@ -121,8 +120,13 @@ require_once "common.php";
 
 <?php
 
+$folder = $datafolder;
+
 // allow for direct URL parameters and command line for cron
-if(isset($argv)) { parse_str(implode('&', array_slice($argv, 1)), $_GET); }
+if(isset($argv)) {
+	parse_str(implode('&', array_slice($argv, 1)), $_GET);
+	$folder = $cronfolder;
+}
 if(isset($_GET["mode"])) { $_POST = $_GET; }
 
 //print_r($_POST); exit;
@@ -161,11 +165,12 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 			exit;
 		}
 		
+		$language = $_POST["language"];
 		$query = $_POST["query"];
 		$iterations = $_POST["iterations"];
 		$rankby = $_POST["rankby"];
 		
-		$ids = getIdsFromSearch($query,$iterations,$rankby);
+		$ids = getIdsFromSearch($query,$iterations,$rankby,$language);
 
 		makeStatsFromIds($ids);
 		
@@ -278,7 +283,7 @@ function getIdsFromPlaylist($uplistid) {
 
 
 
-function getIdsFromSearch($query,$iterations,$rankby) {
+function getIdsFromSearch($query,$iterations,$rankby,$language) {
 
 	global $apikey;
 	
@@ -288,6 +293,10 @@ function getIdsFromSearch($query,$iterations,$rankby) {
 	for($i = 0; $i < $iterations; $i++) {
 		
 		$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=". urlencode($query)."&type=video&order=".$rankby."&key=".$apikey;
+		
+		if($language != "") { $restquery .= "&relevanceLanguage=" . $language; }
+		
+		//echo $restquery;
 		
 		if($nextpagetoken != null) {
 			$restquery .= "&pageToken=".$nextpagetoken;
@@ -309,7 +318,7 @@ function getIdsFromSearch($query,$iterations,$rankby) {
 	
 function makeStatsFromIds($ids) {
 	
-	global $apikey,$mode;
+	global $apikey,$mode,$folder;
 	
 	$vids = array();
 	$lookup = array();
@@ -398,12 +407,12 @@ function makeStatsFromIds($ids) {
 	$filename = "videolist_" . $mode . count($vids) . "_" . date("Y_m_d-H_i_s");
 	if(isset($_POST["filename"])) { $filename = $_POST["filename"] . "_" . $filename; }
 
-	file_put_contents("./data/".$filename.".tab", $content_tsv);
+	file_put_contents($folder.$filename.".tab", $content_tsv);
 	
 	echo '<br /><br />The script has created a file with  '.count($vids).' rows.<br /><br />
 
 	your files:<br />
-	<a href="./data/'.$filename.'.tab">'.$filename.'.tab</a><br />';
+	<a href="'.$folder.$filename.'.tab" download>'.$filename.'.tab</a><br />';
 
 }
 
