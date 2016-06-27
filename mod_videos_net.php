@@ -109,8 +109,13 @@ require_once "common.php";
 <p>
 <?php
 
+$folder = $datafolder;
+
 // allow for direct URL parameters and command line for cron
-if(isset($argv)) { parse_str(implode('&', array_slice($argv, 1)), $_GET); }
+if(isset($argv)) {
+	parse_str(implode('&', array_slice($argv, 1)), $_GET);
+	$folder = $cronfolder;
+}
 if(isset($_GET["mode"])) { $_POST = $_GET; }
 
 if(isset($_POST["query"]) || isset($_POST["seeds"])) {
@@ -354,7 +359,7 @@ function makeNetworkFromIds($depth) {
 
 function renderNetwork() {
 	
-	global $nodes,$edges,$lookup,$no_seeds,$mode;
+	global $nodes,$edges,$lookup,$no_seeds,$mode,$folder;
 	
 	//print_r($nodes); exit;
 	
@@ -376,12 +381,12 @@ function renderNetwork() {
 	$filename = "videonet_" . $mode . $no_seeds . "_nodes" . count($nodes) . "_" . date("Y_m_d-H_i_s");
 	if(isset($_POST["filename"])) { $filename = $_POST["filename"] . "_" . $filename; }
 
-	file_put_contents("./data/".$filename.".gdf", $gdf);
+	file_put_contents($folder.$filename.".gdf", $gdf);
 	
 	echo '<br /><br />The script has created a net with  '.count($nodes).' videos from '.$no_seeds.' seeds.<br /><br />
 
 	your files:<br />
-	<a href="./data/'.$filename.'.gdf">'.$filename.'.gdf</a><br />';
+	<a href="'.$folder.$filename.'.gdf" download>'.$filename.'.gdf</a><br />';
 }
 
 ?>
