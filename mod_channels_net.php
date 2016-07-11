@@ -246,7 +246,6 @@ function makeNetworkFromIds($depth) {
 	}
 
 
-	//print_r($nodes);
 
 	if($subscriptions == "on") {
 		echo "<br />getting subscriptions for ".count($ids)." channels at depth ".$depth.": ";
