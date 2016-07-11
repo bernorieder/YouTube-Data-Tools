@@ -358,6 +358,7 @@ function makeStatsFromIds($ids) {
 		$row["channelTitle"] = $vid->snippet->channelTitle;
 		$row["videoId"] = $vid->id;
 		$row["publishedAt"] = $vid->snippet->publishedAt;
+		$row["publishedAtSQL"] = date("Y-m-d H:i:s", strtotime($vid->snippet->publishedAt));
 		$row["videoTitle"] = preg_replace("/\s+/", " ",$vid->snippet->title);
 		$row["videoDescription"] = preg_replace("/\s+/", " ",$vid->snippet->description);
 		$row["videoCategoryId"] = $vid->snippet->categoryId;
