@@ -95,7 +95,8 @@
 	<td colspan="2">
 		<h2>Version History</h2>
 		<ul>
-			<li>v1.04 - 01/02/2015 - Added like/dislike ratio to videonet</li>
+			<li>v1.05 - 01/02/2017 - Added date limited search to video list module</li>
+			<li>v1.04 - 01/02/2015 - Added like/dislike ratio to video network module output</li>
 			<li>v1.03 - 18/10/2015 - Small bugfix</li>
 			<li>v1.02 - 05/06/2015 - Added subscriptions to channel network</li>
 			<li>v1.01 - 26/05/2015 - Bug fix for video network, video category added to several modules</li>
