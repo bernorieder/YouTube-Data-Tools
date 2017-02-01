@@ -41,10 +41,10 @@ require_once "common.php";
 				<p>This module creates a list of video infos and statistics from one of four sources: the videos uploaded to a specified channel, a playlist, the 
 				videos retrieved by a particular search query, or the videos specified by a list of ids.</p>
 
-				<p>The script then creates a tabular file where each row is a video and a number of infos and variables are added for each video.</p>
+				<p>The script then creates a tabular file where each row is a video. A number of infos and variables are added for each video.</p>
 				
 				<p>Check the documentation for the <a href="https://developers.google.com/youtube/v3/docs/videos/list" target="_blank">video/list</a> (used to
-				get the info for each vide) and the
+				get the info for each video) and the
 				<a href="https://developers.google.com/youtube/v3/docs/search/list" target="_blank">search/list</a> (used for the search function) API endpoint for
 				additional information.</p>
 			</td>
