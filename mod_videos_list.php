@@ -79,11 +79,33 @@ require_once "common.php";
 		</tr>
 		<tr>
 			<td></td>
-			<td>Iterations:</td>
+			<td>iterations:</td>
 			<td><input type="text" name="iterations" max="10" value="<?php echo (isset($_POST["iterations"])) ? $_POST["iterations"]:1; ?>" /></td>
 			<td>(max. 10, one iteration gets 50 items)</td>
 			<td></td>
 		</tr>
+		<tr>
+			<td></td>
+			<td>published:</td>
+				<td colspan="3">
+					<input type="checkbox" name="timeframe" <?php if(isset($_POST["timeframe"])) { echo "checked"; } ?> /> limit search to videos published in a specific timeframe:<br />
+				</td>
+			</td>
+			<td></td>
+		</tr>
+		
+		<tr>
+			<td></td>
+			<td></td>
+				<td colspan="3">
+					after: <input type="text" name="date_after" value="<?php echo (isset($_POST["date_after"])) ? $_POST["date_after"]:"1970-01-01T00:00:00Z"; ?>" />&nbsp;&nbsp;&nbsp;
+					before: <input type="text" name="date_before" value="<?php echo (isset($_POST["date_before"])) ? $_POST["date_before"]:"1970-01-01T00:00:00Z"; ?>" /> (format: yyyy-mm-ddThh:mm:ssZ)
+				</td>
+			</td>
+			<td></td>
+		</tr>
+		
+
 		<tr>
 			<td></td>
 			<td>rank by:</td>
@@ -160,7 +182,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 			exit;
 		}
 		
-		if($_POST["iterations"] > 10 || preg_match("/\D/", $_POST["iterations"])) {
+		if($_POST["iterations"] > 50 || preg_match("/\D/", $_POST["iterations"])) {
 			echo "Wrong iteration parameter.";
 			exit;
 		}
@@ -168,9 +190,14 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		$language = $_POST["language"];
 		$query = $_POST["query"];
 		$iterations = $_POST["iterations"];
+		$date_before = $date_after = false;
+		if(isset($_POST["timeframe"])) {
+			$date_before = $_POST["date_before"];
+			$date_after = $_POST["date_after"];
+		}
 		$rankby = $_POST["rankby"];
 		
-		$ids = getIdsFromSearch($query,$iterations,$rankby,$language);
+		$ids = getIdsFromSearch($query,$iterations,$rankby,$language,$date_before,$date_after);
 
 		makeStatsFromIds($ids);
 		
@@ -283,7 +310,7 @@ function getIdsFromPlaylist($uplistid) {
 
 
 
-function getIdsFromSearch($query,$iterations,$rankby,$language) {
+function getIdsFromSearch($query,$iterations,$rankby,$language,$date_before,$date_after) {
 
 	global $apikey;
 	
@@ -293,6 +320,9 @@ function getIdsFromSearch($query,$iterations,$rankby,$language) {
 	for($i = 0; $i < $iterations; $i++) {
 		
 		$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=". urlencode($query)."&type=video&order=".$rankby."&key=".$apikey;
+		if($date_before != false) {
+			$restquery .= "&publishedAfter=".$date_after."&publishedBefore=".$date_before;
+		}
 		
 		if($language != "") { $restquery .= "&relevanceLanguage=" . $language; }
 		
