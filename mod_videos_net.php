@@ -245,7 +245,7 @@ function makeNetworkFromIds($depth) {
 			$row["viewCount"] = $video->statistics->viewCount;
 			$row["likeCount"] = $video->statistics->likeCount;
 			$row["dislikeCount"] = $video->statistics->dislikeCount;
-			$row["dislikeLikeRatio"] = $video->statistics->dislikeCount / $video->statistics->likeCount;
+			$row["dislikeLikeRatio"] = ($video->statistics->likeCount > 0) ? $video->statistics->dislikeCount / $video->statistics->likeCount:0;
 			$row["favoriteCount"] = $video->statistics->favoriteCount;
 			$row["commentCount"] = $video->statistics->commentCount;
 
