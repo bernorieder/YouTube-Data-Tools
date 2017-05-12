@@ -339,7 +339,11 @@ function makeNetworkFromIds($depth) {
 						
 						$run = false;
 					}
+<<<<<<< HEAD
 	
+=======
+				
+>>>>>>> d5e5bacf427f76e7971294b0dda623c221eea519
 				} else {
 					
 					$run = false;
