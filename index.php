@@ -95,6 +95,7 @@
 	<td colspan="2">
 		<h2>Version History</h2>
 		<ul>
+			<li>v1.04 - 12/05/2017 - Added country and "channel age" to channel network module</li>
 			<li>v1.05 - 01/02/2017 - Added date limited search to video list module</li>
 			<li>v1.04 - 01/02/2015 - Added like/dislike ratio to video network module output</li>
 			<li>v1.03 - 18/10/2015 - Small bugfix</li>
