@@ -226,7 +226,7 @@ function makeNetworkFromIds($depth) {
 	
 		$reply = doAPIRequest($restquery);
 		
-		print_r($reply);
+		//print_r($reply);
 
 		if(isset($reply->items[0])) {
 			
@@ -339,11 +339,7 @@ function makeNetworkFromIds($depth) {
 						
 						$run = false;
 					}
-<<<<<<< HEAD
-	
-=======
-				
->>>>>>> d5e5bacf427f76e7971294b0dda623c221eea519
+
 				} else {
 					
 					$run = false;
@@ -380,12 +376,14 @@ function renderNetwork() {
 	global $nodes,$edges,$lookup,$no_seeds,$mode;
 
 	
-	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,subscriberCount INT,videoCount INT,viewCount(100s) INT\n";
+	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,subscriberCount INT,videoCount INT,viewCount(100s) INT,country VARCHAR,publishedAt VARCHAR,daysactive INT\n";
 	foreach($nodes as $nodeid => $nodedata) {
 		
 		$nodedata->statistics->viewCount = round($nodedata->statistics->viewCount / 100);
+		$nodedata->snippet->country = (isset($nodedata->snippet->country)) ? $nodedata->snippet->country:"not set";
+		$daysactive = round((time() - strtotime($nodedata->snippet->publishedAt)) / (60 * 60 * 24));
 		
-		$nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata->snippet->title) . "," . $nodedata->isSeed . "," . $nodedata->seedRank . "," . $nodedata->statistics->subscriberCount . "," . $nodedata->statistics->videoCount . "," . $nodedata->statistics->viewCount . "\n";
+		$nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata->snippet->title) . "," . $nodedata->isSeed . "," . $nodedata->seedRank . "," . $nodedata->statistics->subscriberCount . "," . $nodedata->statistics->videoCount . "," . $nodedata->statistics->viewCount . "," . $nodedata->snippet->country . "," . $nodedata->snippet->publishedAt . "," . $daysactive .  "\n";
 	}
 	
 	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR,directed BOOLEAN\n";
