@@ -226,7 +226,7 @@ function makeNetworkFromIds($depth) {
 	
 		$reply = doAPIRequest($restquery);
 		
-		//print_r($reply);
+		print_r($reply);
 
 		if(isset($reply->items[0])) {
 			
@@ -301,38 +301,45 @@ function makeNetworkFromIds($depth) {
 				
 				
 				//print_r($reply); exit;
+				
+				if(count($reply->items) > 0) {
 									
-				foreach($reply->items as $item) {
-					
-					$featid = $item->snippet->resourceId->channelId;
-					
-					//print_r($item);
-										
-					if(!isset($nodes[$featid])) {
+					foreach($reply->items as $item) {
 						
-						if(!in_array($featid, $newids)) {
+						$featid = $item->snippet->resourceId->channelId;
+						
+						//print_r($item);
+											
+						if(!isset($nodes[$featid])) {
 							
-							$newids[] = $featid;
-						}
-						
-						if($depth < $crawldepth) {
+							if(!in_array($featid, $newids)) {
+								
+								$newids[] = $featid;
+							}
+							
+							if($depth < $crawldepth) {
+								$edgeid = $nodeid . "_|_|X|_|_" . $featid;
+								$edges[$edgeid] = true;
+							}
+							
+						} else {
+			
 							$edgeid = $nodeid . "_|_|X|_|_" . $featid;
 							$edges[$edgeid] = true;
 						}
-						
-					} else {
-		
-						$edgeid = $nodeid . "_|_|X|_|_" . $featid;
-						$edges[$edgeid] = true;
+	
 					}
-
-				}
-			
 				
-				if(isset($reply->nextPageToken) && $reply->nextPageToken != "") {
 					
-					$nextpagetoken = $reply->nextPageToken;
+					if(isset($reply->nextPageToken) && $reply->nextPageToken != "") {
 						
+						$nextpagetoken = $reply->nextPageToken;
+							
+					} else {
+						
+						$run = false;
+					}
+	
 				} else {
 					
 					$run = false;
