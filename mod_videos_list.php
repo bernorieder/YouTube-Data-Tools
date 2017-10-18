@@ -72,10 +72,13 @@ require_once "common.php";
 			<td colspan="5"><hr /></td>
 		</tr>
 		<tr>
-			<td><input type="radio" name="mode" value="search" <?php if($_POST["mode"] == "search") { echo "checked"; } ?> /></td>
-			<td>search query:</td>
-			<td><input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; }; ?>" /></td>
-			<td colspan="2">(this is passed to the search endpoint) - optional <a href="http://www.loc.gov/standards/iso639-2/php/code_list.php" target="_blank">ISO 639-1</a> relevance language: <input type="text" name="language" style="width:20px;" value="<?php if(isset($_POST["language"])) { echo $_POST["language"]; }; ?>" /></td>
+			<td valign="top"><input type="radio" name="mode" value="search" <?php if($_POST["mode"] == "search") { echo "checked"; } ?> /></td>
+			<td valign="top">search query:</td>
+			<td valign="top"><input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; }; ?>" /></td>
+			<td colspan="2">(this is passed to the search endpoint)
+				<br />optional <a href="http://www.loc.gov/standards/iso639-2/php/code_list.php" target="_blank">ISO 639-1</a> relevance language: <input type="text" name="language" style="width:20px;" value="<?php if(isset($_POST["language"])) { echo $_POST["language"]; }; ?>" />
+				<br />optional <a href="https://www.iso.org/obp/ui/#search" target="_blank">ISO 3166-1 alpha-2</a> region code: <input type="text" name="regioncode" style="width:20px;" value="<?php if(isset($_POST["regioncode"])) { echo $_POST["regioncode"]; }; ?>" />
+			</td>
 		</tr>
 		<tr>
 			<td></td>
@@ -188,6 +191,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		}
 		
 		$language = $_POST["language"];
+		$regioncode = $_POST["regioncode"];
 		$query = $_POST["query"];
 		$iterations = $_POST["iterations"];
 		$date_before = $date_after = false;
@@ -197,7 +201,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		}
 		$rankby = $_POST["rankby"];
 		
-		$ids = getIdsFromSearch($query,$iterations,$rankby,$language,$date_before,$date_after);
+		$ids = getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after);
 
 		makeStatsFromIds($ids);
 		
@@ -310,7 +314,7 @@ function getIdsFromPlaylist($uplistid) {
 
 
 
-function getIdsFromSearch($query,$iterations,$rankby,$language,$date_before,$date_after) {
+function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after) {
 
 	global $apikey;
 	
@@ -325,6 +329,7 @@ function getIdsFromSearch($query,$iterations,$rankby,$language,$date_before,$dat
 		}
 		
 		if($language != "") { $restquery .= "&relevanceLanguage=" . $language; }
+		if($regioncode != "") { $restquery .= "&regionCode=" . $regioncode; }
 		
 		//echo $restquery;
 		
