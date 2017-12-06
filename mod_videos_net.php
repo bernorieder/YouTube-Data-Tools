@@ -42,7 +42,7 @@ require_once "common.php";
 				
 				<p>It retrieves "related videos" from the <a href="https://developers.google.com/youtube/v3/docs/search/list#relatedToVideoId" target="_blank">search/list#relatedToVideoId</a> API endpoint and creates a graph file in GDF format.</p>
 				
-				<p>Crawl depth specifies how far from the seeds the script should go. Crawl depth 0 will get only the relations between seeds. Using many seeds and the maximum crawl depth (2) can take a very long time or the script might run out of memory. Start small.</p>
+				<p>Crawl depth specifies how far from the seeds the script should go. Crawl depth 0 will get only the relations between seeds. Using many seeds and the maximum crawl depth (2) can take a very long time or the script will very probably run out of memory. Start small.</p>
 			</td>
 		</tr>
 		<tr>
@@ -243,11 +243,11 @@ function makeNetworkFromIds($depth) {
 			$row["caption"] = $video->contentDetails->caption;
 			$row["licensedContent"] = $video->contentDetails->licensedContent;
 			$row["viewCount"] = $video->statistics->viewCount;
-			$row["likeCount"] = $video->statistics->likeCount;
-			$row["dislikeCount"] = $video->statistics->dislikeCount;
-			$row["dislikeLikeRatio"] = ($video->statistics->likeCount > 0) ? $video->statistics->dislikeCount / $video->statistics->likeCount:0;
+			$row["dislikeLikeRatio"] = (isset($video->statistics->likeCount) && isset($video->statistics->dislikeCount) && $video->statistics->likeCount > 0) ? $video->statistics->dislikeCount / $video->statistics->likeCount:"";
+			$row["likeCount"] = (isset($video->statistics->likeCount)) ? $video->statistics->likeCount:"";
+			$row["dislikeCount"] = (isset($video->statistics->dislikeCount)) ? $video->statistics->dislikeCount:"";
 			$row["favoriteCount"] = $video->statistics->favoriteCount;
-			$row["commentCount"] = $video->statistics->commentCount;
+			$row["commentCount"] = (isset($video->statistics->commentCount)) ? $video->statistics->commentCount:"";
 
 			$nodes[$vid] = $row;
 
