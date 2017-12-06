@@ -95,6 +95,7 @@
 	<td colspan="2">
 		<h2>Version History</h2>
 		<ul>
+			<li>v1.08 - 06/12/2017 - Channel info module can now make queries for several channels at a time</li>
 			<li>v1.07 - 19/10/2017 - Added region code parameter to video list</li>
 			<li>v1.06 - 12/05/2017 - Added country and "channel age" to channel network module</li>
 			<li>v1.05 - 01/02/2017 - Added date limited search to video list module</li>
