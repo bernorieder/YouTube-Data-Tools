@@ -41,6 +41,7 @@ require_once "common.php";
 				<p>This module retrieves different kinds of information for a channel from the <a href="https://developers.google.com/youtube/v3/docs/channels/list" target="_blank">channels/list</a> API endpoint
 				from a specified channel id. The following resources are requested: brandingSettings, status, id, snippet, contentDetails, contentOwnerDetails, statistics, topicDetails, invideoPromotion.</p>
 				<p>Output is a direct print of the API response.</p>
+				<p>You can use comma-separated hashes to retrieve information for more than one channel as a list (tab file).</p>
 			</td>
 		</tr>
 		<tr>
@@ -67,12 +68,70 @@ if(isset($_GET["hash"])) {
 
 	$hash = $_GET["hash"];
 	
-	getInfo();
+	if(preg_match("/,/", $hash)) {
+		getInfos($hash);
+	} else {
+		getInfo($hash);
+	}
 }
 
-function getInfo() {
 
-	global $hash,$apikey;
+function getInfos($hash) {
+	
+	global $apikey,$datafolder;
+	
+	$hashes = explode(",",$hash);
+	
+	$channels = array();
+	
+	foreach($hashes as $hash) {
+		
+		
+		
+		$restquery = "https://www.googleapis.com/youtube/v3/channels?part=id,snippet,statistics&id=".$hash."&key=".$apikey;
+		
+		$reply = doAPIRequest($restquery);
+		
+		//print_r($reply);
+		
+		$channel = array();
+		$channel["id"] = $reply->items[0]->id;
+		$channel["title"] = $reply->items[0]->snippet->title;
+		$channel["description"] = $reply->items[0]->snippet->description;
+		$channel["publishedAt"] = $reply->items[0]->snippet->publishedAt;
+		$channel["defaultLanguage"] = $reply->items[0]->snippet->defaultLanguage;
+		$channel["country"] = $reply->items[0]->snippet->country;
+		$channel["viewCount"] = $reply->items[0]->statistics->viewCount;
+		$channel["subscriberCount"] = $reply->items[0]->statistics->subscriberCount;
+		$channel["videoCount"] = $reply->items[0]->statistics->videoCount;
+		
+		$channels[] = $channel;
+		
+	}
+	
+	$filename = "channellist_channels" . count($hashes) . "_" . date("Y_m_d-H_i_s") . ".tab";
+	$fp = fopen($datafolder.$filename, 'w');
+	
+	
+	fputcsv($fp,array_keys($channel),"\t");
+	
+	foreach($channels as $channel) {
+		fputcsv($fp,$channel,"\t");
+	}
+	
+	
+	
+	echo '<br /><br />The script has retrieved information for '.count($hashes).' channels.<br /><br />
+
+	your file:<br />
+	<a href="'.$datafolder.$filename.'" download>'.$filename."</a><br />";
+
+}
+
+
+function getInfo($hash) {
+
+	global $apikey;
 
 	$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails,invideoPromotion&id=".$hash."&key=".$apikey;
 	
