@@ -19,4 +19,6 @@ require_once "common.php";
 </head>
 
 <body>
+
+<div id="fullpage">
 	
