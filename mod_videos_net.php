@@ -1,110 +1,94 @@
-<?php
+<?php include("html_head.php"); ?>
 
-require_once "config.php";
-require_once "common.php";
+	<div class="rowTab">
+		<div class="sectionTab">
+			<h1>Video Network Module</h1>
+		</div>
+	</div>
 
-?>
+	<div class="rowTab">
+		<div class="fullTab">
+			<p>This module creates a network of relations between videos, starting from a search or a list of video ids.</p>
+			
+			<p>It retrieves "related videos" from the <a href="https://developers.google.com/youtube/v3/docs/search/list#relatedToVideoId" target="_blank">search/list#relatedToVideoId</a> API endpoint and creates a graph file in GDF format.</p>
+			
+			<p>Crawl depth specifies how far from the seeds the script should go. Crawl depth 0 will get only the relations between seeds. Using many seeds and the maximum crawl depth (2) can take a very long time or the script will very probably run out of memory. Start small.</p>
+		</div>
+	</div>
 
-<!doctype html>
-
-<html lang="en">
-<head>
-	<meta charset="utf-8">
+	<div class="rowTab">
+		<div class="sectionTab"><h1>Parameters</h1></div>
+	</div>
 	
-	<title>YouTube Data Tools</title>
-	
-	<link rel="stylesheet" type="text/css" href="main.css" />
-</head>
-
-<body>
-
-<table>
 	<form action="mod_videos_net.php" method="post">
-		<tr>
-			<td colspan="5">
-				<a href="index.php" class="navlink">Home</a>
-				<a href="mod_channel_info.php" class="navlink">Channel Info</a>
-				<a href="mod_channels_net.php" class="navlink">Channel Network</a>
-				<a href="mod_videos_list.php" class="navlink">Video List</a>
-				<a href="mod_videos_net.php" class="navlink">Video Network</a>
-				<a href="mod_video_info.php" class="navlink">Video Info</a>
-				<a href="faq.php" class="navlink">FAQ</a>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="5"></td>
-		</tr>
-		<tr>
-			<td colspan="5">			
-				<h1>YTDT Video Network</h1>
-				
-				<p>This module creates a network of relations between videos, starting from a search or a list of video ids.</p>
-				
-				<p>It retrieves "related videos" from the <a href="https://developers.google.com/youtube/v3/docs/search/list#relatedToVideoId" target="_blank">search/list#relatedToVideoId</a> API endpoint and creates a graph file in GDF format.</p>
-				
-				<p>Crawl depth specifies how far from the seeds the script should go. Crawl depth 0 will get only the relations between seeds. Using many seeds and the maximum crawl depth (2) can take a very long time or the script will very probably run out of memory. Start small.</p>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td colspan="5">1) choose a starting point:</td>
-		</tr>
-		<tr>
-			<td><input type="radio" name="mode" value="search" <?php if($_POST["mode"] != "seeds") { echo "checked"; } ?> /></td>
-			<td>search query:</td>
-			<td><input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; } ?>" /></td>
-			<td>(this is passed to the search endpoint)</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>Iterations:</td>
-			<td><input type="text" name="iterations" max="10" value="<?php echo (isset($_POST["iterations"])) ? $_POST["iterations"]:1; ?>" /></td>
-			<td>(max. 10, one iteration gets 50 items)</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>rank by:</td>
-			<td colspan="3">
-				<select name="rankby">
+	
+	<div class="rowTab">
+		<div class="sectionTab"><h2>1) choose a starting point:</h2></div>
+	</div>
+
+	<div class="rowTab">
+		<div class="oneTab"><input type="radio" name="mode" value="search" <?php if($_POST["mode"] != "seeds") { echo "checked"; } ?> /></div>
+		<div class="twoTab">Search query:</div>
+		<div class="threeTab">
+			<input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; } ?>" />
+		</div>
+		<div class="fourTab">(this is passed to the search endpoint)</div>
+	</div>
+
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">Iterations:</div>
+		<div class="threeTab">
+			<input type="text" name="iterations" max="10" value="<?php echo (isset($_POST["iterations"])) ? $_POST["iterations"]:1; ?>" />
+		</div>
+		<div class="fourTab">(max. 10, one iteration gets 50 items)</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">Rank by:</div>
+		<div class="fourTab">
+			<select name="rankby">
 					<option value="relevance" <?php if($_POST["rankby"] == "relevance") { echo "selected"; } ?>>relevance - Resources are sorted based on their relevance to the search query</option>
 					<option value="date" <?php if($_POST["rankby"] == "date") { echo "selected"; } ?>>date – Resources are sorted in reverse chronological order based on the date they were created</option>
 					<option value="rating" <?php if($_POST["rankby"] == "rating") { echo "selected"; } ?>>rating – Resources are sorted from highest to lowest rating</option>
 					<option value="title" <?php if($_POST["rankby"] == "title") { echo "selected"; } ?>>title – Resources are sorted alphabetically by title</option>
 					<option value="viewCount" <?php if($_POST["rankby"] == "viewCount") { echo "selected"; } ?>>viewCount - Resources are sorted from highest to lowest number of views</option>
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td><input type="radio" name="mode" value="seeds" <?php if($_POST["mode"] == "seeds") { echo "checked"; } ?> /></td>
-			<td>seeds:</td>
-			<td colspan="2">
-				<textarea name="seeds"><?php if($_POST["mode"] == "seeds") { echo $_POST["seeds"]; } ?></textarea>
-			</td>
-			<td>(video ids, comma separated)</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td colspan="2">2) set crawl depth:</td>
-			<td><input type="text" name="crawldepth" max="2" value="<?php echo (isset($_POST["crawldepth"])) ? $_POST["crawldepth"]:1; ?>" /></td>
-			<td colspan="2">(values are 0, 1 or 2)</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td colspan="5"><input type="submit" /></td>
-		</tr>
+			</select>
+		</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="sectionTab"><hr /></div>
+	</div>
+
+	<div class="rowTab">
+		<div class="oneTab"><input type="radio" name="mode" value="seeds" <?php if($_POST["mode"] == "seeds") { echo "checked"; } ?> /></div>
+		<div class="twoTab">Seeds:</div>
+		<div class="threeTab">
+			<textarea name="seeds"><?php if($_POST["mode"] == "seeds") { echo $_POST["seeds"]; } ?></textarea>
+		</div>
+		<div class="fourTab">(video ids, comma separated)</div>
+	</div>
+
+
+	<div class="rowTab">
+		<div class="sectionTab"><h2>2) set additional parameters:</h2></div>
+	</div>
+
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">Crawl depth:</div>
+		<div class="threeTab"><input type="text" name="crawldepth" max="2" value="<?php echo (isset($_POST["crawldepth"])) ? $_POST["crawldepth"]:1; ?>" /></div>
+		<div class="fourTab">(values are 0, 1 or 2)</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="fourTab"><input type="submit" /></div>
+	</div>
+
 	</form>
-</table>
 
 <p>
 <?php
@@ -120,25 +104,30 @@ if(isset($_GET["mode"])) { $_POST = $_GET; }
 
 if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 
+	echo '<div class="rowTab">
+			<div class="sectionTab"><h1>Results</h1></div>
+		 </div>
+		 <div class="rowTab">Processing:';
+
 	$mode = $_POST["mode"];
 	$crawldepth = $_POST["crawldepth"];
 	$nodes = array();
 	$edges = array();
 	
 	if($_POST["crawldepth"] > 2 || preg_match("/\D/", $crawldepth)) {
-		echo "Wrong crawldepth.";
+		echo "<br /><br />Wrong crawldepth.";
 		exit;
 	}
 
 	if($mode == "search") {
 		
 		if($_POST["query"] == "") {
-			echo "Missing query.";
+			echo "<br /><br />Missing query.";
 			exit;
 		}
 		
 		if($_POST["iterations"] > 10 || preg_match("/\D/", $_POST["iterations"])) {
-			echo "Wrong iteration parameter.";
+			echo "<br /><br />Wrong iteration parameter.";
 			exit;
 		}
 		
@@ -155,6 +144,11 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		
 	} else if($mode == "seeds") {
 		
+		if($_POST["seeds"] == "") {
+			echo "<br /><br />Missing seed ids.";
+			exit;
+		}
+		
 		$seeds = $_POST["seeds"];
 		
 		$seeds = preg_replace("/\s+/","",$seeds);
@@ -169,8 +163,10 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		
 	} else {
 		
-		echo "You need to select a mode.";
+		echo "<br /><br />You need to select a mode.";
 	}
+	
+	echo '</div>';
 }
 
 

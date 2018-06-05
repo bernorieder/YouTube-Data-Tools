@@ -1,70 +1,55 @@
-<?php
+<?php include("html_head.php"); ?>
 
-require_once "config.php";
-require_once "common.php";
+	<div class="rowTab">
+		<div class="sectionTab">
+			<h1>Channel Info Module</h1>
+		</div>
+	</div>
 
-?>
+	<div class="rowTab">
+		<div class="fullTab">
+			<p>This module retrieves different kinds of information for a channel from the <a href="https://developers.google.com/youtube/v3/docs/channels/list" target="_blank">channels/list</a> API endpoint
+			from a specified channel id. The following resources are requested: brandingSettings, status, id, snippet, contentDetails, contentOwnerDetails, statistics, topicDetails, invideoPromotion.</p>
+			<p>Output is a direct print of the API response.</p>
+			<p>You can use comma-separated hashes to retrieve information for more than one channel as a list (tab file).</p>
+		</div>
+	</div>
 
-<!doctype html>
+	<div class="rowTab">
+		<div class="sectionTab"><h1>Parameters</h1></div>
+	</div>
 
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	
-	<title>YouTube Data Tools</title>
-	
-	<link rel="stylesheet" type="text/css" href="main.css" />
-</head>
-
-<body>
-
-<table>
 	<form action="mod_channel_info.php" method="get">
-		<tr>
-			<td colspan="5">
-				<a href="index.php" class="navlink">Home</a>
-				<a href="mod_channel_info.php" class="navlink">Channel Info</a>
-				<a href="mod_channels_net.php" class="navlink">Channel Network</a>
-				<a href="mod_videos_list.php" class="navlink">Video List</a>
-				<a href="mod_videos_net.php" class="navlink">Video Network</a>
-				<a href="mod_video_info.php" class="navlink">Video Info</a>
-				<a href="faq.php" class="navlink">FAQ</a>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="3"></td>
-		</tr>
-		<tr>
-			<td colspan="3">			
-				<h1>YTDT Channel Info</h1>
 
-				<p>This module retrieves different kinds of information for a channel from the <a href="https://developers.google.com/youtube/v3/docs/channels/list" target="_blank">channels/list</a> API endpoint
-				from a specified channel id. The following resources are requested: brandingSettings, status, id, snippet, contentDetails, contentOwnerDetails, statistics, topicDetails, invideoPromotion.</p>
-				<p>Output is a direct print of the API response.</p>
-				<p>You can use comma-separated hashes to retrieve information for more than one channel as a list (tab file).</p>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="3"><hr /></td>
-		</tr>
-		<tr>
-			<td>channel id:</td>
-			<td><input type="text" name="hash" value="<?php if(isset($_GET["hash"])) { echo $_GET["hash"]; } ?>" /></td>
-			<td>(channel ids can be found in URLs, e.g. https://www.youtube.com/channel/<b>UCtxGqPJPPi8ptAzB029jpYA</b>)</td>
-		</tr>
-		<tr>
-			<td colspan="3"><hr /></td>
-		</tr>
-		<tr>
-			<td colspan="3"><input type="submit" /></td>
-		</tr>
+	<div class="rowTab">
+		<div class="leftTab">Channel id:</div>
+		<div class="rightTab">
+			<input type="text" name="hash" value="<?php if(isset($_GET["hash"])) { echo $_GET["hash"]; } ?>" /> (channel ids can be found in URLs, e.g. https://www.youtube.com/channel/<b>UCtxGqPJPPi8ptAzB029jpYA</b>)
+		</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="leftTab"></div>
+		<div class="rightTab">
+			<input type="submit" />
+		</div>
+	</div>
+	
 	</form>
-</table>
-
 
 <?php
 
 if(isset($_GET["hash"])) {
+
+	echo '<div class="rowTab">
+			<div class="sectionTab"><h1>Results</h1></div>
+		 </div>
+		 <div class="rowTab">';
+	 
+	if($_GET["hash"] == "") {
+		echo "Missing channel id.";
+		exit;
+	}
 
 	$hash = $_GET["hash"];
 	
@@ -85,8 +70,6 @@ function getInfos($hash) {
 	$channels = array();
 	
 	foreach($hashes as $hash) {
-		
-		
 		
 		$restquery = "https://www.googleapis.com/youtube/v3/channels?part=id,snippet,statistics&id=".$hash."&key=".$apikey;
 		
@@ -147,8 +130,6 @@ function getInfo($hash) {
 	print_r($reply->items[0]);
 	echo '</pre>';
 	*/
-	
-	echo "<hr /><br />";
 
 	echo '<table class="resulttable">';
 	foreach($reply->items[0] as $key => $var) {
@@ -206,10 +187,9 @@ function getInfo($hash) {
 		}
 		echo '</tr>';
 	}
-	echo '</table>';
+	echo '</table></div>';
 }
 
 ?>
 
-</body>
-</html>
+<?php include("html_foot.php"); ?>

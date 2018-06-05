@@ -1,82 +1,60 @@
-<?php
+<?php include("html_head.php"); ?>
 
-require_once "config.php";
-require_once "common.php";
+	<div class="rowTab">
+		<div class="sectionTab">
+			<h1>Video Info and Comments Module</h1>
+		</div>
+	</div>
 
-?>
+	<div class="rowTab">
+		<div class="fullTab">
+			<p>This module starts from a video id and retrieves basic info for the video in question and provides a number of analyses of the comment section.
+			Comments are retrieved via the <a href="https://developers.google.com/youtube/v3/docs/commentThreads/list" target="_blank">commentThreads/list</a> API endpoint.</p>
+				
+			<p>The number of comments the script is able to retrieve can vary wildly. In some cases, only a relatively small percentage is made available, while in others well over
+			100.000 comments have been successfully retrieved. This seems to be mainly related to the age of the video in question.</p>
+			
+			<p>The module creates the following outputs:
+				<ul>
+					<li>a tabular file containing basic info and statistics about the video;</li>
+					<li>a tabular file containing all retrievable comments, both top level and replies;</li>
+					<li>a tabular file containing comment authors and their comment count;</li>
+					<li>a network file (gdf format) that maps interactions between users in the comment section;</li>
+				</ul>
+			</p>
+			
+			<p>The first three elements can be shown directly in the browser by enabling HTML output.</p>
+		</div>
+	</div>
 
-<!doctype html>
-
-<html lang="en">
-<head>
-	<meta charset="utf-8">
+	<div class="rowTab">
+		<div class="sectionTab"><h1>Parameters</h1></div>
+	</div>
 	
-	<title>YouTube Data Tools</title>
-	
-	<link rel="stylesheet" type="text/css" href="main.css" />
-</head>
-
-<body>
-
-<table>
 	<form action="mod_video_info.php" method="get">
-		<tr>
-			<td colspan="5">
-				<a href="index.php" class="navlink">Home</a>
-				<a href="mod_channel_info.php" class="navlink">Channel Info</a>
-				<a href="mod_channels_net.php" class="navlink">Channel Network</a>
-				<a href="mod_videos_list.php" class="navlink">Video List</a>
-				<a href="mod_videos_net.php" class="navlink">Video Network</a>
-				<a href="mod_video_info.php" class="navlink">Video Info</a>
-				<a href="faq.php" class="navlink">FAQ</a>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="3"></td>
-		</tr>
-		<tr>
-			<td colspan="3">			
-				<h1>YTDT Video Info and Comments</h1>
+		
+	<div class="rowTab">
+		<div class="leftTab">Video id:</div>
+		<div class="rightTab">
+			<input type="text" name="videohash" value="<?php if(isset($_GET["videohash"])) { echo $_GET["videohash"]; } ?>" /> (video ids can be found in URLs, e.g. https://www.youtube.com/watch?v=<b>aXnaHh40xnM</b>)
+		</div>
+	</div>
 
-				<p>This module starts from a video id and retrieves basic info for the video in question and provides a number of analyses of the comment section.
-				Comments are retrieved via the <a href="https://developers.google.com/youtube/v3/docs/commentThreads/list" target="_blank">commentThreads/list</a> API endpoint.</p>
-				
-				<p>The number of comments the script is able to retrieve can vary wildly. In some cases, only a relatively small percentage is made available, while in others well over
-				100.000 comments have been successfully retrieved. This seems to be mainly related to the age of the video in question.</p>
-				
-				<p>The module creates the following outputs:
-					<ul>
-						<li>a tabular file containing basic info and statistics about the video;</li>
-						<li>a tabular file containing all retrievable comments, both top level and replies;</li>
-						<li>a tabular file containing comment authors and their comment count;</li>
-						<li>a network file (gdf format) that maps interactions between users in the comment section;</li>
-					</ul>
-				</p>
-				
-				<p>The first three elements can be shown directly in the browser by enabling HTML output.</p>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="3"><hr /></td>
-		</tr>
-		<tr>
-			<td>video id:</td>
-			<td><input type="text" name="videohash" value="<?php if(isset($_GET["videohash"])) { echo $_GET["videohash"]; } ?>" /></td>
-			<td>(video ids can be found in URLs, e.g. https://www.youtube.com/watch?v=<b>aXnaHh40xnM</b>)</td>
-		</tr>
-		<tr>
-			<td>HTML output:</td>
-			<td><input type="checkbox" name="htmloutput" <?php if($_GET["htmloutput"] == "on") { echo "checked"; } ?> /></td>
-			<td>(adds HTML result tables in addition to the file exports)</td>
-		</tr>
-		<tr>
-			<td colspan="3"><hr /></td>
-		</tr>
-		<tr>
-			<td colspan="3"><input type="submit" /></td>
-		</tr>
+	<div class="rowTab">
+		<div class="leftTab">HTML output:</div>
+		<div class="rightTab">
+			<input type="checkbox" name="htmloutput" <?php if($_GET["htmloutput"] == "on") { echo "checked"; } ?> /> (displays HTML result tables in addition to file exports)
+		</div>
+	</div>
+
+	<div class="rowTab">
+		<div class="leftTab"></div>
+		<div class="rightTab">
+			<input type="submit" />
+		</div>
+	</div>
+	
 	</form>
-</table>
 
 <?php
 
@@ -88,6 +66,18 @@ $feed["comments"] = array();
 $video = array();
 
 if(isset($_GET["videohash"])) {
+
+	echo '<div class="rowTab">
+			<div class="sectionTab"><h1>Results</h1></div>
+		 </div>
+		 <div class="rowTab">';
+		 
+	if($_GET["videohash"] == "") {
+		echo "Missing video id.";
+		exit;
+	}
+
+	echo 'Processing:';
 
 	$videohash = $_GET["videohash"];
 	$html = $_GET["htmloutput"];
@@ -156,6 +146,8 @@ if(isset($_GET["videohash"])) {
 		echo '</table>';
 		
 	}
+	
+	echo '</div>';
 }
 
 
@@ -168,7 +160,7 @@ function getInfo($videohash) {
 
 	$reply = doAPIRequest($restquery);
 	if(count($reply->items) == 0) {
-		echo "No results found. You are probably not using a valid video id"; exit;
+		echo "<br /><br />No results found. You are probably not using a valid video id."; exit;
 	}
 	$reply = $reply->items[0];
 	$video = array();
@@ -224,7 +216,7 @@ function getComments($videohash) {
 	$run = true;
 	$comments = array();
 	
-	echo "<br />getting comments: "; flush(); ob_flush();
+	echo "<br /><br />Getting comments: "; flush(); ob_flush();
 
 	while($run == true) {
 		
@@ -255,7 +247,7 @@ function getComments($videohash) {
 	$nodecomments = array();
 	$counter = 0;
 	
-	echo "<br /><br/>digging into thread structure: "; flush(); ob_flush();
+	echo "<br /><br/>Digging into thread structure: "; flush(); ob_flush();
 	
 	foreach($comments as $comment) {
 		

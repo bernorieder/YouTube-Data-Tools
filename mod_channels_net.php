@@ -1,122 +1,104 @@
-<?php
+<?php include("html_head.php"); ?>
 
-require_once "config.php";
-require_once "common.php";
+	<div class="rowTab">
+		<div class="sectionTab">
+			<h1>Channel Network Module</h1>
 
-?>
+		</div>
+	</div>
 
-<!doctype html>
-
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	
-	<title>YouTube Data Tools</title>
-	
-	<link rel="stylesheet" type="text/css" href="main.css" />
-</head>
-
-<body>
-
-<table>
-	<form action="mod_channels_net.php" method="post">
-		<tr>
-			<td colspan="5">
-				<a href="index.php" class="navlink">Home</a>
-				<a href="mod_channel_info.php" class="navlink">Channel Info</a>
-				<a href="mod_channels_net.php" class="navlink">Channel Network</a>
-				<a href="mod_videos_list.php" class="navlink">Video List</a>
-				<a href="mod_videos_net.php" class="navlink">Video Network</a>
-				<a href="mod_video_info.php" class="navlink">Video Info</a>
-				<a href="faq.php" class="navlink">FAQ</a>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="5"></td>
-		</tr>
-		<tr>
-			<td colspan="5">			
-				<h1>YTDT Channel Network</h1>
-
-				<p>This module crawls a network of channels connected via the "featured channels" (and via subscriptions) tab from a list of seeds. Featured channels are retrieved via <a href="https://developers.google.com/youtube/v3/docs/channels/list" target="_blank">channels/list#brandingSettings</a> 
+	<div class="rowTab">
+		<div class="fullTab">
+			<p>This module crawls a network of channels connected via the "featured channels" (and via subscriptions) tab from a list of seeds. Featured channels are retrieved via <a href="https://developers.google.com/youtube/v3/docs/channels/list" target="_blank">channels/list#brandingSettings</a> 
 				and subscriptions via <a href="https://developers.google.com/youtube/v3/docs/subscriptions/list" target="_blank">subscriptions/list</a>. Seeds can be channels retrieved from a search or via manual input of channel ids.</p>
 				
-				<p>Crawl depth specifies how far from the seeds the script should go. Crawl depth 0 will get only the relations between seeds. Using many seeds and the maximum crawl depth (2) can take a very long time or the script might run out of memory. Start small.</p>
+			<p>Crawl depth specifies how far from the seeds the script should go. Crawl depth 0 will get only the relations between seeds. Using many seeds and the maximum crawl depth (2) can take a very long time or the script might run out of memory. Start small.</p>
 				
-				<p>NB: since graph analysis software can have difficulties with very large numbers, channels' viewcount is given in 100s.</p>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td colspan="5">1) choose a starting point:</td>
-		</tr>
-		<tr>
-			<td><input type="radio" name="mode" value="search" <?php if($_POST["mode"] != "seeds") { echo "checked"; } ?> /></td>
-			<td>search query:</td>
-			<td><input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; } ?>" /></td>
-			<td>(this is passed to the search endpoint)</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>Iterations:</td>
-			<td><input type="text" name="iterations" max="20" value="<?php echo (isset($_POST["iterations"])) ? $_POST["iterations"]:1; ?>" /></td>
-			<td>(max. 20, one iteration gets 50 items)</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>rank by:</td>
-			<td colspan="3">
-				<select name="rankby">
-					<option value="relevance" <?php if($_POST["rankby"] == "relevance") { echo "selected"; } ?>>relevance - Resources are sorted based on their relevance to the search query</option>
-					<option value="date" <?php if($_POST["rankby"] == "date") { echo "selected"; } ?>>date – Resources are sorted in reverse chronological order based on the date they were created</option>
-					<option value="rating" <?php if($_POST["rankby"] == "rating") { echo "selected"; } ?>>rating – Resources are sorted from highest to lowest rating</option>
-					<option value="title" <?php if($_POST["rankby"] == "title") { echo "selected"; } ?>>title – Resources are sorted alphabetically by title</option>
-					<option value="videoCount" <?php if($_POST["rankby"] == "videoCount") { echo "selected"; } ?>>videoCount – Channels are sorted in descending order of their number of uploaded videos</option>
-					<option value="viewCount" <?php if($_POST["rankby"] == "viewCount") { echo "selected"; } ?>>viewCount - Resources are sorted from highest to lowest number of views</option>
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td><input type="radio" name="mode" value="seeds" <?php if($_POST["mode"] == "seeds") { echo "checked"; } ?> /></td>
-			<td>seeds:</td>
-			<td colspan="2">
-				<textarea name="seeds"><?php if($_POST["mode"] == "seeds") { echo $_POST["seeds"]; } ?></textarea>
-			</td>
-			<td>(channel ids, comma separated)</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td colspan="2">2) add subscriptions:</td>
-			<td><input type="checkbox" name="subscriptions" <?php if($_POST["subscriptions"] == "on") { echo "checked"; } ?> /></td>
-			<td colspan="2">(use both featured channels and channel subscriptions for linking)</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td colspan="2">3) set crawl depth:</td>
-			<td><input type="text" name="crawldepth" max="2" value="<?php echo (isset($_POST["crawldepth"])) ? $_POST["crawldepth"]:1; ?>" /></td>
-			<td colspan="2">(values are 0, 1 or 2)</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td colspan="5"><input type="submit" /></td>
-		</tr>
-	</form>
-</table>
+			<p>NB: since graph analysis software can have difficulties with very large numbers, channels' viewcount is given in 100s.</p>
+		</div>
+	</div>
 
-<p>
+	<div class="rowTab">
+		<div class="sectionTab"><h1>Parameters</h1></div>
+	</div>
+	
+	<form action="mod_channels_net.php" method="post">
+	
+	<div class="rowTab">
+		<div class="sectionTab"><h2>1) choose a starting point:</h2></div>
+	</div>
+
+	<div class="rowTab">
+		<div class="oneTab"><input type="radio" name="mode" value="search" <?php if($_POST["mode"] != "seeds") { echo "checked"; } ?> /></div>
+		<div class="twoTab">Search query:</div>
+		<div class="threeTab">
+			<input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; } ?>" />
+		</div>
+		<div class="fourTab">(this is passed to the search endpoint)</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">Iterations:</div>
+		<div class="threeTab">
+			<input type="text" name="iterations" max="20" value="<?php echo (isset($_POST["iterations"])) ? $_POST["iterations"]:1; ?>" />
+		</div>
+		<div class="fourTab">(max. 20, one iteration gets 50 items)</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">Rank by:</div>
+		<div class="fourTab">
+			<select name="rankby">
+				<option value="relevance" <?php if($_POST["rankby"] == "relevance") { echo "selected"; } ?>>relevance - Resources are sorted based on their relevance to the search query</option>
+				<option value="date" <?php if($_POST["rankby"] == "date") { echo "selected"; } ?>>date – Resources are sorted in reverse chronological order based on the date they were created</option>
+				<option value="rating" <?php if($_POST["rankby"] == "rating") { echo "selected"; } ?>>rating – Resources are sorted from highest to lowest rating</option>
+				<option value="title" <?php if($_POST["rankby"] == "title") { echo "selected"; } ?>>title – Resources are sorted alphabetically by title</option>
+				<option value="videoCount" <?php if($_POST["rankby"] == "videoCount") { echo "selected"; } ?>>videoCount – Channels are sorted in descending order of their number of uploaded videos</option>
+				<option value="viewCount" <?php if($_POST["rankby"] == "viewCount") { echo "selected"; } ?>>viewCount - Resources are sorted from highest to lowest number of views</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="rowTab">
+		<div class="sectionTab"><hr /></div>
+	</div>
+
+	<div class="rowTab">
+		<div class="oneTab"><input type="radio" name="mode" value="seeds" <?php if($_POST["mode"] == "seeds") { echo "checked"; } ?> /></div>
+		<div class="twoTab">Seeds:</div>
+		<div class="threeTab">
+			<textarea name="seeds"><?php if($_POST["mode"] == "seeds") { echo $_POST["seeds"]; } ?></textarea>
+		</div>
+		<div class="fourTab">(channel ids, comma separated)</div>
+	</div>
+
+	<div class="rowTab">
+		<div class="sectionTab"><h2>2) set additional parameters:</h2></div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">Subscriptions:</div>
+		<div class="threeTab"><input type="checkbox" name="subscriptions" <?php if($_POST["subscriptions"] == "on") { echo "checked"; } ?> /></div>
+		<div class="fourTab">(use both featured channels and channel subscriptions for linking)</div>
+	</div>
+
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">Crawl depth:</div>
+		<div class="threeTab"><input type="text" name="crawldepth" max="2" value="<?php echo (isset($_POST["crawldepth"])) ? $_POST["crawldepth"]:1; ?>" /></div>
+		<div class="fourTab">(values are 0, 1 or 2)</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="fourTab"><input type="submit" /></div>
+	</div>
+	
+	</form>
+
 <?php
 
 if(isset($_POST["query"]) || isset($_POST["seeds"])) {
@@ -126,21 +108,26 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 	$subscriptions = $_POST["subscriptions"];
 	$nodes = array();
 	$edges = array();
+
+	echo '<div class="rowTab">
+			<div class="sectionTab"><h1>Result</h1></div>
+		 </div>
+		 <div class="rowTab">Processing:';
 	
 	if($_POST["crawldepth"] > 2 || preg_match("/\D/", $_POST["crawldepth"])) {
-		echo "Wrong crawldepth.";
+		echo "<br /><br />Wrong crawldepth.";
 		exit;
 	}
 	
 	if($mode == "search") {
 		
 		if($_POST["query"] == "") {
-			echo "Missing query.";
+			echo "<br /><br />Missing query.";
 			exit;
 		}
 		
 		if($_POST["iterations"] > 20 || preg_match("/\D/", $_POST["iterations"])) {
-			echo "Wrong iteration count.";
+			echo "<br /><br />Wrong iteration count.";
 			exit;
 		}
 
@@ -171,8 +158,10 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		
 	} else {
 		
-		echo "You need to select a mode.";
+		echo "<br /><br />You need to select a mode.";
 	}
+	
+	echo '</div>';
 }
 
 
@@ -407,7 +396,6 @@ function renderNetwork() {
 }
 
 ?>
-</p>
 
 </body>
 </html>

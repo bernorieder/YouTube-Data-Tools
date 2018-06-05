@@ -1,150 +1,139 @@
-<?php
+<?php include("html_head.php"); ?>
 
-require_once "config.php";
-require_once "common.php";
+	<div class="rowTab">
+		<div class="sectionTab">
+			<h1>Video List Module</h1>
+		</div>
+	</div>
 
-?>
-
-<!doctype html>
-
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	
-	<title>YouTube Data Tools</title>
-	
-	<link rel="stylesheet" type="text/css" href="main.css" />
-</head>
-
-<body>
-	
-<table>
-	<form action="mod_videos_list.php" method="post">
-		<tr>
-			<td colspan="5">
-				<a href="index.php" class="navlink">Home</a>
-				<a href="mod_channel_info.php" class="navlink">Channel Info</a>
-				<a href="mod_channels_net.php" class="navlink">Channel Network</a>
-				<a href="mod_videos_list.php" class="navlink">Video List</a>
-				<a href="mod_videos_net.php" class="navlink">Video Network</a>
-				<a href="mod_video_info.php" class="navlink">Video Info</a>
-				<a href="faq.php" class="navlink">FAQ</a>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="5"></td>
-		</tr>
-		<tr>
-			<td colspan="5">
-				<h1>YTDT Video List</h1>
-
-				<p>This module creates a list of video infos and statistics from one of four sources: the videos uploaded to a specified channel, a playlist, the 
+	<div class="rowTab">
+		<div class="fullTab">
+		<p>This module creates a list of video infos and statistics from one of four sources: the videos uploaded to a specified channel, a playlist, the 
 				videos retrieved by a particular search query, or the videos specified by a list of ids.</p>
 
-				<p>The script then creates a tabular file where each row is a video. A number of infos and variables are added for each video.</p>
-				
-				<p>Check the documentation for the <a href="https://developers.google.com/youtube/v3/docs/videos/list" target="_blank">video/list</a> (used to
-				get the info for each video) and the
-				<a href="https://developers.google.com/youtube/v3/docs/search/list" target="_blank">search/list</a> (used for the search function) API endpoint for
-				additional information.</p>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td><input type="radio" name="mode" value="channel" <?php if($_POST["mode"] != "seeds" && $_POST["mode"] != "search") { echo "checked"; } ?> /></td>
-			<td>channel id:</td>
-			<td><input type="text" name="channel" value="<?php if(isset($_POST["channel"])) { echo $_POST["channel"]; }; ?>" /></td>
-			<td colspan="2">(channel ids can be found in URLs, e.g. https://www.youtube.com/channel/<b>UCiDJtJKMICpb9B1qf7qjEOA</b>)</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td><input type="radio" name="mode" value="playlist" <?php if($_POST["mode"] == "playlist") { echo "checked"; } ?> /></td>
-			<td>playlist id:</td>
-			<td><input type="text" name="playlist" value="<?php if(isset($_POST["playlist"])) { echo $_POST["playlist"]; }; ?>" /></td>
-			<td colspan="2">(playlist ids can be found in URLs, e.g. https://www.youtube.com/playlist?list=<b>PLJtitKU0CAehMmiSI9oCIv3WCJrZqMWZ0</b>)</td>
-		</tr>
+		<p>The script then creates a tabular file where each row is a video. A number of infos and variables are added for each video.</p>
 		
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td valign="top"><input type="radio" name="mode" value="search" <?php if($_POST["mode"] == "search") { echo "checked"; } ?> /></td>
-			<td valign="top">search query:</td>
-			<td valign="top"><input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; }; ?>" /></td>
-			<td colspan="2">(this is passed to the search endpoint)
-				<br />optional <a href="http://www.loc.gov/standards/iso639-2/php/code_list.php" target="_blank">ISO 639-1</a> relevance language: <input type="text" name="language" style="width:20px;" value="<?php if(isset($_POST["language"])) { echo $_POST["language"]; }; ?>" />
-				<br />optional <a href="https://www.iso.org/obp/ui/#search" target="_blank">ISO 3166-1 alpha-2</a> region code: <input type="text" name="regioncode" style="width:20px;" value="<?php if(isset($_POST["regioncode"])) { echo $_POST["regioncode"]; }; ?>" /> (default = US)
-			</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>iterations:</td>
-			<td><input type="text" name="iterations" max="10" value="<?php echo (isset($_POST["iterations"])) ? $_POST["iterations"]:1; ?>" /></td>
-			<td>(max. 10, one iteration gets 50 items)</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>published:</td>
-				<td colspan="3">
-					<input type="checkbox" name="timeframe" <?php if(isset($_POST["timeframe"])) { echo "checked"; } ?> /> limit search to videos published in a specific timeframe:<br />
-				</td>
-			</td>
-			<td></td>
-		</tr>
-		
-		<tr>
-			<td></td>
-			<td></td>
-				<td colspan="3">
-					after: <input type="text" name="date_after" value="<?php echo (isset($_POST["date_after"])) ? $_POST["date_after"]:"1970-01-01T00:00:00Z"; ?>" />&nbsp;&nbsp;&nbsp;
-					before: <input type="text" name="date_before" value="<?php echo (isset($_POST["date_before"])) ? $_POST["date_before"]:"1970-01-01T00:00:00Z"; ?>" /> (format: yyyy-mm-ddThh:mm:ssZ)
-				</td>
-			</td>
-			<td></td>
-		</tr>
-		
+		<p>Check the documentation for the <a href="https://developers.google.com/youtube/v3/docs/videos/list" target="_blank">video/list</a> (used to
+		get the info for each video) and the
+		<a href="https://developers.google.com/youtube/v3/docs/search/list" target="_blank">search/list</a> (used for the search function) API endpoint for
+		additional information.</p>
 
-		<tr>
-			<td></td>
-			<td>rank by:</td>
-			<td colspan="3">
-				<select name="rankby">
-					<option value="relevance" <?php if($_POST["rankby"] == "relevance") { echo "selected"; } ?>>relevance - Resources are sorted based on their relevance to the search query</option>
-					<option value="date" <?php if($_POST["rankby"] == "date") { echo "selected"; } ?>>date – Resources are sorted in reverse chronological order based on the date they were created</option>
-					<option value="rating" <?php if($_POST["rankby"] == "rating") { echo "selected"; } ?>>rating – Resources are sorted from highest to lowest rating</option>
-					<option value="title" <?php if($_POST["rankby"] == "title") { echo "selected"; } ?>>title – Resources are sorted alphabetically by title</option>
-					<option value="videoCount" <?php if($_POST["rankby"] == "videoCount") { echo "selected"; } ?>>videoCount – Channels are sorted in descending order of their number of uploaded videos</option>
-					<option value="viewCount" <?php if($_POST["rankby"] == "viewCount") { echo "selected"; } ?>>viewCount - Resources are sorted from highest to lowest number of views</option>	
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td><input type="radio" name="mode" value="seeds" <?php if($_POST["mode"] == "seeds") { echo "checked"; } ?> /></td>
-			<td>manual selection:</td>
-			<td colspan="2">
-				<textarea name="seeds"><?php if($_POST["mode"] == "seeds") { echo $_POST["seeds"]; } ?></textarea>
-			</td>
-			<td>(video ids, comma separated)</td>
-		</tr>
-		<tr>
-			<td colspan="5"><hr /></td>
-		</tr>
-		<tr>
-			<td colspan="5"><input type="submit" /></td>
-		</tr>
+		</div>
+	</div>
+
+	<div class="rowTab">
+		<div class="sectionTab"><h1>Parameters</h1></div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="sectionTab"><h2>Choose a way of making a list:</h2></div>
+	</div>
+	
+	<form action="mod_videos_list.php" method="post">
+	
+	<div class="rowTab">
+		<div class="oneTab"><input type="radio" name="mode" value="channel" <?php if($_POST["mode"] != "seeds" && $_POST["mode"] != "search") { echo "checked"; } ?> /></div>
+		<div class="twoTab">Channel id:</div>
+		<div class="threeTab">
+			<input type="text" name="channel" value="<?php if(isset($_POST["channel"])) { echo $_POST["channel"]; }; ?>" />
+		</div>
+		<div class="fourTab">(channel ids can be found in URLs, e.g. https://www.youtube.com/channel/<b>UCiDJtJKMICpb9B1qf7qjEOA</b>)</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="sectionTab"><hr /></div>
+	</div>
+	
+	
+	<div class="rowTab">
+		<div class="oneTab"><input type="radio" name="mode" value="playlist" <?php if($_POST["mode"] == "playlist") { echo "checked"; } ?> /></div>
+		<div class="twoTab">Playlist id:</div>
+		<div class="threeTab">
+			<input type="text" name="playlist" value="<?php if(isset($_POST["playlist"])) { echo $_POST["playlist"]; }; ?>" />
+		</div>
+		<div class="fourTab">(playlist ids can be found in URLs, e.g. https://www.youtube.com/playlist?list=<b>PLJtitKU0CAehMmiSI9oCIv3WCJrZqMWZ0</b>)</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="sectionTab"><hr /></div>
+	</div>
+	
+	
+	<div class="rowTab">
+		<div class="oneTab"><input type="radio" name="mode" value="search" <?php if($_POST["mode"] == "search") { echo "checked"; } ?> /></div>
+		<div class="twoTab">Search query:</div>
+		<div class="threeTab">
+			<input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; }; ?>" />
+		</div>
+		<div class="fourTab">
+			(this is passed to the search endpoint)
+			<p>optional <a href="http://www.loc.gov/standards/iso639-2/php/code_list.php" target="_blank">ISO 639-1</a> relevance language: <input type="text" name="language" style="width:20px;" value="<?php if(isset($_POST["language"])) { echo $_POST["language"]; }; ?>" /></p>
+			<p>optional <a href="https://www.iso.org/obp/ui/#search" target="_blank">ISO 3166-1 alpha-2</a> region code: <input type="text" name="regioncode" style="width:20px;" value="<?php if(isset($_POST["regioncode"])) { echo $_POST["regioncode"]; }; ?>" /> (default = US)</p>
+		</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">Iterations:</div>
+		<div class="threeTab">
+			<input type="text" name="iterations" max="10" value="<?php echo (isset($_POST["iterations"])) ? $_POST["iterations"]:1; ?>" />
+		</div>
+		<div class="fourTab">(max. 10, one iteration gets 50 items)</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">Published:</div>
+		<div class="fourTab">
+			<input type="checkbox" name="timeframe" <?php if(isset($_POST["timeframe"])) { echo "checked"; } ?> /> limit search to videos published in a specific timeframe (format: yyyy-mm-ddThh:mm:ssZ - timezone: UTC):
+			<p>after: <input type="text" name="date_after" value="<?php echo (isset($_POST["date_after"])) ? $_POST["date_after"]:"1970-01-01T00:00:00Z"; ?>" />&nbsp;&nbsp;&nbsp;</p>
+			<p>before: <input type="text" name="date_before" value="<?php echo (isset($_POST["date_before"])) ? $_POST["date_before"]:"1970-01-01T00:00:00Z"; ?>" /></p>
+			<input type="checkbox" name="daymode" <?php if(isset($_POST["daymode"])) { echo "checked"; } ?> /> make a search for each day of the timeframe (can yield many more videos, use wisely)
+		</div>
+	</div>
+	
+	
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">Rank by:</div>
+		<div class="fourTab">
+			<select name="rankby">
+				<option value="relevance" <?php if($_POST["rankby"] == "relevance") { echo "selected"; } ?>>relevance - Resources are sorted based on their relevance to the search query</option>
+				<option value="date" <?php if($_POST["rankby"] == "date") { echo "selected"; } ?>>date – Resources are sorted in reverse chronological order based on the date they were created</option>
+				<option value="rating" <?php if($_POST["rankby"] == "rating") { echo "selected"; } ?>>rating – Resources are sorted from highest to lowest rating</option>
+				<option value="title" <?php if($_POST["rankby"] == "title") { echo "selected"; } ?>>title – Resources are sorted alphabetically by title</option>
+				<option value="videoCount" <?php if($_POST["rankby"] == "videoCount") { echo "selected"; } ?>>videoCount – Channels are sorted in descending order of their number of uploaded videos</option>
+				<option value="viewCount" <?php if($_POST["rankby"] == "viewCount") { echo "selected"; } ?>>viewCount - Resources are sorted from highest to lowest number of views</option>	
+			</select>
+		</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="sectionTab"><hr /></div>
+	</div>
+	
+	
+	<div class="rowTab">
+		<div class="oneTab"><input type="radio" name="mode" value="seeds" <?php if($_POST["mode"] == "seeds") { echo "checked"; } ?> /></div>
+		<div class="twoTab">Manual selection:</div>
+		<div class="threeTab">
+			<textarea name="seeds"><?php if($_POST["mode"] == "seeds") { echo $_POST["seeds"]; } ?></textarea>
+		</div>
+		<div class="fourTab">(video ids, comma separated)</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="fourTab">
+			<input type="submit" />
+		</div>
+	</div>
+	
 	</form>
-</table>
-
+	
 <?php
 
+date_default_timezone_set('UTC');
 $folder = $datafolder;
 
 // allow for direct URL parameters and command line for cron
@@ -156,14 +145,24 @@ if(isset($_GET["mode"])) { $_POST = $_GET; }
 
 //print_r($_POST); exit;
 
+
 if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"])) {
+
+	echo '<div class="rowTab">
+			<div class="sectionTab"><h1>Results</h1></div>
+		 </div>
+		 <div class="rowTab">Processing:';
 
 	$mode = $_POST["mode"];
 
 	if($mode == "channel") {
 	
+		if($_POST["channel"] == "") {
+			echo "<br /><br />Missing channel id.";
+			exit;
+		}
+	
 		$channel = $_POST["channel"];
-		$iterations = $_POST["iterations"];
 		
 		$ids = getIdsFromChannel($channel);
 		
@@ -171,8 +170,12 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		
 	} else if($mode == "playlist") {
 	
+		if($_POST["playlist"] == "") {
+			echo "<br /><br />Missing playlist id.";
+			exit;
+		}
+	
 		$playlist = $_POST["playlist"];
-		$iterations = $_POST["iterations"];
 		
 		$ids = getIdsFromPlaylist($playlist);
 		
@@ -181,12 +184,12 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 	} else if($mode == "search") {
 		
 		if($_POST["query"] == "") {
-			echo "Missing query.";
+			echo "<br /><br />Missing query.";
 			exit;
 		}
 		
 		if($_POST["iterations"] > 50 || preg_match("/\D/", $_POST["iterations"])) {
-			echo "Wrong iteration parameter.";
+			echo "<br /><br />Wrong iteration parameter.";
 			exit;
 		}
 		
@@ -194,6 +197,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		$regioncode = $_POST["regioncode"];
 		$query = $_POST["query"];
 		$iterations = $_POST["iterations"];
+		$daymode = isset($_POST["daymode"]);
 		$date_before = $date_after = false;
 		if(isset($_POST["timeframe"])) {
 			$date_before = $_POST["date_before"];
@@ -201,11 +205,16 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		}
 		$rankby = $_POST["rankby"];
 		
-		$ids = getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after);
+		$ids = getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after,$daymode);
 
 		makeStatsFromIds($ids);
 		
 	} else if($mode == "seeds") {
+		
+		if($_POST["seeds"] == "") {
+			echo "<br /><br />Missing seed ids.";
+			exit;
+		}
 		
 		$seeds = $_POST["seeds"];
 		
@@ -218,8 +227,10 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		
 	} else {
 		
-		echo "You need to select a mode.";
+		echo "<br /><br />You need to select a mode.";
 	}
+	
+	echo '</div>';
 }
 
 
@@ -314,36 +325,65 @@ function getIdsFromPlaylist($uplistid) {
 
 
 
-function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after) {
+function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after,$daymode) {
 
 	global $apikey;
 	
 	$nextpagetoken = null;
+	$datespans = array();
 	$ids = array();
+	
+	
+	if($daymode) {
+		
+		$before = strtotime($date_before);
+		$after = strtotime($date_after);
+		
+		while($after < $before) {
+			
+			$datespans[] = array("after" => date("Y-m-d\TH:i:s",$after) . "Z","before" => date("Y-m-d\TH:i:s",$after + 86400) . "Z");
+			
+			$after = $after + 86400;
+		}
+	} else {
+		
+		$datespans[] = array("after" => $date_after,"before" => $date_before);
+	}
+	
+	echo "<br /><br />Executing searches (".count($datespans)."): ";
+	$counter = 0;
 
-	for($i = 0; $i < $iterations; $i++) {
-		
-		$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=". urlencode($query)."&type=video&order=".$rankby."&key=".$apikey;
-		if($date_before != false) {
-			$restquery .= "&publishedAfter=".$date_after."&publishedBefore=".$date_before;
-		}
-		
-		if($language != "") { $restquery .= "&relevanceLanguage=" . $language; }
-		if($regioncode != "") { $restquery .= "&regionCode=" . $regioncode; }
-		
-		//echo $restquery;
-		
-		if($nextpagetoken != null) {
-			$restquery .= "&pageToken=".$nextpagetoken;
-		}
-		
-		$reply = doAPIRequest($restquery);
-		$nextpagetoken = $reply->nextPageToken;
-		
-		//print_r($reply);
-		
-		foreach($reply->items as $item) {
-			$ids[] = $item->id->videoId;
+	foreach($datespans as $datespan) {
+
+		echo $counter . " "; flush(); ob_flush();
+		$counter++;
+
+		$nextpagetoken = null;
+	
+		for($i = 0; $i < $iterations; $i++) {
+			
+			$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=". urlencode($query)."&type=video&order=".$rankby."&key=".$apikey;
+			if($date_before != false) {
+				$restquery .= "&publishedAfter=".$datespan["after"]."&publishedBefore=".$datespan["before"];
+			}
+			
+			if($language != "") { $restquery .= "&relevanceLanguage=" . $language; }
+			if($regioncode != "") { $restquery .= "&regionCode=" . $regioncode; }
+			
+			//echo $restquery;
+			
+			if($nextpagetoken != null) {
+				$restquery .= "&pageToken=".$nextpagetoken;
+			}
+			
+			$reply = doAPIRequest($restquery);
+			$nextpagetoken = $reply->nextPageToken;
+			
+			//print_r($reply);
+			
+			foreach($reply->items as $item) {
+				$ids[] = $item->id->videoId;
+			}
 		}
 	}
 	
@@ -359,7 +399,7 @@ function makeStatsFromIds($ids) {
 	$lookup = array();
 	$categoryIds = array();
 	
-	echo "<br />Getting video details (".count($ids)."): ";
+	echo "<br /><br />Getting video details (".count($ids)."): ";
 	
 	for($i = 0; $i < count($ids); $i++) {
 		
