@@ -195,6 +195,21 @@ function getInfo($videohash) {
     $video["publicStatsViewable"] = $reply->status->publicStatsViewable;
 	
 	
+	/* For the future: download caption, requires consent from owner apparently
+
+	$restquery = "https://www.googleapis.com/youtube/v3/captions?part=snippet&videoId=".$videohash."&key=".$apikey;
+	$reply = doAPIRequest($restquery);
+	print_r($reply);
+
+	$restquery = "https://www.googleapis.com/youtube/v3/captions/FoE78jXCVkv2pgggu3SxyR6RGMjJTsxBFOrGoVqdFpA=?key=".$apikey;
+	$reply = doAPIRequest($restquery);
+	print_r($reply);
+	exit;
+
+	*/
+		
+	
+	
 	$content = "";
 	foreach($video as $key => $data) {
 		$content .= $key."\t".$data."\n";
@@ -251,7 +266,7 @@ function getComments($videohash) {
 	
 	foreach($comments as $comment) {
 		
-		echo " " . $counter;
+		echo " " . $counter; flush(); ob_flush();
 		$counter++;
 		
 		$tmp = array();
@@ -286,8 +301,6 @@ function getComments($videohash) {
 				}
 				
 				$reply = doAPIRequest($restquery);
-				
-				//print_r($reply);
 			
 				foreach($reply->items as $item) {
 					$replies[] = $item;

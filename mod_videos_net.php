@@ -32,7 +32,11 @@
 		<div class="threeTab">
 			<input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; } ?>" />
 		</div>
-		<div class="fourTab">(this is passed to the search endpoint)</div>
+		<div class="fourTab">
+			(this is passed to the search endpoint)
+			<p>optional <a href="http://www.loc.gov/standards/iso639-2/php/code_list.php" target="_blank">ISO 639-1</a> relevance language: <input type="text" name="language" style="width:20px;" value="<?php if(isset($_POST["language"])) { echo $_POST["language"]; }; ?>" /></p>
+			<p>optional <a href="https://www.iso.org/obp/ui/#search" target="_blank">ISO 3166-1 alpha-2</a> region code: <input type="text" name="regioncode" style="width:20px;" value="<?php if(isset($_POST["regioncode"])) { echo $_POST["regioncode"]; }; ?>" /> (default = US)</p>
+		</div>
 	</div>
 
 	<div class="rowTab">
@@ -55,6 +59,16 @@
 					<option value="title" <?php if($_POST["rankby"] == "title") { echo "selected"; } ?>>title – Resources are sorted alphabetically by title</option>
 					<option value="viewCount" <?php if($_POST["rankby"] == "viewCount") { echo "selected"; } ?>>viewCount - Resources are sorted from highest to lowest number of views</option>
 			</select>
+		</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">Published:</div>
+		<div class="fourTab">
+			<input type="checkbox" name="timeframe" <?php if(isset($_POST["timeframe"])) { echo "checked"; } ?> /> limit search to videos published in a specific timeframe (format: yyyy-mm-ddThh:mm:ssZ - timezone: UTC):
+			<p>after: <input type="text" name="date_after" value="<?php echo (isset($_POST["date_after"])) ? $_POST["date_after"]:"1970-01-01T00:00:00Z"; ?>" />&nbsp;&nbsp;&nbsp;</p>
+			<p>before: <input type="text" name="date_before" value="<?php echo (isset($_POST["date_before"])) ? $_POST["date_before"]:"1970-01-01T00:00:00Z"; ?>" /></p>
 		</div>
 	</div>
 	
@@ -132,10 +146,17 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		}
 		
 		$query = $_POST["query"];
+		$language = $_POST["language"];
+		$regioncode = $_POST["regioncode"];
 		$iterations = $_POST["iterations"];
 		$rankby = $_POST["rankby"];
+		$date_before = $date_after = false;
+		if(isset($_POST["timeframe"])) {
+			$date_before = $_POST["date_before"];
+			$date_after = $_POST["date_after"];
+		}
 		
-		$ids = getIdsFromSearch($query,$iterations,$rankby);
+		$ids = getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after);
 		
 		$no_seeds = count($ids);
 		
@@ -170,7 +191,7 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 }
 
 
-function getIdsFromSearch($query,$iterations,$rankby) {
+function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after) {
 
 	global $apikey;
 	
@@ -180,6 +201,12 @@ function getIdsFromSearch($query,$iterations,$rankby) {
 	for($i = 0; $i < $iterations; $i++) {
 		
 		$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=".urlencode($query)."&type=video&order=".$rankby."&key=".$apikey;
+		if($date_before != false) {
+			$restquery .= "&publishedAfter=".$date_after."&publishedBefore=".$date_before;
+		}
+		
+		if($language != "") { $restquery .= "&relevanceLanguage=" . $language; }
+		if($regioncode != "") { $restquery .= "&regionCode=" . $regioncode; }
 		
 		if($nextpagetoken != null) {
 			$restquery .= "&pageToken=".$nextpagetoken;
