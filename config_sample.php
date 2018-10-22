@@ -10,4 +10,8 @@ ini_set("default_charset", "UTF-8");
 ini_set("memory_limit", "4000M");
 ini_set("max_execution_time", 3600*5);
 
+// folders
+$datafolder = "./data/";			// where you put the datafiles for analysis
+$cronfolder = "./crondata/";		// output folder for cron automation
+
 ?>
