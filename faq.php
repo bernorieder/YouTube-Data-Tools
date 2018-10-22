@@ -39,7 +39,7 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			There is currently no publication on YTDT. But the different citation standards provide guidelines for how to cite software, e.g. MLA:
-			Rieder, Bernhard. YouTube Data Tools. Computer software. Vers. 1.08. N.p., 5 December 2017. Web. &lt;https://tools.digitalmethods.net/netvizz/youtube/&gt;.
+			Rieder, Bernhard. YouTube Data Tools. Computer software. Vers. 1.09. N.p., 10 May 2018. Web. &lt;https://tools.digitalmethods.net/netvizz/youtube/&gt;.
 			
 			<p>Alternatively, you can cite this <a href="http://thepoliticsofsystems.net/2015/05/exploring-youtube/">blog post</a>.</p>
 			
