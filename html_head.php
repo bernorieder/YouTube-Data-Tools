@@ -22,7 +22,16 @@ require_once "common.php";
 
 <div id="fullpage">
 
-
+	<div class="headTab">
+		<div class="leftHead" onclick="document.location.href='https://tools.digitalmethods.net/netvizz/youtube/';" style="cursor:pointer;">YouTube Data Tools</div>
+		<div class="rightHead">
+			<a href="http://thepoliticsofsystems.net">blog</a>
+			<a href="http://labs.polsys.net">software</a>
+			<a href="http://thepoliticsofsystems.net/papers-and-talks/">research</a>
+			<a href="https://www.digitalmethods.net">DMI</a>
+			<a href="http://thepoliticsofsystems.net/about/">about</a>
+		</div>
+	</div>
 	
 	
 	<div class="rowTab">
