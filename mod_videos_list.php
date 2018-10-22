@@ -9,8 +9,8 @@
 	<div class="rowTab">
 		<div class="fullTab">
 		<p>This module creates a list of video infos and statistics from one of four sources: the videos uploaded to a specified channel, a playlist, the 
-				videos retrieved by a particular search query, or the videos specified by a list of ids.</p>
-
+		videos retrieved by a particular search query, or the videos specified by a list of ids.</p>
+		
 		<p>The script then creates a tabular file where each row is a video. A number of infos and variables are added for each video.</p>
 		
 		<p>Check the documentation for the <a href="https://developers.google.com/youtube/v3/docs/videos/list" target="_blank">video/list</a> (used to
@@ -412,17 +412,12 @@ function makeStatsFromIds($ids) {
 		
 		$vid = $reply->items[0];
 		
-		//print_r($vid); exit;
-		
-		// convert YT duraction format to seconds
-		preg_match_all('/(\d+)/',$vid->contentDetails->duration,$parts);
-		$tmptime = array_reverse($parts[0]);
-		$smulti = 1;
+		//print_r($vid); exit;		
 		$seconds = 0;
-		for($j = 0;  $j < count($tmptime); $j++) {
-			$seconds += $tmptime[$j] * $smulti;
-			$smulti = $smulti * 60; 
-		}
+		preg_match_all('/(\d+)M/',$vid->contentDetails->duration,$parts);
+		$seconds += $parts[1][0] * 60;
+		preg_match_all('/(\d+)S/',$vid->contentDetails->duration,$parts);
+		$seconds += $parts[1][0];
 		
 		// collect categories
 		if(!in_array($vid->snippet->categoryId,$categoryIds)) { $categoryIds[] = $vid->snippet->categoryId; }
