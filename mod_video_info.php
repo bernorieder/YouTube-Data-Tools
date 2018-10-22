@@ -195,17 +195,17 @@ function getInfo($videohash) {
     $video["publicStatsViewable"] = $reply->status->publicStatsViewable;
 	
 	
-	/* For the future: download caption, requires consent from owner apparently
-
+	/*
 	$restquery = "https://www.googleapis.com/youtube/v3/captions?part=snippet&videoId=".$videohash."&key=".$apikey;
 	$reply = doAPIRequest($restquery);
 	print_r($reply);
 
-	$restquery = "https://www.googleapis.com/youtube/v3/captions/FoE78jXCVkv2pgggu3SxyR6RGMjJTsxBFOrGoVqdFpA=?key=".$apikey;
+	
+
+	$restquery = "https://www.googleapis.com/youtube/v3/captions/jok3UFaSbEjX-R-97b-Ahr-QhuWTlfEc5VPtlaOhD4c=?tfmt=srt&alt=media&key=".$apikey;
 	$reply = doAPIRequest($restquery);
 	print_r($reply);
 	exit;
-
 	*/
 		
 	
