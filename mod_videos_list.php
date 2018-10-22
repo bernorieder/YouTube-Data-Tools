@@ -137,6 +137,8 @@ date_default_timezone_set('UTC');
 $folder = $datafolder;
 
 // allow for direct URL parameters and command line for cron
+// e.g. php mod_videos_list.php rankby=relevance mode=search iterations=6 query=yourquery filename=yourfilename
+// don't forget to set $cronfolder in config.php
 if(isset($argv)) {
 	parse_str(implode('&', array_slice($argv, 1)), $_GET);
 	$folder = $cronfolder;
