@@ -60,6 +60,17 @@
 
 // blocked video example: https://www.youtube.com/watch?v=pLN59ZOweUE
 
+date_default_timezone_set('UTC');
+$folder = $datafolder;
+
+// allow for direct URL parameters and command line for cron
+// e.g. php mod_video_info.php videohash=aXnaHh40xnM commentonly=on
+// don't forget to set $cronfolder in config.php
+if(isset($argv)) {
+	parse_str(implode('&', array_slice($argv, 1)), $_GET);
+	$folder = $cronfolder;
+}
+
 $feed = array();
 $feed["comments"] = array();
 
@@ -81,10 +92,12 @@ if(isset($_GET["videohash"])) {
 
 	$videohash = $_GET["videohash"];
 	$html = $_GET["htmloutput"];
+	$commentonly = $_GET["commentonly"];
 	$filename = "videoinfo_".$videohash."_".date("Y_m_d-H_i_s");
 
-	$video = getInfo($videohash);
 	$nodecomments = getComments($videohash);
+	if($commentonly == "on") { exit; }
+	$video = getInfo($videohash);
 	$commenters = getCommenters($nodecomments);
 	makeNetwork($nodecomments);
 	
@@ -153,7 +166,7 @@ if(isset($_GET["videohash"])) {
 
 function getInfo($videohash) {
 
-	global $apikey,$html,$filename;
+	global $apikey,$html,$filename,$folder;
 
 	// forbidden: fileDetails,processingDetails,suggestions
 	$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet,status,topicDetails&id=".$videohash."&key=".$apikey;
@@ -214,7 +227,7 @@ function getInfo($videohash) {
 	foreach($video as $key => $data) {
 		$content .= $key."\t".$data."\n";
 	}
-	file_put_contents("./data/".$filename."_basicinfo.tab",$content);
+	file_put_contents("./".$folder."/".$filename."_basicinfo.tab",$content);
 	
 	return $video;
 }
@@ -222,7 +235,7 @@ function getInfo($videohash) {
 
 function getComments($videohash) {
 	
-	global $apikey,$html,$filename;
+	global $apikey,$html,$filename,$folder;
 
 	
 	// get toplevel comments first
@@ -340,7 +353,7 @@ function getComments($videohash) {
 	foreach($nodecomments as $comment) {
 		$content .= implode("\t",$comment) . "\n";
 	}
-	file_put_contents("./data/".$filename."_comments.tab",$content);
+	file_put_contents("./".$folder."/".$filename."_comments.tab",$content);
 	
 	
 	return $nodecomments;
@@ -349,7 +362,7 @@ function getComments($videohash) {
 
 function getCommenters($nodecomments) {
 	
-	global $filename;
+	global $filename,$folder;
 	
 	$authors = array();
 	
@@ -366,7 +379,7 @@ function getCommenters($nodecomments) {
 	foreach($authors as $key => $data) {
 		$content .= $key."\t".$data."\n";
 	}
-	file_put_contents("./data/".$filename."_authors.tab",$content);
+	file_put_contents("./".$folder."/".$filename."_authors.tab",$content);
 	
 	return $authors;
 }
@@ -374,7 +387,7 @@ function getCommenters($nodecomments) {
 
 function makeNetwork($nodecomments) {
 	
-	global $filename;
+	global $filename,$folder;
 	
 	$nodes = array();
 	$edges = array();
@@ -432,7 +445,7 @@ function makeNetwork($nodecomments) {
 	
 	$gdf = $nodegdf . $edgegdf;
 	
-	file_put_contents("./data/".$filename."_commentnetwork.gdf",$gdf);
+	file_put_contents("./".$folder."/".$filename."_commentnetwork.gdf",$gdf);
 }
 
 ?>
