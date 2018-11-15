@@ -85,6 +85,7 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			<ul>
+			<li>v1.10 - 15/11/2018 - Added a "related channel" module</li>
 			<li>v1.09 - 10/05/2018 - Added a "per day" mode to the video list module</li>
 			<li>v1.08 - 06/12/2017 - Channel info module can now make queries for several channels at a time</li>
 			<li>v1.07 - 19/10/2017 - Added region code parameter to video list</li>
