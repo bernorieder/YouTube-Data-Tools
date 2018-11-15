@@ -64,7 +64,7 @@ date_default_timezone_set('UTC');
 $folder = $datafolder;
 
 // allow for direct URL parameters and command line for cron
-// e.g. php mod_video_info.php videohash=aXnaHh40xnM commentonly=on
+// e.g. php mod_video_info.php videohash=aXnaHh40xnM or php mod_video_info.php videolist=videolist_xy.tab (file must be in cronfolder)
 // don't forget to set $cronfolder in config.php
 if(isset($argv)) {
 	parse_str(implode('&', array_slice($argv, 1)), $_GET);
@@ -76,7 +76,31 @@ $feed["comments"] = array();
 
 $video = array();
 
-if(isset($_GET["videohash"])) {
+if(isset($_GET["videolist"])) {
+	
+	$filename = "./".$folder."/".$_GET["videolist"];
+		
+	$header = NULL;
+	$videolist = array();
+	if(($handle = fopen($filename, 'r')) !== FALSE) {
+		while (($row = fgetcsv($handle,0,"\t",chr(8))) !== FALSE) {
+            if(!$header)
+				$header = $row;
+            else
+                $videolist[] = array_combine($header, $row);
+        }
+        fclose($handle);
+    } else {
+	    echo "no list file found"; exit;
+    }
+	
+	foreach($videolist as $video) {
+		$filename = "videoinfo_".$video["channelId"]."_".$video["videoId"]."_".date("Y_m_d-H_i_s");
+		getComments($video["videoId"]);
+	}
+	
+	
+} else if(isset($_GET["videohash"])) {
 
 	echo '<div class="rowTab">
 			<div class="sectionTab"><h1>Results</h1></div>
@@ -95,9 +119,8 @@ if(isset($_GET["videohash"])) {
 	$commentonly = $_GET["commentonly"];
 	$filename = "videoinfo_".$videohash."_".date("Y_m_d-H_i_s");
 
-	$nodecomments = getComments($videohash);
-	if($commentonly == "on") { exit; }
 	$video = getInfo($videohash);
+	$nodecomments = getComments($videohash);
 	$commenters = getCommenters($nodecomments);
 	makeNetwork($nodecomments);
 	
