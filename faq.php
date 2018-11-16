@@ -54,7 +54,7 @@
 	
 	<div class="rowTab">
 		<div class="fullTab">
-			It creates network files in <a href="http://guess.wikispot.org/The_GUESS_.gdf_format" target="_blank">gdf format</a> (a simple text format that specifies a graph) as well as
+			It creates network files in <a href="https://gephi.org/users/supported-graph-formats/gdf-format/" target="_blank">gdf format</a> (a simple text format that specifies a graph) as well as
 			statistical files using a <a href="http://en.wikipedia.org/wiki/Tab-separated_values">tab-separated format</a>. You can easily change TSV to CSV by searching and replacing all tabs with commas.
 			
 			<p>These files can then be analyzed and visualized using graph visualization software such as the powerful and very easy to use <a href="http://gephi.org/" target="_blank">gephi</a>
@@ -96,7 +96,6 @@
 			Many of the modules require a video or channel id as input. These can normally be found in the respective YouTube URLs.
 			For example, in the URL https://www.youtube.com/watch?v=BNM4kEUEcp8 the strange code after the "=" sign is the video id.
 			For further information, there's a lot of great material available on these things through a simple Google query.
-
 		</div>
 	</div>
 
