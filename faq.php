@@ -12,7 +12,7 @@
 	
 	<div class="rowTab">
 		<div class="fullTab">
-			YouTube Data Tools (YTDT) is a collection of simple tools for extracting data from the YouTube platform via the <a href="https://developers.google.com/youtube/v3/" target="_blank">YouTube API v3</a>.
+			YouTube Data Tools (YTDT) is a collection of simple tools for extracting data from the YouTube platform via the <a href="https://developers.google.com/youtube/v3/" target="_blank">YouTube API v3</a> (and some scraping).
 			It is not a mashup or fully developed analytics software, but a means for researchers to extract data via YouTube's API to analyze further in other software packages.
 		</div>
 	</div>
@@ -39,8 +39,8 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			There is currently no publication on YTDT. But the different citation standards provide guidelines for how to cite software, e.g. MLA:
-			Rieder, Bernhard. YouTube Data Tools. Computer software. Vers. 1.09. N.p., 10 May 2018. Web. &lt;https://tools.digitalmethods.net/netvizz/youtube/&gt;.
-			
+			Rieder, Bernhard. YouTube Data Tools. Computer software. Vers. 1.10. N.p., 16 Nov 2018. Web. &lt;https://tools.digitalmethods.net/netvizz/youtube/&gt;.
+						
 			<p>Alternatively, you can cite this <a href="http://thepoliticsofsystems.net/2015/05/exploring-youtube/">blog post</a>.</p>
 			
 			<p>If you are interested in the kind of work that can be done with this tool, check out this <a href="http://journals.sagepub.com/doi/full/10.1177/1354856517736982">research paper</a>.</p>
@@ -69,7 +69,6 @@
 	
 	<div class="rowTab">
 		<div class="fullTab">
-			
 			Since I develop tools in my spare time, this is "as is" software and <strong>no support</strong> is provided. I do not respond to questions on how to use the tool or how
 			to solve a particular research problem with it.
 			
