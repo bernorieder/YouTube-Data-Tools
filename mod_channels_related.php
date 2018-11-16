@@ -9,8 +9,8 @@
 
 	<div class="rowTab">
 		<div class="fullTab">
-			<p>This module crawls a network of channels connected via the "<a href="https://support.google.com/youtube/answer/7216516?hl=en" target="_blank">related channels</a>" panel, starting from a list of seeds.
-			These data are not retrieved via the API, but scraped from YT's web interface. To reduce the number of requests, this module caches channel data for three days. Remember that channels can opt out of this feature.</p>
+			<p>This module crawls a network of channels connected via the "<a href="https://support.google.com/youtube/answer/7216516?hl=en" target="_blank">related channels</a>" panel (unlike the channel network module, which uses featured channels and subscriptions as connections),
+			starting from a list of seeds. These data are not retrieved via the API, but scraped from YT's web interface. To reduce the number of requests, this module caches channel data for three days. Remember that channels can opt out of this feature.</p>
 				
 			<p>Crawl depth specifies how far from the seeds the script should go. Crawl depth 0 will get only the relations between seeds. Using many seeds and the maximum crawl depth (3) can take a very long time or the script might run out of memory or get blocked. Start small.</p>
 				
