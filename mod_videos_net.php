@@ -97,6 +97,8 @@
 		<div class="fourTab">(values are 0, 1 or 2)</div>
 	</div>
 	
+	<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
+	
 	<div class="rowTab">
 		<div class="oneTab"></div>
 		<div class="fourTab"><input type="submit" /></div>
@@ -122,6 +124,12 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 			<div class="sectionTab"><h1>Results</h1></div>
 		 </div>
 		 <div class="rowTab">Processing:';
+
+	if($_POST["g-recaptcha-response"] == "") {
+		echo "<br /><br />Recaptcha missing.";
+		exit;
+	}
+	testcaptcha($_POST["g-recaptcha-response"]);
 
 	$mode = $_POST["mode"];
 	$crawldepth = $_POST["crawldepth"];
@@ -404,7 +412,7 @@ function renderNetwork() {
 	$filename = "videonet_" . $mode . $no_seeds . "_nodes" . count($nodes) . "_" . date("Y_m_d-H_i_s");
 	if(isset($_POST["filename"])) { $filename = $_POST["filename"] . "_" . $filename; }
 
-	file_put_contents($folder.$filename.".gdf", $gdf);
+	writefile($folder.$filename.".gdf", $gdf);
 	
 	echo '<br /><br />The script has created a net with  '.count($nodes).' videos from '.$no_seeds.' seeds.<br /><br />
 
