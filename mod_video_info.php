@@ -47,6 +47,8 @@
 		</div>
 	</div>
 
+	<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
+
 	<div class="rowTab">
 		<div class="leftTab"></div>
 		<div class="rightTab">
@@ -60,7 +62,6 @@
 
 // blocked video example: https://www.youtube.com/watch?v=pLN59ZOweUE
 
-date_default_timezone_set('UTC');
 $folder = $datafolder;
 
 // allow for direct URL parameters and command line for cron
@@ -75,6 +76,7 @@ $feed = array();
 $feed["comments"] = array();
 
 $video = array();
+
 
 if(isset($_GET["videolist"])) {
 	
@@ -106,6 +108,12 @@ if(isset($_GET["videolist"])) {
 			<div class="sectionTab"><h1>Results</h1></div>
 		 </div>
 		 <div class="rowTab">';
+		 
+	if($_GET["g-recaptcha-response"] == "") {
+		echo "Recaptcha missing.";
+		exit;
+	}
+	testcaptcha($_GET["g-recaptcha-response"]);
 		 
 	if($_GET["videohash"] == "") {
 		echo "Missing video id.";
@@ -250,7 +258,7 @@ function getInfo($videohash) {
 	foreach($video as $key => $data) {
 		$content .= $key."\t".$data."\n";
 	}
-	file_put_contents("./".$folder."/".$filename."_basicinfo.tab",$content);
+	writefile("./".$folder.$filename."_basicinfo.tab",$content);
 	
 	return $video;
 }
@@ -376,7 +384,7 @@ function getComments($videohash) {
 	foreach($nodecomments as $comment) {
 		$content .= implode("\t",$comment) . "\n";
 	}
-	file_put_contents("./".$folder."/".$filename."_comments.tab",$content);
+	writefile("./".$folder.$filename."_comments.tab",$content);
 	
 	
 	return $nodecomments;
@@ -402,7 +410,7 @@ function getCommenters($nodecomments) {
 	foreach($authors as $key => $data) {
 		$content .= $key."\t".$data."\n";
 	}
-	file_put_contents("./".$folder."/".$filename."_authors.tab",$content);
+	writefile("./".$folder.$filename."_authors.tab",$content);
 	
 	return $authors;
 }
@@ -468,7 +476,7 @@ function makeNetwork($nodecomments) {
 	
 	$gdf = $nodegdf . $edgegdf;
 	
-	file_put_contents("./".$folder."/".$filename."_commentnetwork.gdf",$gdf);
+	writefile("./".$folder.$filename."_commentnetwork.gdf",$gdf);
 }
 
 ?>
