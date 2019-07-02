@@ -21,12 +21,16 @@
 
 	<form action="mod_channel_info.php" method="get">
 
+	
+
 	<div class="rowTab">
 		<div class="leftTab">Channel id:</div>
 		<div class="rightTab">
 			<input type="text" name="hash" value="<?php if(isset($_GET["hash"])) { echo $_GET["hash"]; } ?>" /> (channel ids can be found in URLs, e.g. https://www.youtube.com/channel/<b>UCtxGqPJPPi8ptAzB029jpYA</b>)
 		</div>
 	</div>
+	
+	<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
 	
 	<div class="rowTab">
 		<div class="leftTab"></div>
@@ -50,6 +54,12 @@ if(isset($_GET["hash"])) {
 		echo "Missing channel id.";
 		exit;
 	}
+
+	if($_GET["g-recaptcha-response"] == "") {
+		echo "Recaptcha missing.";
+		exit;
+	}
+	testcaptcha($_GET["g-recaptcha-response"]);
 
 	$hash = $_GET["hash"];
 	
