@@ -122,6 +122,8 @@
 		<div class="fourTab">(video ids, comma separated)</div>
 	</div>
 	
+	<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
+	
 	<div class="rowTab">
 		<div class="oneTab"></div>
 		<div class="fourTab">
@@ -148,12 +150,20 @@ if(isset($_GET["mode"])) { $_POST = $_GET; }
 //print_r($_POST); exit;
 
 
+
+
 if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"])) {
 
 	echo '<div class="rowTab">
 			<div class="sectionTab"><h1>Results</h1></div>
 		 </div>
 		 <div class="rowTab">Processing:';
+
+	if($_POST["g-recaptcha-response"] == "") {
+		echo "<br /><br />Recaptcha missing.";
+		exit;
+	}
+	//testcaptcha($_POST["g-recaptcha-response"]);
 
 	$mode = $_POST["mode"];
 
@@ -412,6 +422,8 @@ function makeStatsFromIds($ids) {
 
 		$reply = doAPIRequest($restquery);
 		
+		//print_r($reply);
+		
 		$vid = $reply->items[0];
 		
 		//print_r($vid); exit;		
@@ -440,6 +452,7 @@ function makeStatsFromIds($ids) {
         $row["dimension"] = $vid->contentDetails->dimension;
         $row["definition"] = $vid->contentDetails->definition;
         $row["caption"] = $vid->contentDetails->caption;
+        $row["thumbnail_maxres"] = $vid->snippet->thumbnails->maxres->url;
         $row["licensedContent"] = $vid->contentDetails->licensedContent;
         $row["viewCount"] = $vid->statistics->viewCount;
         $row["likeCount"] = $vid->statistics->likeCount;
@@ -480,7 +493,7 @@ function makeStatsFromIds($ids) {
 	$filename = "videolist_" . $mode . count($vids) . "_" . date("Y_m_d-H_i_s");
 	if(isset($_POST["filename"])) { $filename = $_POST["filename"] . "_" . $filename; }
 
-	file_put_contents($folder.$filename.".tab", $content_tsv);
+	writefile($folder.$filename.".tab", $content_tsv);
 	
 	echo '<br /><br />The script has created a file with  '.count($vids).' rows.<br /><br />
 
