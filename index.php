@@ -7,6 +7,8 @@
 			<p>For some context and a small introduction, please check out this <a href="http://thepoliticsofsystems.net/2015/05/exploring-youtube/">blog post</a>.
 			
 			<p>Each of the modules has a basic description of how it works, there is a <a href="faq.php">FAQ</a> section with additional information, and an <a href="https://www.youtube.com/watch?v=sbErTW2MzCY" target="_blank">introductory video</a>.</p>
+			
+			<p>If you use this tool in a scientific publication, please cite it, e.g. in APA style: Rieder, Bernhard (2015). YouTube Data Tools (Version 1.11) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.</p>
 		</div>
 	</div>
 	
@@ -38,6 +40,19 @@
 			<p><a href="mod_channels_net.php">launch</a></p>
 		</div>
 	</div>
+	
+	<!--
+	<div class="rowTab">
+		<div class="sectionTab"><h2>Related Channel Network</h2></div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="fullTab">
+			This module starts from a list of seeds and crawls networks of channels connected via the "related channels" panel which YouTube generates algorithmically.
+			<p><a href="mod_channels_net.php">launch</a></p>
+		</div>
+	</div>
+	-->
 	
 	
 	<div class="rowTab">
@@ -85,6 +100,7 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			<ul>
+			<li>v1.11 - 02/07/2019 - Removed "related channel" module after YT removed the feature; added thumbnail url to video list module</li>
 			<li>v1.10 - 15/11/2018 - Added a "related channel" module</li>
 			<li>v1.09 - 10/05/2018 - Added a "per day" mode to the video list module</li>
 			<li>v1.08 - 06/12/2017 - Channel info module can now make queries for several channels at a time</li>
@@ -95,7 +111,7 @@
 			<li>v1.03 - 18/10/2015 - Small bugfix</li>
 			<li>v1.02 - 05/06/2015 - Added subscriptions to channel network</li>
 			<li>v1.01 - 26/05/2015 - Bug fix for video network, video category added to several modules</li>
-			<li>v1.0 - 04/05/2015 - Initial Resease</li>
+			<li>v1.0 - 04/05/2015 - Initial Release</li>
 			</ul>
 		</div>
 	</div>
