@@ -92,6 +92,8 @@
 		<div class="fourTab">(values are 0, 1 or 2)</div>
 	</div>
 	
+	<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
+	
 	<div class="rowTab">
 		<div class="oneTab"></div>
 		<div class="fourTab"><input type="submit" /></div>
@@ -118,6 +120,12 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		echo "<br /><br />Wrong crawldepth.";
 		exit;
 	}
+	
+	if($_POST["g-recaptcha-response"] == "") {
+		echo "<br /><br />Recaptcha missing.";
+		exit;
+	}
+	testcaptcha($_POST["g-recaptcha-response"]);
 	
 	if($mode == "search") {
 		
@@ -209,13 +217,22 @@ function makeNetworkFromIds($depth) {
 	for($i = 0; $i < count($ids); $i++) {
 		
 		$chid = $ids[$i];
-			
-		//$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails,invideoPromotion&id=".$chid."&key=".$apikey;
-		$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,id,snippet,statistics&id=".$chid."&key=".$apikey;
-	
-		$reply = doAPIRequest($restquery);
 		
-		//print_r($reply);
+		$jsonfn = "./cache/channelmoreinfo_" . $chid . ".json";
+
+		if (file_exists($jsonfn) && $delta < (60 * 60 * 24 * 3)) {
+
+			$reply = json_decode(file_get_contents($jsonfn));
+			
+		} else {
+
+			//$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails,invideoPromotion&id=".$chid."&key=".$apikey;
+			$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,id,snippet,statistics&id=".$chid."&key=".$apikey;
+	
+			$reply = doAPIRequest($restquery);
+
+			file_put_contents($jsonfn, json_encode($reply));
+		}
 
 		if(isset($reply->items[0])) {
 			
@@ -386,7 +403,7 @@ function renderNetwork() {
 	$gdf = $nodegdf . $edgegdf;
 	$filename = "channelnet_" . $mode . $no_seeds . "_nodes" . count($nodes) . "_" . date("Y_m_d-H_i_s");
 
-	file_put_contents("./data/".$filename.".gdf", $gdf);
+	writefile("./data/".$filename.".gdf", $gdf);
 	
 	echo '<br /><br />The script has created a net with  '.count($nodes).' channels from '.$no_seeds.' seeds.<br /><br />
 
