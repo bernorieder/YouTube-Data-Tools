@@ -16,6 +16,7 @@ function doAPIRequest($url) {
 	$callcount++;
 	
 	$run = true;
+	$errorcount = 0;
 	
 	while($run == true) {
 		
@@ -26,14 +27,35 @@ function doAPIRequest($url) {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		
 		$reply = curl_exec($ch);
-		
-		curl_close($ch);
-		
+		$info = curl_getinfo($ch);
+				
 		if($reply != false) {
 			$run = false;
-			//$reply = json_decode($reply);
-			return json_decode($reply);
+			$reply = json_decode($reply);
+			if(isset($reply->error)) {
+				if($reply->error->errors[0]->reason == "backendError") {
+					echo("YouTube's API reported 'backendError'. The tool will wait and try again.");
+					sleep(10);
+					continue;
+				} elseif($reply->error->errors[0]->reason == "notFound") {
+					echo("YouTube's API reported 'notFound'. The tool will skip this item.");
+					sleep(1);
+					return $reply;
+				} elseif($reply->error->errors[0]->reason != "subscriptionForbidden") {
+					echo("The request failed. YouTube's API gave the following error: " . $reply->error->errors[0]->reason);
+					exit;
+				} else {
+					return $reply;
+				}
+			} else {
+				return $reply;
+			}
 		} else {
+			$errorcount++;
+			if($errorcount > 10) {
+				echo("Too many connection errors.");
+				exit;
+			}
 			sleep(1);
 		}
 	}
