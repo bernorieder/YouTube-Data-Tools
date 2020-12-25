@@ -121,11 +121,13 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		exit;
 	}
 	
-	if($_POST["g-recaptcha-response"] == "") {
-		echo "<br /><br />Recaptcha missing.";
-		exit;
+	if(RECAPTCHA) {
+		if($_POST["g-recaptcha-response"] == "") {
+			echo "<br /><br />Recaptcha missing.";
+			exit;
+		}
+		testcaptcha($_POST["g-recaptcha-response"]);
 	}
-	testcaptcha($_POST["g-recaptcha-response"]);
 	
 	if($mode == "search") {
 		
@@ -174,15 +176,13 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 
 
 function getIdsFromSearch($query,$iterations,$rankby) {
-
-	global $apikey;
 	
 	$nextpagetoken = null;
 	$ids = array();
 
 	for($i = 0; $i < $iterations; $i++) {
 		
-		$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=".urlencode($query)."&type=channel&order=".$rankby."&key=".$apikey;
+		$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=".urlencode($query)."&type=channel&order=".$rankby;
 		
 		if($nextpagetoken != null) {
 			$restquery .= "&pageToken=".$nextpagetoken;
@@ -208,7 +208,7 @@ function getIdsFromSearch($query,$iterations,$rankby) {
 	
 function makeNetworkFromIds($depth) {
 	
-	global $apikey,$nodes,$edges,$ids,$crawldepth,$subscriptions;
+	global $nodes,$edges,$ids,$crawldepth,$subscriptions;
 	
 	echo "<br /><br />getting details for ".count($ids)." channels at depth ".$depth.": ";
 	
@@ -226,8 +226,9 @@ function makeNetworkFromIds($depth) {
 			
 		} else {
 
-			//$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails,invideoPromotion&id=".$chid."&key=".$apikey;
-			$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,id,snippet,statistics&id=".$chid."&key=".$apikey;
+			//$restquery = "https://www.googleapis.com/youtube/v3/channels?part=status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails&id=".$chid;
+			//$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails&id=".$chid;
+			$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,id,snippet,statistics&id=".$chid;
 	
 			$reply = doAPIRequest($restquery);
 
@@ -296,7 +297,7 @@ function makeNetworkFromIds($depth) {
 			
 			while($run == true) {
 		
-				$restquery = "https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&channelId=".$nodedata->id."&maxResults=50&key=".$apikey;
+				$restquery = "https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&channelId=".$nodedata->id."&maxResults=50";
 				
 				if($nextpagetoken != null) {
 					$restquery .= "&pageToken=".$nextpagetoken;

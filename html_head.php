@@ -17,7 +17,9 @@ require_once "common.php";
 	<link rel="stylesheet" type="text/css" href="main.css" />
 	<link href="https://fonts.googleapis.com/css?family=Droid+Sans|Muli:700" rel="stylesheet">
 	
+	<?php if(RECAPTCHA) { ?> 
 	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+	<?php } ?>
 </head>
 
 <body>
@@ -25,7 +27,7 @@ require_once "common.php";
 <div id="fullpage">
 
 	<div class="headTab">
-		<div class="leftHead" onclick="document.location.href='https://tools.digitalmethods.net/netvizz/youtube/';" style="cursor:pointer;">YouTube Data Tools</div>
+		<div class="leftHead" onclick="document.location.href='<?php echo BASEURL; ?>';" style="cursor:pointer;">YouTube Data Tools</div>
 		<div class="rightHead">
 			<a href="http://thepoliticsofsystems.net">blog</a>
 			<a href="http://labs.polsys.net">software</a>

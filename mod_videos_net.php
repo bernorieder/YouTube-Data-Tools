@@ -8,7 +8,7 @@
 
 	<div class="rowTab">
 		<div class="fullTab">
-			<p>This module creates a network of relations between videos, starting from a search or a list of video ids.</p>
+			<p>This module creates a network of relations between videos, starting from a search or a list of video ids. It will also generate a network of channels based on the same relations. (If a video from one channel points to the video of another channel, an edge is created and the more often that happens, the more weight the connection gets.)</p>
 			
 			<p>It retrieves "related videos" from the <a href="https://developers.google.com/youtube/v3/docs/search/list#relatedToVideoId" target="_blank">search/list#relatedToVideoId</a> API endpoint and creates a graph file in GDF format.</p>
 			
@@ -125,11 +125,13 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		 </div>
 		 <div class="rowTab">Processing:';
 
-	if($_POST["g-recaptcha-response"] == "") {
-		echo "<br /><br />Recaptcha missing.";
-		exit;
+	if(RECAPTCHA) {
+		if($_POST["g-recaptcha-response"] == "") {
+			echo "<br /><br />Recaptcha missing.";
+			exit;
+		}
+		testcaptcha($_POST["g-recaptcha-response"]);
 	}
-	testcaptcha($_POST["g-recaptcha-response"]);
 
 	$mode = $_POST["mode"];
 	$crawldepth = $_POST["crawldepth"];
@@ -200,15 +202,13 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 
 
 function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after) {
-
-	global $apikey;
 	
 	$nextpagetoken = null;
 	$ids = array();
 
 	for($i = 0; $i < $iterations; $i++) {
 		
-		$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=".urlencode($query)."&type=video&order=".$rankby."&key=".$apikey;
+		$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=".urlencode($query)."&type=video&order=".$rankby;
 		if($date_before != false) {
 			$restquery .= "&publishedAfter=".$date_after."&publishedBefore=".$date_before;
 		}
@@ -235,7 +235,7 @@ function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date
 	
 function makeNetworkFromIds($depth) {
 	
-	global $apikey,$nodes,$edges,$ids,$crawldepth;
+	global $nodes,$edges,$ids,$crawldepth;
 	
 	echo "<br /><br />getting details for ".count($ids)." videos at depth ".$depth.": ";
 	
@@ -246,7 +246,7 @@ function makeNetworkFromIds($depth) {
 		
 		$vid = $ids[$i];
 		
-		$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet&id=".$vid."&key=".$apikey;
+		$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet&id=".$vid;
 		
 		$reply = doAPIRequest($restquery);
 
@@ -296,7 +296,7 @@ function makeNetworkFromIds($depth) {
 
 
 	// get category labels and assign to videos
-	$restquery = "https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&id=".urlencode(implode(",", $categoryIds))."&key=".$apikey;
+	$restquery = "https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&id=".urlencode(implode(",", $categoryIds));
 
 	$reply = doAPIRequest($restquery);
 
@@ -322,7 +322,7 @@ function makeNetworkFromIds($depth) {
 		
 		while($run == true) {
 	
-			$restquery = "https://www.googleapis.com/youtube/v3/search?part=id&maxResults=50&relatedToVideoId=".$vid."&type=video&key=".$apikey;
+			$restquery = "https://www.googleapis.com/youtube/v3/search?part=id&maxResults=50&relatedToVideoId=".$vid."&type=video";
 			
 			if($nextpagetoken != null) {
 				$restquery .= "&pageToken=".$nextpagetoken;
@@ -392,32 +392,81 @@ function renderNetwork() {
 	
 	global $nodes,$edges,$lookup,$no_seeds,$mode,$folder;
 	
-	//print_r($nodes); exit;
+	// to generate channel network
+	$ch_nodes = array();
+	$ch_edges = array();
 	
+	
+	// generate related video network and extract data for related channel network
 	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,publishedAt INT,channelTitle VARCHAR,channelId VARCHAR,videoCategoryLabel VARCHAR,viewCount INT,likeCount INT,dislikeCount INT,dislikeLikeRatio FLOAT,favoriteCount INT,commentCount INT\n";
 	foreach($nodes as $nodeid => $nodedata) {
-		$nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata["videoTitle"]) . "," . $nodedata["isSeed"] . "," . $nodedata["seedRank"] . "," . $nodedata["publishedAt"] . "," . preg_replace("/,|\"|\'/"," ",$nodedata["channelTitle"]) . "," . $nodedata["channelId"] . "," . 
-					 preg_replace("/,|\"|\'/"," ",$nodedata["videoCategoryLabel"]) . "," .$nodedata["viewCount"] . "," . $nodedata["likeCount"] . "," . $nodedata["dislikeCount"] . "," . $nodedata["dislikeLikeRatio"] . "," . $nodedata["favoriteCount"] . "," . $nodedata["commentCount"] . "," . "\n";
-	}
-	
-	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR,directed BOOLEAN\n";
-	foreach($edges as $edgeid => $edgedata) {
-		$tmp = explode("_|_|X|_|_",$edgeid);
-		if(isset($nodes[$tmp[0]]) && isset($nodes[$tmp[1]])) {
-			$edgegdf .= $tmp[0] . "," . $tmp[1] . ",true\n";
+
+		$nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata["videoTitle"]) . "," . $nodedata["isSeed"] . "," . $nodedata["seedRank"] . "," . $nodedata["publishedAt"] . "," . preg_replace("/,|\"|\'/"," ",$nodedata["channelTitle"]) . "," . $nodedata["channelId"] . "," . preg_replace("/,|\"|\'/"," ",$nodedata["videoCategoryLabel"]) . "," .$nodedata["viewCount"] . "," . $nodedata["likeCount"] . "," . $nodedata["dislikeCount"] . "," . $nodedata["dislikeLikeRatio"] . "," . $nodedata["favoriteCount"] . "," . $nodedata["commentCount"] . "," . "\n";
+
+		if(!isset($ch_nodes[$nodedata["channelId"]])) {
+			$tmpnode = array();
+			$tmpnode["channelId"] = $nodedata["channelId"];
+			$tmpnode["channelTitle"] = $nodedata["channelTitle"];
+			$ch_nodes[$nodedata["channelId"]] = $tmpnode;
 		}
 	}
 	
+	
+	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR,directed BOOLEAN\n";
+	foreach($edges as $edgeid => $edgedata) {
+
+		$tmp = explode("_|_|X|_|_",$edgeid);
+
+		if(isset($nodes[$tmp[0]]) && isset($nodes[$tmp[1]])) {
+			
+			$edgegdf .= $tmp[0] . "," . $tmp[1] . ",true\n";
+			
+			$tmpedge = $nodes[$tmp[0]]["channelId"] . "_|_|X|_|_" . $nodes[$tmp[1]]["channelId"];
+			if(!isset($ch_edges[$tmpedge])) {
+				$ch_edges[$tmpedge] = 0;
+			}
+			$ch_edges[$tmpedge]++;
+		}
+	}
+	
+	// generate related channel network
+	$ch_nodegdf = "nodedef>name VARCHAR,label VARCHAR\n";
+	foreach($ch_nodes as $nodeid => $nodedata) {
+
+		$ch_nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata["channelTitle"]) . "\n";
+	}
+	
+	$ch_edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR,weight INT,directed BOOLEAN\n";
+	foreach($ch_edges as $edgeid => $edgedata) {
+
+		$tmp = explode("_|_|X|_|_",$edgeid);
+
+		if(isset($ch_nodes[$tmp[0]]) && isset($ch_nodes[$tmp[1]])) {
+			
+			$ch_edgegdf .= $tmp[0] . "," . $tmp[1] . "," . $edgedata . ",true\n";
+		
+		}
+	}
+
 	$gdf = $nodegdf . $edgegdf;
+	$ch_gdf = $ch_nodegdf . $ch_edgegdf;
+	
+	
 	$filename = "videonet_" . $mode . $no_seeds . "_nodes" . count($nodes) . "_" . date("Y_m_d-H_i_s");
-	if(isset($_POST["filename"])) { $filename = $_POST["filename"] . "_" . $filename; }
+	$ch_filename = "videonet_channels_" . $mode . $no_seeds . "_nodes" . count($nodes) . "_" . date("Y_m_d-H_i_s");
+	if(isset($_POST["filename"])) {
+		$filename = $_POST["filename"] . "_" . $filename;
+		$ch_filename = $_POST["filename"] . "_" . $ch_filename;
+	}
 
 	writefile($folder.$filename.".gdf", $gdf);
+	writefile($folder.$ch_filename.".gdf", $ch_gdf);
 	
 	echo '<br /><br />The script has created a net with  '.count($nodes).' videos from '.$no_seeds.' seeds.<br /><br />
 
 	your files:<br />
-	<a href="'.$folder.$filename.'.gdf" download>'.$filename.'.gdf</a><br />';
+	<a href="'.$folder.$filename.'.gdf" download>'.$filename.'.gdf</a> (the related video network)<br />
+	<a href="'.$folder.$ch_filename.'.gdf" download>'.$ch_filename.'.gdf</a> (the extracted channel network)<br />';
 }
 
 ?>

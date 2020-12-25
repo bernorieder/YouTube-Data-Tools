@@ -11,8 +11,10 @@ $callcount = 0;
 // some common functions
 function doAPIRequest($url) {
 	
-	global $callcount;
-	
+	global $callcount, $apikey;
+
+	$url .= "&key=" . $apikey;
+
 	$callcount++;
 	
 	$run = true;

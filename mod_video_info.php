@@ -108,12 +108,14 @@ if(isset($_GET["videolist"])) {
 			<div class="sectionTab"><h1>Results</h1></div>
 		 </div>
 		 <div class="rowTab">';
-		 
-	if($_GET["g-recaptcha-response"] == "") {
-		echo "Recaptcha missing.";
-		exit;
+	
+	if(RECAPTCHA) {
+		if($_GET["g-recaptcha-response"] == "") {
+			echo "Recaptcha missing.";
+			exit;
+		}
+		testcaptcha($_GET["g-recaptcha-response"]);
 	}
-	testcaptcha($_GET["g-recaptcha-response"]);
 		 
 	if($_GET["videohash"] == "") {
 		echo "Missing video id.";
@@ -197,10 +199,10 @@ if(isset($_GET["videolist"])) {
 
 function getInfo($videohash) {
 
-	global $apikey,$html,$filename,$folder;
+	global $html,$filename,$folder;
 
 	// forbidden: fileDetails,processingDetails,suggestions
-	$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet,status,topicDetails&id=".$videohash."&key=".$apikey;
+	$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet,status,topicDetails&id=".$videohash;
 
 	$reply = doAPIRequest($restquery);
 	if(count($reply->items) == 0) {
@@ -237,22 +239,7 @@ function getInfo($videohash) {
     $video["license"] = $reply->status->license;
     $video["embeddable"] = $reply->status->embeddable;
     $video["publicStatsViewable"] = $reply->status->publicStatsViewable;
-	
-	
-	/*
-	$restquery = "https://www.googleapis.com/youtube/v3/captions?part=snippet&videoId=".$videohash."&key=".$apikey;
-	$reply = doAPIRequest($restquery);
-	print_r($reply);
 
-	
-
-	$restquery = "https://www.googleapis.com/youtube/v3/captions/jok3UFaSbEjX-R-97b-Ahr-QhuWTlfEc5VPtlaOhD4c=?tfmt=srt&alt=media&key=".$apikey;
-	$reply = doAPIRequest($restquery);
-	print_r($reply);
-	exit;
-	*/
-		
-	
 	
 	$content = "";
 	foreach($video as $key => $data) {
@@ -266,7 +253,7 @@ function getInfo($videohash) {
 
 function getComments($videohash) {
 	
-	global $apikey,$html,$filename,$folder;
+	global $html,$filename,$folder;
 
 	
 	// get toplevel comments first
@@ -279,7 +266,7 @@ function getComments($videohash) {
 
 	while($run == true) {
 		
-		$restquery = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&maxResults=100&videoId=".$videohash."&key=".$apikey;
+		$restquery = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&maxResults=100&videoId=".$videohash;
 		
 		if($nextpagetoken != null) {
 			$restquery .= "&pageToken=".$nextpagetoken;
@@ -338,7 +325,7 @@ function getComments($videohash) {
 		
 			while($run == true) {
 				
-				$restquery = "https://www.googleapis.com/youtube/v3/comments?part=snippet&textFormat=plainText&maxResults=100&parentId=".$tmp["id"]."&key=".$apikey;
+				$restquery = "https://www.googleapis.com/youtube/v3/comments?part=snippet&textFormat=plainText&maxResults=100&parentId=".$tmp["id"];
 				
 				if($nextpagetoken != null) {
 					$restquery .= "&pageToken=".$nextpagetoken;

@@ -55,11 +55,13 @@ if(isset($_GET["hash"])) {
 		exit;
 	}
 
-	if($_GET["g-recaptcha-response"] == "") {
-		echo "Recaptcha missing.";
-		exit;
+	if(RECAPTCHA) {
+		if($_GET["g-recaptcha-response"] == "") {
+			echo "Recaptcha missing.";
+			exit;
+		}
+		testcaptcha($_GET["g-recaptcha-response"]);
 	}
-	testcaptcha($_GET["g-recaptcha-response"]);
 
 	$hash = $_GET["hash"];
 	
@@ -73,7 +75,7 @@ if(isset($_GET["hash"])) {
 
 function getInfos($hash) {
 	
-	global $apikey,$datafolder;
+	global $datafolder;
 	
 	$hashes = explode(",",$hash);
 	
@@ -81,7 +83,7 @@ function getInfos($hash) {
 	
 	foreach($hashes as $hash) {
 		
-		$restquery = "https://www.googleapis.com/youtube/v3/channels?part=id,snippet,statistics&id=".$hash."&key=".$apikey;
+		$restquery = "https://www.googleapis.com/youtube/v3/channels?part=id,snippet,statistics&id=".$hash;
 		
 		$reply = doAPIRequest($restquery);
 		
@@ -124,22 +126,9 @@ function getInfos($hash) {
 
 function getInfo($hash) {
 
-	global $apikey;
-
-	$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails,invideoPromotion&id=".$hash."&key=".$apikey;
-	
-	// example
-	//$hash = "LLP2X3cVGXP0r56gOGhiRDlA";
-	//$restquery = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=".$hash."&maxResults=50&key=".$apikey;
-
-	
+	$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails&id=".$hash;
+		
 	$reply = doAPIRequest($restquery);
-
-	/*
-	echo '<pre>';
-	print_r($reply->items[0]);
-	echo '</pre>';
-	*/
 
 	echo '<table class="resulttable">';
 	foreach($reply->items[0] as $key => $var) {

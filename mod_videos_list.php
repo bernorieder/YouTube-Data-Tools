@@ -159,15 +159,18 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		 </div>
 		 <div class="rowTab">Processing:';
 
-	if($_POST["g-recaptcha-response"] == "") {
-		echo "<br /><br />Recaptcha missing.";
-		exit;
+	if(RECAPTCHA) {
+		if($_POST["g-recaptcha-response"] == "") {
+			echo "<br /><br />Recaptcha missing.";
+			exit;
+		}
+		testcaptcha($_POST["g-recaptcha-response"]);
 	}
-	//testcaptcha($_POST["g-recaptcha-response"]);
 
 	$mode = $_POST["mode"];
 
 	if($mode == "channel") {
+
 	
 		if($_POST["channel"] == "") {
 			echo "<br /><br />Missing channel id.";
@@ -176,7 +179,29 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 	
 		$channel = $_POST["channel"];
 		
-		$ids = getIdsFromChannel($channel);
+		if(preg_match("/,/",$channel)) {
+			$channels = preg_split("/,/",$channel);
+			
+			echo "<br /><br />Getting videos from several channels: ";
+			
+			$ids = array();
+			$count = 0;
+			foreach($channels as $channel) {
+				$tmpsids = getIdsFromChannel(trim($channel));
+				
+				echo $count . " "; flush(); ob_flush();
+				
+				$count++;
+				
+				$ids = array_merge($ids,$tmpsids);
+			} 
+			
+			$ids = array_unique($ids);
+			
+		} else {
+		
+			$ids = getIdsFromChannel($channel);
+		}
 		
 		makeStatsFromIds($ids);
 		
@@ -235,6 +260,8 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		
 		$ids = explode(",",$seeds);
 		
+		$ids = array_unique($ids);
+		
 		makeStatsFromIds($ids);
 		
 	} else {
@@ -248,9 +275,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 
 function getIdsFromChannel($channel) {
 
-	global $apikey;
-
-	$restquery = "https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=".$channel."&key=".$apikey;
+	$restquery = "https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=".$channel;
 	
 	$reply = doAPIRequest($restquery);
 	
@@ -265,7 +290,7 @@ function getIdsFromChannel($channel) {
 		
 		while($run == true) {
 		
-			$restquery = "https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&playlistId=".$uplistid."&key=".$apikey;
+			$restquery = "https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&playlistId=".$uplistid;
 			
 			if($nextpagetoken != null) {
 				$restquery .= "&pageToken=".$nextpagetoken;
@@ -299,8 +324,6 @@ function getIdsFromChannel($channel) {
 
 function getIdsFromPlaylist($uplistid) {
 
-	global $apikey;
-
 	$nextpagetoken = null;
 	$ids = array();
 	$run = true;
@@ -309,7 +332,7 @@ function getIdsFromPlaylist($uplistid) {
 	
 	while($run == true) {
 	
-		$restquery = "https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&playlistId=".$uplistid."&key=".$apikey;
+		$restquery = "https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&playlistId=".$uplistid;
 		
 		if($nextpagetoken != null) {
 			$restquery .= "&pageToken=".$nextpagetoken;
@@ -338,8 +361,6 @@ function getIdsFromPlaylist($uplistid) {
 
 
 function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after,$daymode) {
-
-	global $apikey;
 	
 	$nextpagetoken = null;
 	$datespans = array();
@@ -374,7 +395,7 @@ function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date
 	
 		for($i = 0; $i < $iterations; $i++) {
 			
-			$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=". urlencode($query)."&type=video&order=".$rankby."&key=".$apikey;
+			$restquery = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=". urlencode($query)."&type=video&order=".$rankby;
 			if($date_before != false) {
 				$restquery .= "&publishedAfter=".$datespan["after"]."&publishedBefore=".$datespan["before"];
 			}
@@ -405,7 +426,7 @@ function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date
 	
 function makeStatsFromIds($ids) {
 	
-	global $apikey,$mode,$folder;
+	global $mode,$folder;
 	
 	$vids = array();
 	$lookup = array();
@@ -418,7 +439,7 @@ function makeStatsFromIds($ids) {
 		$vid = $ids[$i];
 		$lookup[$vid] = $i; 
 		
-		$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet&id=".$vid."&key=".$apikey;
+		$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet&id=".$vid;
 
 		$reply = doAPIRequest($restquery);
 		
@@ -469,7 +490,7 @@ function makeStatsFromIds($ids) {
 	
 	
 	// get category labels and assign to videos
-	$restquery = "https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&id=".urlencode(implode(",", $categoryIds))."&key=".$apikey;
+	$restquery = "https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&id=".urlencode(implode(",", $categoryIds));
 
 	$reply = doAPIRequest($restquery);
 
