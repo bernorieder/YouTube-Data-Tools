@@ -1,4 +1,4 @@
-body { font-family:'Droid Sans',sans-serif; font-size: 13px; background:#000; margin:0px; padding:0px; background-color:#fff; }
+body { font-family:'Droid Sans',sans-serif; font-size: 14px; background:#000; margin:0px; padding:0px; background-color:#fff; line-height:20px; }
 
 a { text-decoration:none; color:#fff; background-color:#D9B310; padding:0px 3px 0px 3px; }
 
@@ -6,15 +6,17 @@ h1 { font-family:'Muli',sans-serif; margin:10px 0px 3px 0px; font-size:16px; let
 h2 { font-family:'Muli',sans-serif; margin:5px 8px 3px 8px; font-size:14px; letter-spacing:1px; color:#328CC1; border-bottom:2px solid #328CC1; padding:3px 0px 3px 2px; }
 h3 { font-family:'Muli',sans-serif; margin:15px 0px 5px 0px; font-size:14px; letter-spacing:1px; color:#000; }
 
-p { line-height:18px; margin:8px 0px 8px 0px; }
+p { margin:8px 0px 8px 0px; }
 
 hr { border:0; height:1px; color:#328CC1; background-color:#328CC1; margin:0px 8px 0px 8px; }
 
-table.resulttable { border-collapse:collapse; }
+table.resulttable { border-collapse:collapse; font-size: 12px; }
 table.resulttable, th.resulttable, tr.resulttable, td.resulttable { border:1px solid black; padding:2px; }
 td.resulttableHi { border:1px solid black; padding:2px; background-color:#eee; }
 
 #fullpage { width: 1240px; position:absolute; left:50%; margin-left:-620px; background:#fff; padding:0px; min-height:100%; }
+
+.grey { color:#aaa; }
 
 .rowTab { display:table; padding:8px 0px 8px 0px; }
 .fullTab { display:table-cell; vertical-align:middle; padding:0px 3px 0px 10px; width:1240px; }

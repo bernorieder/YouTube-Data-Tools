@@ -1,4 +1,27 @@
-<?php include("html_head.php"); ?>
+<?php
+
+require_once "config.php";
+require_once "common.php";
+
+$folder = DATAFOLDER;
+
+// allow for direct URL parameters
+if(isset($_GET["mode"])) { $_POST = $_GET; }
+
+// command line interface
+// e.g. php mod_videos_list.php rankby=relevance mode=search iterations=6 query=yourquery filename=yourfilename
+// don't forget to set CRONFOLDER in config.php
+if(isset($argv)) {
+	parse_str(implode('&', array_slice($argv, 1)), $_POST);
+	$folder = CRONFOLDER;
+	define('WEBMODE', false);
+} else {
+
+	define('WEBMODE', true);
+
+	include("html_head.php");
+
+?>
 
 	<div class="rowTab">
 		<div class="sectionTab">
@@ -37,7 +60,7 @@
 		<div class="threeTab">
 			<input type="text" name="channel" value="<?php if(isset($_POST["channel"])) { echo $_POST["channel"]; }; ?>" />
 		</div>
-		<div class="fourTab">(channel ids can be found in URLs, e.g. https://www.youtube.com/channel/<b>UCiDJtJKMICpb9B1qf7qjEOA</b>)</div>
+		<div class="fourTab">(channel ids can be found in URLs, e.g. <span class="grey">https://www.youtube.com/channel/</span><b>UCiDJtJKMICpb9B1qf7qjEOA</b>)</div>
 	</div>
 	
 	<div class="rowTab">
@@ -51,7 +74,7 @@
 		<div class="threeTab">
 			<input type="text" name="playlist" value="<?php if(isset($_POST["playlist"])) { echo $_POST["playlist"]; }; ?>" />
 		</div>
-		<div class="fourTab">(playlist ids can be found in URLs, e.g. https://www.youtube.com/playlist?list=<b>PLJtitKU0CAehMmiSI9oCIv3WCJrZqMWZ0</b>)</div>
+		<div class="fourTab">(playlist ids can be found in URLs, e.g. <span class="grey">https://www.youtube.com/playlist?list=</span><b>PLJtitKU0CAehMmiSI9oCIv3WCJrZqMWZ0</b>)</div>
 	</div>
 	
 	<div class="rowTab">
@@ -102,7 +125,7 @@
 				<option value="date" <?php if($_POST["rankby"] == "date") { echo "selected"; } ?>>date – Resources are sorted in reverse chronological order based on the date they were created</option>
 				<option value="rating" <?php if($_POST["rankby"] == "rating") { echo "selected"; } ?>>rating – Resources are sorted from highest to lowest rating</option>
 				<option value="title" <?php if($_POST["rankby"] == "title") { echo "selected"; } ?>>title – Resources are sorted alphabetically by title</option>
-				<option value="videoCount" <?php if($_POST["rankby"] == "videoCount") { echo "selected"; } ?>>videoCount – Channels are sorted in descending order of their number of uploaded videos</option>
+				<!--<option value="videoCount" <?php if($_POST["rankby"] == "videoCount") { echo "selected"; } ?>>videoCount – Channels are sorted in descending order of their number of uploaded videos</option>-->
 				<option value="viewCount" <?php if($_POST["rankby"] == "viewCount") { echo "selected"; } ?>>viewCount - Resources are sorted from highest to lowest number of views</option>	
 			</select>
 		</div>
@@ -135,31 +158,17 @@
 	
 <?php
 
-date_default_timezone_set('UTC');
-$folder = $datafolder;
-
-// allow for direct URL parameters and command line for cron
-// e.g. php mod_videos_list.php rankby=relevance mode=search iterations=6 query=yourquery filename=yourfilename
-// don't forget to set $cronfolder in config.php
-if(isset($argv)) {
-	parse_str(implode('&', array_slice($argv, 1)), $_GET);
-	$folder = $cronfolder;
 }
-if(isset($_GET["mode"])) { $_POST = $_GET; }
-
-//print_r($_POST); exit;
-
-
-
 
 if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"])) {
 
-	echo '<div class="rowTab">
+	outweb('<div class="rowTab">
 			<div class="sectionTab"><h1>Results</h1></div>
 		 </div>
-		 <div class="rowTab">Processing:';
+		 <div class="rowTab">');
+	out('Processing:');
 
-	if(RECAPTCHA) {
+	if(RECAPTCHA && WEBMODE) {
 		if($_POST["g-recaptcha-response"] == "") {
 			echo "<br /><br />Recaptcha missing.";
 			exit;
@@ -171,9 +180,8 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 
 	if($mode == "channel") {
 
-	
 		if($_POST["channel"] == "") {
-			echo "<br /><br />Missing channel id.";
+			out("<br /><br />Missing channel id.");
 			exit;
 		}
 	
@@ -182,14 +190,14 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		if(preg_match("/,/",$channel)) {
 			$channels = preg_split("/,/",$channel);
 			
-			echo "<br /><br />Getting videos from several channels: ";
+			out("<br /><br />Getting videos from several channels: ");
 			
 			$ids = array();
 			$count = 0;
 			foreach($channels as $channel) {
 				$tmpsids = getIdsFromChannel(trim($channel));
 				
-				echo $count . " "; flush(); ob_flush();
+				out($count . " ");
 				
 				$count++;
 				
@@ -208,7 +216,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 	} else if($mode == "playlist") {
 	
 		if($_POST["playlist"] == "") {
-			echo "<br /><br />Missing playlist id.";
+			out("<br /><br />Missing playlist id.");
 			exit;
 		}
 	
@@ -221,12 +229,12 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 	} else if($mode == "search") {
 		
 		if($_POST["query"] == "") {
-			echo "<br /><br />Missing query.";
+			out("<br /><br />Missing query.");
 			exit;
 		}
 		
-		if($_POST["iterations"] > 50 || preg_match("/\D/", $_POST["iterations"])) {
-			echo "<br /><br />Wrong iteration parameter.";
+		if($_POST["iterations"] > 10 || preg_match("/\D/", $_POST["iterations"])) {
+			out("<br /><br />Wrong iteration parameter.");
 			exit;
 		}
 		
@@ -249,7 +257,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 	} else if($mode == "seeds") {
 		
 		if($_POST["seeds"] == "") {
-			echo "<br /><br />Missing seed ids.";
+			out("<br /><br />Missing seed ids.");
 			exit;
 		}
 		
@@ -266,10 +274,10 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		
 	} else {
 		
-		echo "<br /><br />You need to select a mode.";
+		out("<br /><br />You need to select a mode.");
 	}
 	
-	echo '</div>';
+	outweb('</div>');
 }
 
 
@@ -285,8 +293,6 @@ function getIdsFromChannel($channel) {
 		$nextpagetoken = null;
 		$ids = array();
 		$run = true;
-		
-		//echo "<br />Retrieving videos."; flush(); ob_flush();
 		
 		while($run == true) {
 		
@@ -317,7 +323,7 @@ function getIdsFromChannel($channel) {
 		
 	} else {
 		
-		echo "This is either not a valid channel id or the channel has no uploads playlist.";
+		out("This is either not a valid channel id or the channel has no uploads playlist.");
 	}
 }
 
@@ -327,8 +333,6 @@ function getIdsFromPlaylist($uplistid) {
 	$nextpagetoken = null;
 	$ids = array();
 	$run = true;
-	
-	//echo "<br />Retrieving videos."; flush(); ob_flush();
 	
 	while($run == true) {
 	
@@ -383,12 +387,12 @@ function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date
 		$datespans[] = array("after" => $date_after,"before" => $date_before);
 	}
 	
-	echo "<br /><br />Executing searches (".count($datespans)."): ";
+	out("<br /><br />Executing searches (".count($datespans)."): ");
 	$counter = 0;
 
 	foreach($datespans as $datespan) {
 
-		echo $counter . " "; flush(); ob_flush();
+		out($counter . " ");
 		$counter++;
 
 		$nextpagetoken = null;
@@ -432,7 +436,7 @@ function makeStatsFromIds($ids) {
 	$lookup = array();
 	$categoryIds = array();
 	
-	echo "<br /><br />Getting video details (".count($ids)."): ";
+	out("<br /><br />Getting video details (".count($ids)."): ");
 	
 	for($i = 0; $i < count($ids); $i++) {
 		
@@ -485,7 +489,7 @@ function makeStatsFromIds($ids) {
 		
 		//print_r($row); exit;
 		
-		echo $i . " "; flush(); ob_flush();
+		out($i . " ");
 	}
 	
 	
@@ -516,14 +520,13 @@ function makeStatsFromIds($ids) {
 
 	writefile($folder.$filename.".tab", $content_tsv);
 	
-	echo '<br /><br />The script has created a file with  '.count($vids).' rows.<br /><br />
+	out("<br /><br />The script has created a file with " . count($vids) . " rows.<br /><br />");
 
-	your files:<br />
-	<a href="'.$folder.$filename.'.tab" download>'.$filename.'.tab</a><br />';
+	outweb('your files:<br />
+	<a href="'.$folder.$filename.'.tab" download>' . $filename . '.tab</a>
+	</body>
+	</html>');
 
 }
 
 ?>
-
-</body>
-</html>

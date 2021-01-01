@@ -9,7 +9,7 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			<p>This module retrieves different kinds of information for a channel from the <a href="https://developers.google.com/youtube/v3/docs/channels/list" target="_blank">channels/list</a> API endpoint
-			from a specified channel id. The following resources are requested: brandingSettings, status, id, snippet, contentDetails, contentOwnerDetails, statistics, topicDetails, invideoPromotion.</p>
+			from a specified channel id. The following resources are requested: brandingSettings, status, id, snippet, contentDetails, statistics, and topicDetails.</p>
 			<p>Output is a direct print of the API response.</p>
 			<p>You can use comma-separated hashes to retrieve information for more than one channel as a list (tab file).</p>
 		</div>
@@ -26,7 +26,7 @@
 	<div class="rowTab">
 		<div class="leftTab">Channel id:</div>
 		<div class="rightTab">
-			<input type="text" name="hash" value="<?php if(isset($_GET["hash"])) { echo $_GET["hash"]; } ?>" /> (channel ids can be found in URLs, e.g. https://www.youtube.com/channel/<b>UCtxGqPJPPi8ptAzB029jpYA</b>)
+			<input type="text" name="hash" value="<?php if(isset($_GET["hash"])) { echo $_GET["hash"]; } ?>" /> (channel ids can be found in URLs, e.g. <span class="grey">https://www.youtube.com/channel/</span><b>UCtxGqPJPPi8ptAzB029jpYA</b>)
 		</div>
 	</div>
 	
@@ -91,8 +91,8 @@ function getInfos($hash) {
 		
 		$channel = array();
 		$channel["id"] = $reply->items[0]->id;
-		$channel["title"] = $reply->items[0]->snippet->title;
-		$channel["description"] = $reply->items[0]->snippet->description;
+		$channel["title"] = preg_replace("/\s+/", " ",$reply->items[0]->snippet->title);
+		$channel["description"] = preg_replace("/\s+/", " ",$reply->items[0]->snippet->description);
 		$channel["publishedAt"] = $reply->items[0]->snippet->publishedAt;
 		$channel["defaultLanguage"] = $reply->items[0]->snippet->defaultLanguage;
 		$channel["country"] = $reply->items[0]->snippet->country;
@@ -114,8 +114,7 @@ function getInfos($hash) {
 		fputcsv($fp,$channel,"\t");
 	}
 	
-	
-	
+
 	echo '<br /><br />The script has retrieved information for '.count($hashes).' channels.<br /><br />
 
 	your file:<br />
@@ -126,7 +125,7 @@ function getInfos($hash) {
 
 function getInfo($hash) {
 
-	$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,contentOwnerDetails,statistics,topicDetails&id=".$hash;
+	$restquery = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings,status,id,snippet,contentDetails,statistics,topicDetails&id=".$hash;
 		
 	$reply = doAPIRequest($restquery);
 

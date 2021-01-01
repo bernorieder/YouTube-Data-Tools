@@ -8,7 +8,7 @@
 			
 			<p>Each of the modules has a basic description of how it works, there is a <a href="faq.php">FAQ</a> section with additional information, and an <a href="https://www.youtube.com/watch?v=sbErTW2MzCY" target="_blank">introductory video</a>.</p>
 			
-			<p>If you use this tool in a scientific publication, please cite it, e.g. in APA style: Rieder, Bernhard (2015). YouTube Data Tools (Version 1.12) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.</p>
+			<p>If you use this tool in a scientific publication, please cite it, e.g. in APA style: Rieder, Bernhard (2015). YouTube Data Tools (Version 1.20) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.</p>
 		</div>
 	</div>
 	
@@ -29,6 +29,18 @@
 		</div>
 	</div>
 	
+
+	<div class="rowTab">
+		<div class="sectionTab"><h2>Channel Search</h2></div>
+	</div>
+
+	<div class="rowTab">
+		<div class="fullTab">		
+			This module searches for channels relevant to a user query.
+			<p><a href="mod_channel_info.php">launch</a></p>
+		</div>
+	</div>
+
 	
 	<div class="rowTab">
 		<div class="sectionTab"><h2>Channel Network</h2></div>
@@ -99,6 +111,7 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			<ul>
+			<li>v1.20 - 31/12/2020 - Added channel search module, housekeeping.</li>
 			<li>v1.12 - 20/09/2019 - Added a channel network output to the video network module.</li>
 			<li>v1.11 - 02/07/2019 - Removed "related channel" module after YT removed the feature from the interface; added thumbnail url to video list module</li>
 			<li>v1.10 - 15/11/2018 - Added a "related channel" module</li>
@@ -116,5 +129,4 @@
 		</div>
 	</div>
 
-	
 <?php include("html_foot.php"); ?>

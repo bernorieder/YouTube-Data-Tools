@@ -3,7 +3,6 @@
 	<div class="rowTab">
 		<div class="sectionTab">
 			<h1>Channel Network Module</h1>
-
 		</div>
 	</div>
 

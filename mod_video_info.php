@@ -36,7 +36,7 @@
 	<div class="rowTab">
 		<div class="leftTab">Video id:</div>
 		<div class="rightTab">
-			<input type="text" name="videohash" value="<?php if(isset($_GET["videohash"])) { echo $_GET["videohash"]; } ?>" /> (video ids can be found in URLs, e.g. https://www.youtube.com/watch?v=<b>aXnaHh40xnM</b>)
+			<input type="text" name="videohash" value="<?php if(isset($_GET["videohash"])) { echo $_GET["videohash"]; } ?>" /> (video ids can be found in URLs, e.g. <span class="grey">https://www.youtube.com/watch?v=</span><b>aXnaHh40xnM</b>)
 		</div>
 	</div>
 

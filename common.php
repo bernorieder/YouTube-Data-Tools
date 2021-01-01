@@ -1,6 +1,10 @@
 <?php
 
 date_default_timezone_set('UTC');
+ini_set( 'default_charset', 'UTF-8');
+
+error_reporting(E_ALL ^ E_NOTICE);
+
 
 // punctuation and stopword collections
 $punctuation = array("\s","\.",",","!","\?",":",";","\/","\\","#","@","&","\^","\$","\|","`","~","=","\+","\*","\"","'","\(","\)","\]","\[","\{","\}","<",">","�");
@@ -55,7 +59,7 @@ function doAPIRequest($url) {
 		} else {
 			$errorcount++;
 			if($errorcount > 10) {
-				echo("Too many connection errors.");
+				echo("Too many connection errors. Please try again later.");
 				exit;
 			}
 			sleep(1);
@@ -86,6 +90,7 @@ function testcaptcha($response) {
 	} 
 }
 
+
 function writefile($filename,$content) {
 	
 	global $callcount;
@@ -97,9 +102,29 @@ function writefile($filename,$content) {
 	file_put_contents("writefile.log", $message, FILE_APPEND);
 }
 
-function get_client_ip_server() {
 
-    $ipaddress = '';
+function out($msg) {
+
+	if(WEBMODE) {
+		echo $msg;
+		flush(); ob_flush();
+	} else {
+		$msg = preg_replace('/\<br \/\>/',PHP_EOL,$msg);
+		echo $msg;
+	}
+}
+
+
+function outweb($msg) {
+
+	if(WEBMODE) {
+		echo $msg;
+		flush(); ob_flush();
+	}
+}
+
+
+function get_client_ip_server() {
 
     if ($_SERVER['HTTP_CLIENT_IP'])
         $ipaddress = $_SERVER['HTTP_CLIENT_IP'];

@@ -12,8 +12,9 @@
 	
 	<div class="rowTab">
 		<div class="fullTab">
-			YouTube Data Tools (YTDT) is a collection of simple tools for extracting data from the YouTube platform via the <a href="https://developers.google.com/youtube/v3/" target="_blank">YouTube API v3</a> (and some scraping).
-			It is not a mashup or fully developed analytics software, but a means for researchers to extract data via YouTube's API to analyze further in other software packages.
+			YouTube Data Tools (YTDT) is a collection of simple modules for extracting data from the YouTube platform via the <a href="https://developers.google.com/youtube/v3/" target="_blank">YouTube API v3</a>.
+			It is not a mashup or fully developed analytics software, but a means for researchers to collect data in standard file formats to analyze further in
+			other software packages.
 		</div>
 	</div>
 	
@@ -27,7 +28,11 @@
 			YTDT is written and maintained by <a href="http://rieder.polsys.net">Bernhard Rieder</a>, Associate Professor in <a href="http://mediastudies.nl" target="_blank">Media Studies</a> at the
 			<a href="http://www.uva.nl">University of Amsterdam</a> and researcher at the <a href="https://www.digitalmethods.net" target="_blank">Digital Methods Initiative</a>.
 			
-			<p>I announce changes or new modules on <a href="https://twitter.com/RiederB/" target="_blank">@RiederB</a>, but I <strong>do not react</strong> to any tool related matters on channels other than <a href="mailto:tools@polsys.net">tools@polsys.net</a>.</p>
+			<p>Development and maintainance of this tool are financed by the Dutch <a href="https://pdi-ssh.nl/" target="_blank">Platform Digitale Infrastructuur 
+			Social Science and Humanities</a> as part of the <a href="https://cat4smr.humanities.uva.nl/" target="_blank">CAT4SMR project</a>.</p>
+
+			<p>Changes or new modules are announced on <a href="https://twitter.com/RiederB/" target="_blank">@RiederB</a> and <a href="https://twitter.com/cat4smr" target="_blank">@cat4smr</a>, but
+			for questions and support please refer to the help section below.</p>
 		</div>
 	</div>
 	
@@ -39,7 +44,7 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			There is currently no publication on YTDT. But the different citation standards provide guidelines for how to cite software, e.g. APA:
-			Rieder, Bernhard (2015). YouTube Data Tools (Version 1.10) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.
+			Rieder, Bernhard (2015). YouTube Data Tools (Version 1.12) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.
 						
 			<p>Alternatively, you can cite this <a href="http://thepoliticsofsystems.net/2015/05/exploring-youtube/">blog post</a>.</p>
 			
@@ -58,7 +63,7 @@
 			statistical files using a <a href="http://en.wikipedia.org/wiki/Tab-separated_values">tab-separated format</a>. You can easily change TSV to CSV by searching and replacing all tabs with commas.
 			
 			<p>These files can then be analyzed and visualized using graph visualization software such as the powerful and very easy to use <a href="http://gephi.org/" target="_blank">gephi</a>
-			platform or statistical tools such as R, Excel, SPSS or the interactive visualization software <a href="http://www.rosuda.org/Mondrian/">Mondrian</a>.</p>
+			platform or statistical tools such as R, Excel, SPSS, or others.</p>
 		</div>
 	</div>
 	
@@ -69,20 +74,13 @@
 	
 	<div class="rowTab">
 		<div class="fullTab">
-			Since I develop tools in my spare time, this is "as is" software and <strong>no support</strong> is provided. I do not respond to questions on how to use the tool or how
-			to solve a particular research problem with it.
-			
-			<p>There is an <a href="https://www.youtube.com/watch?v=sbErTW2MzCY" target="_blank">introductory video</a> and the interface for
+			There is an <a href="https://www.youtube.com/watch?v=sbErTW2MzCY" target="_blank">introductory video</a> and the interface for
 			each data module contains a description of what is does and links to the relevant sections of the API. Most importantly, to make sense of the data, a good
 			understanding of YouTube's basic architecture is required. The <a href="https://developers.google.com/youtube/v3/"  target="_blank">
-			documentation</a> for YouTube's API has comprehensive descriptions of entities and metrics.</p>
+			documentation</a> for YouTube's API has comprehensive descriptions of entities and metrics.
 			
-			<p>For finding help with technical matters or research design, I recommend looking in your own organization, e.g. your tech support team,
-			your thesis supervisor, or one of the departments that are actively engaged in data analysis. There are also numerous commercial data
-			analysis services that provide support for their customers.</p>
-			
-			<p>If your institution is interested in acquiring training or consulting services, please contact <a href="mailto:tools@polsys.net">tools@polsys.net</a>
-			with an outline of your requirements to receive a quote.</p>
+			<p>We provide user support through a <a href="https://www.reddit.com/r/CAT4SMR/" target="_blank">subreddit</a> and a
+			<a href="https://www.facebook.com/groups/678943026381479" target="_blank">Facebook Group</a>.</p>
 		</div>
 	</div>
 	
@@ -94,8 +92,11 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			Many of the modules require a video or channel id as input. These can normally be found in the respective YouTube URLs.
-			For example, in the URL https://www.youtube.com/watch?v=BNM4kEUEcp8 the strange code after the "=" sign is the video id.
-			For further information, there's a lot of great material available on these things through a simple Google query.
+			
+			<p>For example, in the URL <span class="grey">https://www.youtube.com/watch?v=</span><b>BNM4kEUEcp8</b> the strange code after the "=" sign is the video id.</p>
+			
+			<p>Channel ids can be found either directly in the channel URL (e.g. <span class="grey">https://www.youtube.com/channel/</span><b>UCtxGqPJPPi8ptAzB029jpYA</b>)
+			or by pasting the full channel URL <a href="https://commentpicker.com/youtube-channel-id.php" target="_blank">here</a>.</p>
 		</div>
 	</div>
 
@@ -106,7 +107,8 @@
 	
 	<div class="rowTab">
 		<div class="fullTab">
-			While this is very simple software, this can happen for all kinds of reasons.
+			While this is very simple software, this can happen for all kinds of reasons. Most problems are due to limitations or bugs in YouTube's Web-API and
+			cannot be solved easily on our side, though.
 	
 			<p>High quality bug reports are much appreciated. If you have no experience with reporting bugs effectively, please read
 			<a href="http://www.chiark.greenend.org.uk/~sgtatham/bugs.html" target="_blank">this piece</a> at least twice.
@@ -114,7 +116,7 @@
 			screenshot of the interface output, the data files, and a description of what you have been doing and how the problem manifests itself. Without extensive
 			information it can be very hard to replicate a problem and subsequently fix it.</p>
 			
-			<p>Please send bug reports to <a href="mailto:tools@polsys.net">tools@polsys.net</a>. I <strong>do not react</strong> to reports sent through any other channel.</p>
+			<p>Please submit bug reports via <a href="https://github.com/bernorieder/YouTube-Data-Tools/issues" target="_blank">github</a>.</p>
 		</div>
 	</div>
 		
@@ -138,7 +140,8 @@
 	
 	<div class="rowTab">
 		<div class="fullTab">
-			I cannot make any guarantees, but if you send a feature request to <a href="mailto:tools@polsys.net">tools@polsys.net</a>, I will definitely consider it.
+			We cannot make any guarantees, but if you post a feature request in our <a href="https://www.reddit.com/r/CAT4SMR/" target="_blank">subreddit</a> or
+			<a href="https://www.facebook.com/groups/678943026381479" target="_blank">Facebook Group</a>, we will definitely consider it.</p>
 		</div>
 	</div>
 	
