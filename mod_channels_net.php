@@ -219,7 +219,7 @@ function makeNetworkFromIds($depth) {
 		
 		$jsonfn = "./cache/channelmoreinfo_" . $chid . ".json";
 
-		if (file_exists($jsonfn) && $delta < (60 * 60 * 24 * 3)) {
+		if (file_exists($jsonfn) && time()-filemtime($jsonfn) < (60 * 60 * 24 * 3)) {
 
 			$reply = json_decode(file_get_contents($jsonfn));
 			

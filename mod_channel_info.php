@@ -24,10 +24,12 @@
 	
 
 	<div class="rowTab">
-		<div class="leftTab">Channel id:</div>
-		<div class="rightTab">
-			<input type="text" name="hash" value="<?php if(isset($_GET["hash"])) { echo $_GET["hash"]; } ?>" /> (channel ids can be found in URLs, e.g. <span class="grey">https://www.youtube.com/channel/</span><b>UCtxGqPJPPi8ptAzB029jpYA</b>)
+		<div class="oneTab"></div>
+		<div class="twoTab">Channel id(s):</div>
+		<div class="threeTab">
+			<textarea name="hash"><?php if(isset($_GET["hash"])) { echo $_GET["hash"]; } ?></textarea>
 		</div>
+		<div class="fourTab">(channel ids can be found in URLs, e.g. <span class="grey">https://www.youtube.com/channel/</span><b>UCtxGqPJPPi8ptAzB029jpYA</b>)</div>
 	</div>
 	
 	<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>

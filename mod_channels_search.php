@@ -32,7 +32,7 @@ if(isset($argv)) {
 	<div class="rowTab">
 		<div class="fullTab">
 		<p>This module queries the <a href="https://developers.google.com/youtube/v3/docs/search/list" target="_blank">search/list</a> API endpoint
-		for channels that match a search query and creates a a tabular file where each row is a channel.</p>
+		for channels that match a search query and creates a tabular file where each row is a channel.</p>
 		</div>
 	</div>
 

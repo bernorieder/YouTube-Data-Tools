@@ -320,6 +320,34 @@ function makeNetworkFromIds($depth) {
 		$run = true;
 		$nextpagetoken = null;
 		
+		$restquery = "https://www.googleapis.com/youtube/v3/search?part=id&maxResults=50&relatedToVideoId=".$vid."&type=video";
+
+		$reply = doAPIRequest($restquery);
+
+		foreach($reply->items as $item) {
+				
+			$featid = $item->id->videoId;
+			
+			if(!isset($nodes[$featid])) {
+				
+				if(!in_array($featid, $newids)) {
+
+					$newids[] = $featid;
+				}
+				
+				if($depth < $crawldepth) {
+					$edgeid = $vid . "_|_|X|_|_" . $featid;
+					$edges[$edgeid] = true;
+				}
+				
+			} else {
+
+				$edgeid = $vid . "_|_|X|_|_" . $featid;
+				$edges[$edgeid] = true;
+			}
+		}
+
+		/*
 		while($run == true) {
 	
 			$restquery = "https://www.googleapis.com/youtube/v3/search?part=id&maxResults=50&relatedToVideoId=".$vid."&type=video";
@@ -328,7 +356,9 @@ function makeNetworkFromIds($depth) {
 				$restquery .= "&pageToken=".$nextpagetoken;
 			}
 			
+
 			$reply = doAPIRequest($restquery);
+
 								
 			foreach($reply->items as $item) {
 				
@@ -362,7 +392,7 @@ function makeNetworkFromIds($depth) {
 				$run = false;
 			}
 		}
-
+		*/
 		echo $i . " "; flush(); ob_flush();
 	}
 

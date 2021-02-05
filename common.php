@@ -34,21 +34,25 @@ function doAPIRequest($url) {
 		
 		$reply = curl_exec($ch);
 		$info = curl_getinfo($ch);
-				
+
 		if($reply != false) {
 			$run = false;
 			$reply = json_decode($reply);
 			if(isset($reply->error)) {
 				if($reply->error->errors[0]->reason == "backendError") {
-					echo("YouTube's API reported 'backendError'. The tool will wait and try again.");
+					echo("<br /><br />YouTube's API reported 'backendError'. The tool will wait and try again.");
 					sleep(10);
 					continue;
+				} elseif($reply->error->errors[0]->reason == "quotaExceeded") {
+					echo("<br /><br />YouTube's API reported 'quotaExceeded'. This means that too many users have used the tool too hard and our daily request quota has been exceeded.
+					Please try again tomorrow and consider making less data-heavy requests.");
+					exit;
 				} elseif($reply->error->errors[0]->reason == "notFound") {
-					echo("YouTube's API reported 'notFound'. The tool will skip this item.");
+					echo("<br /><br />YouTube's API reported 'notFound'. The tool will skip this item.");
 					sleep(1);
 					return $reply;
 				} elseif($reply->error->errors[0]->reason != "subscriptionForbidden") {
-					echo("The request failed. YouTube's API gave the following error: " . $reply->error->errors[0]->reason);
+					echo("<br /><br />The request failed. YouTube's API gave the following error: " . $reply->error->errors[0]->reason);
 					exit;
 				} else {
 					return $reply;

@@ -60,7 +60,7 @@ if(isset($argv)) {
 		<div class="threeTab">
 			<input type="text" name="channel" value="<?php if(isset($_POST["channel"])) { echo $_POST["channel"]; }; ?>" />
 		</div>
-		<div class="fourTab">(channel ids can be found in URLs, e.g. <span class="grey">https://www.youtube.com/channel/</span><b>UCiDJtJKMICpb9B1qf7qjEOA</b>)</div>
+		<div class="fourTab">(channel ids can be found in URLs, e.g. <span class="grey">https://www.youtube.com/channel/</span><b>UCtxGqPJPPi8ptAzB029jpYA</b>)</div>
 	</div>
 	
 	<div class="rowTab">
@@ -470,6 +470,7 @@ function makeStatsFromIds($ids) {
 		$row["publishedAtSQL"] = date("Y-m-d H:i:s", strtotime($vid->snippet->publishedAt));
 		$row["videoTitle"] = preg_replace("/\s+/", " ",$vid->snippet->title);
 		$row["videoDescription"] = preg_replace("/\s+/", " ",$vid->snippet->description);
+		$row["tags"] = implode(",",$vid->snippet->tags);
 		$row["videoCategoryId"] = $vid->snippet->categoryId;
 		$row["videoCategoryLabel"] = "";
 		$row["duration"] = $vid->contentDetails->duration;

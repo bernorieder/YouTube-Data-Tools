@@ -26,7 +26,7 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			YTDT is written and maintained by <a href="http://rieder.polsys.net">Bernhard Rieder</a>, Associate Professor in <a href="http://mediastudies.nl" target="_blank">Media Studies</a> at the
-			<a href="http://www.uva.nl">University of Amsterdam</a> and researcher at the <a href="https://www.digitalmethods.net" target="_blank">Digital Methods Initiative</a>.
+			<a href="http://www.uva.nl">University of Amsterdam</a> and researcher with the <a href="https://www.digitalmethods.net" target="_blank">Digital Methods Initiative</a>.
 			
 			<p>Development and maintainance of this tool are financed by the Dutch <a href="https://pdi-ssh.nl/" target="_blank">Platform Digitale Infrastructuur 
 			Social Science and Humanities</a> as part of the <a href="https://cat4smr.humanities.uva.nl/" target="_blank">CAT4SMR project</a>.</p>
@@ -44,7 +44,7 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			There is currently no publication on YTDT. But the different citation standards provide guidelines for how to cite software, e.g. APA:
-			Rieder, Bernhard (2015). YouTube Data Tools (Version 1.12) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.
+			Rieder, Bernhard (2015). YouTube Data Tools (Version 1.21) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.
 						
 			<p>Alternatively, you can cite this <a href="http://thepoliticsofsystems.net/2015/05/exploring-youtube/">blog post</a>.</p>
 			
@@ -108,15 +108,18 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			While this is very simple software, this can happen for all kinds of reasons. Most problems are due to limitations or bugs in YouTube's Web-API and
-			cannot be solved easily on our side, though.
+			cannot be solved easily on our side, though. Sometimes the tool will fail because users have been using it too heavily.
 	
 			<p>High quality bug reports are much appreciated. If you have no experience with reporting bugs effectively, please read
-			<a href="http://www.chiark.greenend.org.uk/~sgtatham/bugs.html" target="_blank">this piece</a> at least twice.
+			<a href="http://www.chiark.greenend.org.uk/~sgtatham/bugs.html" target="_blank">this piece</a>.
 			TL;DR: developers need context to debug a tool, when filing a bug report, please add the URL of the call, the browser you are using, a
 			screenshot of the interface output, the data files, and a description of what you have been doing and how the problem manifests itself. Without extensive
 			information it can be very hard to replicate a problem and subsequently fix it.</p>
 			
-			<p>Please submit bug reports via <a href="https://github.com/bernorieder/YouTube-Data-Tools/issues" target="_blank">github</a>.</p>
+			<p>Please submit bug reports via our <a href="https://www.reddit.com/r/CAT4SMR/" target="_blank">subreddit</a>,
+			<a href="https://www.facebook.com/groups/678943026381479" target="_blank">Facebook Group</a>, or (ideally) <a href="https://github.com/bernorieder/YouTube-Data-Tools/issues" target="_blank">github</a>.
+			Please do not use Twitter - we need more information than 280 characters can provide.
+			</p>
 		</div>
 	</div>
 		
@@ -141,7 +144,7 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			We cannot make any guarantees, but if you post a feature request in our <a href="https://www.reddit.com/r/CAT4SMR/" target="_blank">subreddit</a> or
-			<a href="https://www.facebook.com/groups/678943026381479" target="_blank">Facebook Group</a>, we will definitely consider it.</p>
+			<a href="https://www.facebook.com/groups/678943026381479" target="_blank">Facebook Group</a>, we will definitely consider it.
 		</div>
 	</div>
 	
