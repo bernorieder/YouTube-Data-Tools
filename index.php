@@ -7,6 +7,8 @@
 			<p>For some context and a small introduction, please check out this <a href="http://thepoliticsofsystems.net/2015/05/exploring-youtube/">blog post</a>.
 			
 			<p>Each of the modules has a basic description of how it works, there is a <a href="faq.php">FAQ</a> section with additional information, and an <a href="https://www.youtube.com/watch?v=sbErTW2MzCY" target="_blank">introductory video</a>.</p>
+
+			<p>To learn more about how we handle data, please read our <a href="privacy.php">privacy policy</a>.</p>
 			
 			<p>If you use this tool in a scientific publication, please cite it, e.g. in APA style: Rieder, Bernhard (2015). YouTube Data Tools (Version 1.22) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.</p>
 		</div>
