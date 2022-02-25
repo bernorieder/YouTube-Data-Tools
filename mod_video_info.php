@@ -41,6 +41,13 @@
 	</div>
 
 	<div class="rowTab">
+		<div class="leftTab">Limit to:</div>
+		<div class="rightTab">
+			<input type="text" name="toplimit" value="<?php if(isset($_GET["toplimit"])) { echo $_GET["toplimit"]; } ?>" /> top level comments (ranked by relevance, leave empty for no limit)</b>
+		</div>
+	</div>
+
+	<div class="rowTab">
 		<div class="leftTab">HTML output:</div>
 		<div class="rightTab">
 			<input type="checkbox" name="htmloutput" <?php if($_GET["htmloutput"] == "on") { echo "checked"; } ?> /> (displays HTML result tables in addition to file exports)
@@ -122,6 +129,11 @@ if(isset($_GET["videolist"])) {
 		exit;
 	}
 
+	if(preg_match("/\D/", $_GET["toplimit"])) {
+		echo "<br /><br />Wrong comment limit.";
+		exit;
+	}
+
 	echo 'Processing:';
 
 	$videohash = $_GET["videohash"];
@@ -129,8 +141,13 @@ if(isset($_GET["videolist"])) {
 	$commentonly = $_GET["commentonly"];
 	$filename = "videoinfo_".$videohash."_".date("Y_m_d-H_i_s");
 
+	$toplimit = $_GET["toplimit"];
+	if($toplimit == "") {
+		$toplimit = 0;
+	}
+
 	$video = getInfo($videohash);
-	$nodecomments = getComments($videohash);
+	$nodecomments = getComments($videohash,$toplimit);
 	$commenters = getCommenters($nodecomments);
 	makeNetwork($nodecomments);
 	
@@ -251,7 +268,7 @@ function getInfo($videohash) {
 }
 
 
-function getComments($videohash) {
+function getComments($videohash,$toplimit) {
 	
 	global $html,$filename,$folder;
 
@@ -260,27 +277,35 @@ function getComments($videohash) {
 
 	$nextpagetoken = null;
 	$run = true;
+	$counter = 0;
 	$comments = array();
 	
 	echo "<br /><br />Getting comments: "; flush(); ob_flush();
 
 	while($run == true) {
-		
-		$restquery = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&maxResults=100&videoId=".$videohash;
-		
+
+		if($toplimit > 0) {
+			$restquery = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&maxResults=100&order=relevance&videoId=".$videohash;
+		} else {
+			$restquery = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&maxResults=100&videoId=".$videohash;
+		}
+
 		if($nextpagetoken != null) {
 			$restquery .= "&pageToken=".$nextpagetoken;
 		}
 		
 		$reply = doAPIRequest($restquery);
-		
+
 		foreach($reply->items as $item) {
-			$comments[] = $item;
+			if($counter < $toplimit || $toplimit == 0) {
+				$comments[] = $item;
+			}
+			$counter++;
 		}
-		
+
 		echo " " . count($comments); flush(); ob_flush();
 		
-		if(isset($reply->nextPageToken) && $reply->nextPageToken != "") {
+		if(isset($reply->nextPageToken) && $reply->nextPageToken != "" && ($toplimit == 0 || count($comments) < $toplimit)) {
 			$nextpagetoken = $reply->nextPageToken;				
 		} else {
 			$run = false;

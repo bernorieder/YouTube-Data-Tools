@@ -317,12 +317,25 @@ function makeNetworkFromIds($depth) {
 		$vid = $ids[$i];
 		
 		// get related videos
-		$run = true;
-		$nextpagetoken = null;
+		//$run = true;
+		//$nextpagetoken = null;
 		
-		$restquery = "https://www.googleapis.com/youtube/v3/search?part=id&maxResults=50&relatedToVideoId=".$vid."&type=video";
+		$jsonfn = "./cache/videorelated_" . $vid . ".json";
 
-		$reply = doAPIRequest($restquery);
+		// 2 hours caching
+		if (file_exists($jsonfn) && time()-filemtime($jsonfn) < (60 * 60 * 2)) {
+
+			$reply = json_decode(file_get_contents($jsonfn));
+			
+		} else {
+
+			$restquery = "https://www.googleapis.com/youtube/v3/search?part=id&maxResults=50&relatedToVideoId=".$vid."&type=video";
+
+			$reply = doAPIRequest($restquery);
+
+			file_put_contents($jsonfn, json_encode($reply));
+		}
+		
 
 		foreach($reply->items as $item) {
 				

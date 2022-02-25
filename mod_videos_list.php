@@ -89,7 +89,7 @@ if(isset($argv)) {
 			<input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; }; ?>" />
 		</div>
 		<div class="fourTab">
-			(this is passed to the search endpoint)
+			(this is passed to the search endpoint, check the "q" parameter <a href="https://developers.google.com/youtube/v3/docs/search/list" target="_blank">here</a> for for to use boolean operators)
 			<p>optional <a href="http://www.loc.gov/standards/iso639-2/php/code_list.php" target="_blank">ISO 639-1</a> relevance language: <input type="text" name="language" style="width:20px;" value="<?php if(isset($_POST["language"])) { echo $_POST["language"]; }; ?>" /></p>
 			<p>optional <a href="https://www.iso.org/obp/ui/#search" target="_blank">ISO 3166-1 alpha-2</a> region code: <input type="text" name="regioncode" style="width:20px;" value="<?php if(isset($_POST["regioncode"])) { echo $_POST["regioncode"]; }; ?>" /> (default = US)</p>
 		</div>
