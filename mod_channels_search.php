@@ -74,7 +74,6 @@ if(isset($argv)) {
 		</div>
 	</div>
 	
-	
 	<div class="rowTab">
 		<div class="oneTab"></div>
 		<div class="twoTab">Rank by:</div>
@@ -87,6 +86,19 @@ if(isset($argv)) {
 				<option value="videoCount" <?php if($_POST["rankby"] == "videoCount") { echo "selected"; } ?>>videoCount – Channels are sorted in descending order of their number of uploaded videos</option>
 				<option value="viewCount" <?php if($_POST["rankby"] == "viewCount") { echo "selected"; } ?>>viewCount - Resources are sorted from highest to lowest number of views</option>	
 			</select>
+		</div>
+	</div>
+
+	<div class="rowTab">
+		<div class="sectionTab"><hr /></div>
+	</div>
+
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">File format:</div>
+		<div class="fourTab">
+			csv <input type="radio" name="output" value="csv" checked /> / 
+			tab <input type="radio" name="output" value="tab" />
 		</div>
 	</div>
 	
@@ -143,7 +155,9 @@ if(isset($_POST["query"])) {
 		$date_before = $_POST["date_before"];
 		$date_after = $_POST["date_after"];
 	}
+	$output = $_POST["output"];
 	$rankby = $_POST["rankby"];
+
 	
 	$ids = getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after);
 
@@ -199,7 +213,7 @@ function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date
 	
 function makeStatsFromIds($ids) {
 	
-	global $mode,$folder;
+	global $mode,$folder,$output;
 	
 	$vids = array();
 	$lookup = array();
@@ -231,23 +245,29 @@ function makeStatsFromIds($ids) {
 		$channels[] = $channel;
 	}
 	
-	
-	// create TSV file
-	$content_tsv = "position\t".implode("\t", array_keys($channels[0])) . "\n";
-	
-	for($i = 0; $i < count($channels); $i++) {
-		$content_tsv .=  ($i + 1) . "\t". implode("\t",$channels[$i]) . "\n";
-	}
 
-	$filename = "channelsearch_channels" . count($channels) . "_" . date("Y_m_d-H_i_s");
+	$filename = "channelsearch_channels" . count($channels) . "_" . date("Y_m_d-H_i_s") . "." . $output;
 	if(isset($_POST["filename"])) { $filename = $_POST["filename"] . "_" . $filename; }
 
-	writefile($folder.$filename.".tab", $content_tsv);
-	
+	$fp = fopen($folder.$filename, 'w');
+	$fieldnames = array_keys($channels[0]);
+	array_unshift($fieldnames,'position');
+	$separator = ($output == "tab") ? "\t":",";
+
+	fputcsv($fp, $fieldnames,$separator);
+
+	for($i = 0; $i < count($channels); $i++) {
+		array_unshift($channels[$i], $i + 1);
+		fputcsv($fp, $channels[$i],$separator);
+	}
+
+	fclose($fp);
+
+
 	out("<br /><br />The script has created a file with " . count($channels) . " rows.<br /><br />");
 
 	outweb('your files:<br />
-	<a href="'.$folder.$filename.'.tab" download>' . $filename . '.tab</a>
+	<a href="'.$folder.$filename.'" download>' . $filename . '</a>
 	</body>
 	</html>');
 }

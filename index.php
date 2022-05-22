@@ -10,7 +10,7 @@
 
 			<p>To learn more about how we handle data, please read our <a href="privacy.php">privacy policy</a>.</p>
 			
-			<p>If you use this tool in a scientific publication, please cite it, e.g. in APA style: Rieder, Bernhard (2015). YouTube Data Tools (Version 1.22) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.</p>
+			<p>If you use this tool in a scientific publication, please cite it, e.g. in APA style: Rieder, Bernhard (2015). YouTube Data Tools (Version 1.23) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.</p>
 		</div>
 	</div>
 	
@@ -113,6 +113,7 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			<ul>
+			<li>v1.23 - 22/05/2022 - Added output format selector.</li>
 			<li>v1.22 - 25/02/2021 - Added a means to limit to n top comments in video info module.</li>
 			<li>v1.21 - 11/01/2021 - Added video tags to video list module.</li>
 			<li>v1.20 - 31/12/2020 - Added channel search module, housekeeping.</li>

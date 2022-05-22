@@ -15,7 +15,7 @@
 			100.000 comments have been successfully retrieved. This seems to be mainly related to the age of the video in question.</p>
 			
 			<p>The module creates the following outputs:
-				<ul>
+				<ul> 
 					<li>a tabular file containing basic info and statistics about the video;</li>
 					<li>a tabular file containing all retrievable comments, both top level and replies;</li>
 					<li>a tabular file containing comment authors and their comment count;</li>
@@ -51,6 +51,18 @@
 		<div class="leftTab">HTML output:</div>
 		<div class="rightTab">
 			<input type="checkbox" name="htmloutput" <?php if($_GET["htmloutput"] == "on") { echo "checked"; } ?> /> (displays HTML result tables in addition to file exports)
+		</div>
+	</div>
+
+	<div class="rowTab">
+		<div class="sectionTab"><hr /></div>
+	</div>
+
+	<div class="rowTab">
+		<div class="leftTab">File format:</div>
+		<div class="rightTab">
+			csv <input type="radio" name="output" value="csv" checked /> / 
+			tab <input type="radio" name="output" value="tab" />
 		</div>
 	</div>
 
@@ -139,6 +151,7 @@ if(isset($_GET["videolist"])) {
 	$videohash = $_GET["videohash"];
 	$html = $_GET["htmloutput"];
 	$commentonly = $_GET["commentonly"];
+	$output = $_GET["output"];
 	$filename = "videoinfo_".$videohash."_".date("Y_m_d-H_i_s");
 
 	$toplimit = $_GET["toplimit"];
@@ -152,9 +165,9 @@ if(isset($_GET["videolist"])) {
 	makeNetwork($nodecomments);
 	
 	echo '<br /><br />The following files have been generated:<br />';
-	echo '<a href="./data/'.$filename.'_basicinfo.tab" download>'.$filename.'_basicinfo.tab</a><br />';
-	echo '<a href="./data/'.$filename.'_comments.tab" download>'.$filename.'_comments.tab</a><br />';
-	echo '<a href="./data/'.$filename.'_authors.tab" download>'.$filename.'_authors.tab</a><br />';
+	echo '<a href="./data/'.$filename.'_basicinfo.'.$output.'" download>'.$filename.'_basicinfo.'.$output.'</a><br />';
+	echo '<a href="./data/'.$filename.'_comments.'.$output.'" download>'.$filename.'_comments.'.$output.'</a><br />';
+	echo '<a href="./data/'.$filename.'_authors.'.$output.'" download>'.$filename.'_authors.'.$output.'</a><br />';
 	echo '<a href="./data/'.$filename.'_commentnetwork.gdf" download>'.$filename.'_commentnetwork.gdf</a><br />';
 	echo '<br />';
 	
@@ -216,7 +229,7 @@ if(isset($_GET["videolist"])) {
 
 function getInfo($videohash) {
 
-	global $html,$filename,$folder;
+	global $html,$filename,$folder,$output;
 
 	// forbidden: fileDetails,processingDetails,suggestions
 	$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet,status,topicDetails&id=".$videohash;
@@ -258,11 +271,14 @@ function getInfo($videohash) {
     $video["publicStatsViewable"] = $reply->status->publicStatsViewable;
 
 	
-	$content = "";
+	$fp = fopen("./".$folder.$filename."_basicinfo.".$output, 'w');
+	$separator = ($output == "tab") ? "\t":",";
+
 	foreach($video as $key => $data) {
-		$content .= $key."\t".$data."\n";
+		fputcsv($fp, array($key,$data), $separator);
 	}
-	writefile("./".$folder.$filename."_basicinfo.tab",$content);
+
+	fclose($fp);
 	
 	return $video;
 }
@@ -270,7 +286,7 @@ function getInfo($videohash) {
 
 function getComments($videohash,$toplimit) {
 	
-	global $html,$filename,$folder;
+	global $html,$filename,$folder,$output;
 
 	
 	// get toplevel comments first
@@ -391,13 +407,17 @@ function getComments($videohash,$toplimit) {
 	
 	echo '<br /><br/>The script retrieved '.count($nodecomments).' comments from '.count($comments).' top level comments.'; 
 	
-	
-	$content = implode("\t",array_keys($nodecomments[0])) . "\n";
+
+	$fp = fopen("./".$folder.$filename."_comments.".$output, 'w');
+	$separator = ($output == "tab") ? "\t":",";
+	$fieldnames = array_keys($nodecomments[0]);
+	fputcsv($fp, $fieldnames, $separator);
+
 	foreach($nodecomments as $comment) {
-		$content .= implode("\t",$comment) . "\n";
+		fputcsv($fp, $comment, $separator);
 	}
-	writefile("./".$folder.$filename."_comments.tab",$content);
-	
+
+	fclose($fp);	
 	
 	return $nodecomments;
 }
@@ -405,7 +425,7 @@ function getComments($videohash,$toplimit) {
 
 function getCommenters($nodecomments) {
 	
-	global $filename,$folder;
+	global $filename,$folder,$output;
 	
 	$authors = array();
 	
@@ -418,11 +438,15 @@ function getCommenters($nodecomments) {
 	
 	arsort($authors);
 	
-	$content = "";
+	$fp = fopen("./".$folder.$filename."_authors.".$output, 'w');
+	$separator = ($output == "tab") ? "\t":",";
+	fputcsv($fp, array("author","count"), $separator);
+
 	foreach($authors as $key => $data) {
-		$content .= $key."\t".$data."\n";
+		fputcsv($fp, array($key,$data), $separator);
 	}
-	writefile("./".$folder.$filename."_authors.tab",$content);
+
+	fclose($fp);	
 	
 	return $authors;
 }

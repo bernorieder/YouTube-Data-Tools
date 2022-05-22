@@ -144,6 +144,19 @@ if(isset($argv)) {
 		</div>
 		<div class="fourTab">(video ids, comma separated)</div>
 	</div>
+
+	<div class="rowTab">
+		<div class="sectionTab"><hr /></div>
+	</div>
+
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">File format:</div>
+		<div class="fourTab">
+			csv <input type="radio" name="output" value="csv" checked /> / 
+			tab <input type="radio" name="output" value="tab" />
+		</div>
+	</div>
 	
 	<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
 	
@@ -248,6 +261,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 			$date_before = $_POST["date_before"];
 			$date_after = $_POST["date_after"];
 		}
+		$output = $_POST["output"];
 		$rankby = $_POST["rankby"];
 		
 		$ids = getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after,$daymode);
@@ -430,7 +444,7 @@ function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date
 	
 function makeStatsFromIds($ids) {
 	
-	global $mode,$folder;
+	global $mode,$folder,$output;
 	
 	$vids = array();
 	$lookup = array();
@@ -509,22 +523,27 @@ function makeStatsFromIds($ids) {
 	}
 	
 	
-	// create TSV file
-	$content_tsv = "position\t".implode("\t", array_keys($vids[0])) . "\n";
-	
-	for($i = 0; $i < count($vids); $i++) {
-		$content_tsv .=  ($i + 1) . "\t". implode("\t",$vids[$i]) . "\n";
-	}
-
-	$filename = "videolist_" . $mode . count($vids) . "_" . date("Y_m_d-H_i_s");
+	$filename = "videolist_" . $mode . count($vids) . "_" . date("Y_m_d-H_i_s") . "." . $output;
 	if(isset($_POST["filename"])) { $filename = $_POST["filename"] . "_" . $filename; }
 
-	writefile($folder.$filename.".tab", $content_tsv);
+	$fp = fopen($folder.$filename, 'w');
+	$fieldnames = array_keys($vids[0]);
+	array_unshift($fieldnames,'position');
+	$separator = ($output == "tab") ? "\t":",";
+
+	fputcsv($fp, $fieldnames,$separator);
+
+	for($i = 0; $i < count($vids); $i++) {
+		array_unshift($vids[$i], $i + 1);
+		fputcsv($fp, $vids[$i],$separator);
+	}
+
+	fclose($fp);
 	
 	out("<br /><br />The script has created a file with " . count($vids) . " rows.<br /><br />");
 
 	outweb('your files:<br />
-	<a href="'.$folder.$filename.'.tab" download>' . $filename . '.tab</a>
+	<a href="'.$folder.$filename.'" download>' . $filename . '</a>
 	</body>
 	</html>');
 
