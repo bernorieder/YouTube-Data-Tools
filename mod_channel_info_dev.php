@@ -15,8 +15,7 @@ include("html_head.php");
 	<div class="rowTab">
 		<div class="fullTab">
 			<p>This module retrieves different kinds of information for a channel from the <a href="https://developers.google.com/youtube/v3/docs/channels/list" target="_blank">channels/list</a> API endpoint
-			from a specified channel id or channel URL. You can use this module to find channel ids to use in other modules.</p>
-			<p>The following resources are requested: brandingSettings, status, id, snippet, contentDetails, statistics, and topicDetails.</p>
+			from a specified channel id or channel URL. The following resources are requested: brandingSettings, status, id, snippet, contentDetails, statistics, and topicDetails.</p>
 			<p>Output is a direct print of the API response.</p>
 		</div>
 	</div>
@@ -29,7 +28,7 @@ include("html_head.php");
 		<div class="sectionTab"><h2>The channel(s) to investigate:</h2></div>
 	</div>
 
-	<form action="mod_channel_info.php" method="post">
+	<form action="mod_channel_info_dev.php" method="post">
 
 
 	<div class="rowTab">

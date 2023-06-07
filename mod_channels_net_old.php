@@ -21,10 +21,10 @@
 		<div class="sectionTab"><h1>Parameters</h1></div>
 	</div>
 	
-	<form action="mod_channels_net_tmp.php" method="post">
+	<form action="mod_channels_net.php" method="post">
 	
 	<div class="rowTab">
-		<div class="sectionTab"><h2>Starting point:</h2></div>
+		<div class="sectionTab"><h2>1) choose a starting point:</h2></div>
 	</div>
 
 	<div class="rowTab">
@@ -74,7 +74,7 @@
 	</div>
 
 	<div class="rowTab">
-		<div class="sectionTab"><h2>Additional parameters:</h2></div>
+		<div class="sectionTab"><h2>2) set additional parameters:</h2></div>
 	</div>
 	
 	<div class="rowTab">
@@ -91,18 +91,11 @@
 		<div class="fourTab">(values are 0, 1 or 2)</div>
 	</div>
 	
-	<div class="rowTab">
-		<div class="sectionTab"><h2>Run:</h2></div>
-	</div>
-
-	<div class="rowTab">
-		<div class="oneTab">
-			<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
-		</div>
-	</div>
+	<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
 	
 	<div class="rowTab">
-		<div class="oneTab"><input type="submit" /></div>
+		<div class="oneTab"></div>
+		<div class="fourTab"><input type="submit" /></div>
 	</div>
 	
 	</form>
@@ -208,7 +201,7 @@ function getIdsFromSearch($query,$iterations,$rankby) {
 		}
 	}
 	
-	return array_values(array_unique($ids));
+	return $ids;
 }
 	
 	
@@ -258,7 +251,7 @@ function makeNetworkFromIds($depth) {
 		echo $i . " "; flush(); ob_flush();
 	}
 
-	#UCUmEPYxmnyQDeRUcFkslmQw
+
 
 	if($subscriptions == "on") {
 		echo "<br />getting subscriptions for ".count($ids)." channels at depth ".$depth.": ";
@@ -266,41 +259,7 @@ function makeNetworkFromIds($depth) {
 	}
 	
 	foreach($nodes as $nodeid => $nodedata) {
-		
-		$restquery = "https://www.googleapis.com/youtube/v3/channelSections?part=contentDetails&channelId=".$nodedata->id;
 
-		$reply = doAPIRequest($restquery);
-
-		foreach($reply->items as $item) {
-
-			if(isset($item->contentDetails->channels)) {
-
-				foreach($item->contentDetails->channels as $featid) {
-					
-					if(!isset($nodes[$featid])) {
-					
-						if(!in_array($featid, $newids)) {
-							
-							$newids[] = $featid;
-						}
-						
-						if($depth < $crawldepth && $nodeid != $featid) {
-							$edgeid = $nodeid . "_|_|X|_|_" . $featid;
-							$edges[$edgeid] = true;
-						}
-						
-					} else {
-		
-						if($nodeid != $featid) {
-							$edgeid = $nodeid . "_|_|X|_|_" . $featid;
-							$edges[$edgeid] = true;
-						}
-					}
-				}
-			}
-		}
-
-		/*
 		if(isset($nodedata->brandingSettings->channel->featuredChannelsUrls)) {
 				
 			foreach($nodedata->brandingSettings->channel->featuredChannelsUrls as $featid) {
@@ -324,7 +283,7 @@ function makeNetworkFromIds($depth) {
 				}
 			}	
 		}
-		*/
+		
 		
 		
 		if($subscriptions == "on" && $nodedata->done == false) {
@@ -364,17 +323,15 @@ function makeNetworkFromIds($depth) {
 								$newids[] = $featid;
 							}
 							
-							if($depth < $crawldepth && $nodeid != $featid) {
+							if($depth < $crawldepth) {
 								$edgeid = $nodeid . "_|_|X|_|_" . $featid;
 								$edges[$edgeid] = true;
 							}
 							
 						} else {
-							
-							if($nodeid != $featid) {
-								$edgeid = $nodeid . "_|_|X|_|_" . $featid;
-								$edges[$edgeid] = true;
-							}
+			
+							$edgeid = $nodeid . "_|_|X|_|_" . $featid;
+							$edges[$edgeid] = true;
 						}
 	
 					}
@@ -452,6 +409,7 @@ function renderNetwork() {
 
 	your files:<br />
 	<a href="./data/'.$filename.'.gdf" download>'.$filename.'.gdf</a><br />';
+
 }
 
 ?>

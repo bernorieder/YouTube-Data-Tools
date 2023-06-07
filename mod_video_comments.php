@@ -31,8 +31,12 @@
 		<div class="sectionTab"><h1>Parameters</h1></div>
 	</div>
 	
-	<form action="mod_video_info.php" method="get">
+	<form action="mod_video_comments.php" method="get">
 		
+	<div class="rowTab">
+		<div class="sectionTab"><h2>Video selection and comment cutoff:</h2></div>
+	</div>
+
 	<div class="rowTab">
 		<div class="leftTab">Video id:</div>
 		<div class="rightTab">
@@ -48,14 +52,14 @@
 	</div>
 
 	<div class="rowTab">
+		<div class="sectionTab"><h2>Output option:</h2></div>
+	</div>
+
+	<div class="rowTab">
 		<div class="leftTab">HTML output:</div>
 		<div class="rightTab">
 			<input type="checkbox" name="htmloutput" <?php if($_GET["htmloutput"] == "on") { echo "checked"; } ?> /> (displays HTML result tables in addition to file exports)
 		</div>
-	</div>
-
-	<div class="rowTab">
-		<div class="sectionTab"><hr /></div>
 	</div>
 
 	<div class="rowTab">
@@ -66,13 +70,18 @@
 		</div>
 	</div>
 
-	<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
+	<div class="rowTab">
+		<div class="sectionTab"><h2>Run:</h2></div>
+	</div>
 
 	<div class="rowTab">
-		<div class="leftTab"></div>
-		<div class="rightTab">
-			<input type="submit" />
+		<div class="oneTab">
+			<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
 		</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"><input type="submit" /></div>
 	</div>
 	
 	</form>
@@ -500,14 +509,14 @@ function makeNetwork($nodecomments) {
 	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,commentCount INT\n";
 	foreach($nodes as $nodeid => $nodedata) {
 		$nodeid = preg_replace("/,/", " ", $nodeid);
-		$nodegdf .= $nodeid . "," . $nodeid  . "," . $nodedata . "\n";
+		$nodegdf .=sha1($nodeid) . "," . $nodeid  . "," . $nodedata . "\n";
 	}
 	
 	$edgegdf = "edgedef>node1 VARCHAR,node2 VARCHAR,weight INT,directed BOOLEAN\n";
 	foreach($edges as $edgeid => $edgedata) {
 		$tmp = explode("_|_|X|_|_",$edgeid);
 		
-		$edgegdf .= preg_replace("/,/", " ", $tmp[0]) . "," . preg_replace("/,/", " ", $tmp[1]) . "," . $edgedata . ",true\n";
+		$edgegdf .= preg_replace("/,/", " ", sha1($tmp[0])) . "," . preg_replace("/,/", " ", sha1($tmp[1])) . "," . $edgedata . ",true\n";
 	}
 	
 	$gdf = $nodegdf . $edgegdf;

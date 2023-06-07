@@ -89,7 +89,7 @@ if(isset($argv)) {
 			<input type="text" name="query" value="<?php if(isset($_POST["query"])) { echo $_POST["query"]; }; ?>" />
 		</div>
 		<div class="fourTab">
-			(this is passed to the search endpoint, check the "q" parameter <a href="https://developers.google.com/youtube/v3/docs/search/list" target="_blank">here</a> for for to use boolean operators)
+			(this is passed to the search endpoint, check the "q" parameter <a href="https://developers.google.com/youtube/v3/docs/search/list" target="_blank">here</a> for how to use boolean operators)
 			<p>optional <a href="http://www.loc.gov/standards/iso639-2/php/code_list.php" target="_blank">ISO 639-1</a> relevance language: <input type="text" name="language" style="width:20px;" value="<?php if(isset($_POST["language"])) { echo $_POST["language"]; }; ?>" /></p>
 			<p>optional <a href="https://www.iso.org/obp/ui/#search" target="_blank">ISO 3166-1 alpha-2</a> region code: <input type="text" name="regioncode" style="width:20px;" value="<?php if(isset($_POST["regioncode"])) { echo $_POST["regioncode"]; }; ?>" /> (default = US)</p>
 		</div>
@@ -146,7 +146,7 @@ if(isset($argv)) {
 	</div>
 
 	<div class="rowTab">
-		<div class="sectionTab"><hr /></div>
+		<div class="sectionTab"><h2>Output options:</h2></div>
 	</div>
 
 	<div class="rowTab">
@@ -157,14 +157,25 @@ if(isset($argv)) {
 			tab <input type="radio" name="output" value="tab" />
 		</div>
 	</div>
-	
-	<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
-	
+
 	<div class="rowTab">
 		<div class="oneTab"></div>
-		<div class="fourTab">
-			<input type="submit" />
+		<div class="twoTab">Co-tag network:</div>
+		<div class="fourTab"><input type="checkbox" name="cotag" <?php if(isset($_POST["cotag"])) { echo "checked"; } ?> /> generate a co-tag network (can run out of memory if used with very long video lists)</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="sectionTab"><h2>Run:</h2></div>
+	</div>
+
+	<div class="rowTab">
+		<div class="oneTab">
+			<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
 		</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"><input type="submit" /></div>
 	</div>
 	
 	</form>
@@ -190,6 +201,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 	}
 
 	$mode = $_POST["mode"];
+	$output = $_POST["output"];
 
 	if($mode == "channel") {
 
@@ -256,12 +268,12 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		$query = $_POST["query"];
 		$iterations = $_POST["iterations"];
 		$daymode = isset($_POST["daymode"]);
+		$cotag = isset($_POST["cotag"]);
 		$date_before = $date_after = false;
 		if(isset($_POST["timeframe"])) {
 			$date_before = $_POST["date_before"];
 			$date_after = $_POST["date_after"];
 		}
-		$output = $_POST["output"];
 		$rankby = $_POST["rankby"];
 		
 		$ids = getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after,$daymode);
@@ -438,24 +450,24 @@ function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date
 		}
 	}
 	
-	return $ids;
+	return array_values(array_unique($ids));
 }
 	
 	
 function makeStatsFromIds($ids) {
 	
-	global $mode,$folder,$output;
+	global $mode,$folder,$output,$cotag;	
 	
 	$vids = array();
-	$lookup = array();
-	$categoryIds = array();
-	
+	$lookup = array(); 
+	$categoryIds = array();	
+
 	out("<br /><br />Getting video details (".count($ids)."): ");
-	
+
 	for($i = 0; $i < count($ids); $i++) {
-		
+	
 		$vid = $ids[$i];
-		$lookup[$vid] = $i; 
+		$lookup[$vid] = $i;
 		
 		$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet&id=".$vid;
 
@@ -492,6 +504,8 @@ function makeStatsFromIds($ids) {
         $row["dimension"] = $vid->contentDetails->dimension;
         $row["definition"] = $vid->contentDetails->definition;
         $row["caption"] = $vid->contentDetails->caption;
+		$row["defaultLanguage"] = $vid->snippet->defaultLanguage;
+		$row["defaultLAudioLanguage"] = $vid->snippet->defaultAudioLanguage;
         $row["thumbnail_maxres"] = $vid->snippet->thumbnails->maxres->url;
         $row["licensedContent"] = $vid->contentDetails->licensedContent;
         $row["viewCount"] = $vid->statistics->viewCount;
@@ -521,8 +535,60 @@ function makeStatsFromIds($ids) {
 	for($i = 0; $i < count($vids); $i++) {
 		$vids[$i]["videoCategoryLabel"] = $categoryTrans[$vids[$i]["videoCategoryId"]];
 	}
+
+
+	// co-tag network
+	if($cotag) {
+		$tagnodes = array();
+		$tagedges = array();
+		foreach($vids as $vid) {
+			$tags = explode(",",strtolower(trim($vid["tags"])));
+			$tags = array_filter($tags);
+
+			for($i = 0; $i < count($tags); $i++) {
+				if(!isset($tagnodes[$tags[$i]])) {
+					$tagnodes[$tags[$i]] = 0;
+				}
+				$tagnodes[$tags[$i]]++;
+			}
+
+			for($i = 0; $i < count($tags); $i++) {
+
+				for($j = $i+1; $j < count($tags); $j++) {
+
+					$tmpedge = array($tags[$i],$tags[$j]);
+					sort($tmpedge);
+
+					$edgeid = $tmpedge[0] . "_|_|X|_|_" . $tmpedge[1];
+					if(!isset($tagedges[$edgeid])) {
+						$tagedges[$edgeid] = 0;
+					}
+					$tagedges[$edgeid]++;
+				}
+			}
+		}
+
+		$gdf = "nodedef>name VARCHAR,label VARCHAR,count INT\n";
+		foreach($tagnodes as $nodeid => $nodedata) {
+
+			$gdf .= $nodeid . "," . $nodeid . "," . $nodedata . "\n";
+
+		}
+		
+		$gdf .= "edgedef>node1 VARCHAR,node2 VARCHAR,weight INT,directed BOOLEAN\n";
+		foreach($tagedges as $edgeid => $edgedata) {
+			$tmpedge = explode("_|_|X|_|_",$edgeid);
+			$gdf .= $tmpedge[0] . "," . $tmpedge[1] . "," . $edgedata . ",false\n";
+		}
+
+		$filenamegdf = "videolist_tagnet_" . $mode . count($vids) . "_" . date("Y_m_d-H_i_s") . ".gdf";
+		writefile($folder.$filenamegdf, $gdf);
+	}
+
 	
+
 	
+	// generate and write video list file
 	$filename = "videolist_" . $mode . count($vids) . "_" . date("Y_m_d-H_i_s") . "." . $output;
 	if(isset($_POST["filename"])) { $filename = $_POST["filename"] . "_" . $filename; }
 
@@ -542,8 +608,12 @@ function makeStatsFromIds($ids) {
 	
 	out("<br /><br />The script has created a file with " . count($vids) . " rows.<br /><br />");
 
-	outweb('your files:<br />
-	<a href="'.$folder.$filename.'" download>' . $filename . '</a>
+	outweb('your files:<br />');
+	if($cotag) {
+		outweb('T<a href="'.$folder.$filenamegdf.'" download>' . $filenamegdf . '</a><br />');
+	}
+
+	outweb('<a href="'.$folder.$filename.'" download>' . $filename . '</a>
 	</body>
 	</html>');
 

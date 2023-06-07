@@ -23,7 +23,7 @@
 	<form action="mod_videos_net.php" method="post">
 	
 	<div class="rowTab">
-		<div class="sectionTab"><h2>1) choose a starting point:</h2></div>
+		<div class="sectionTab"><h2>Choose a starting point:</h2></div>
 	</div>
 
 	<div class="rowTab">
@@ -87,7 +87,7 @@
 
 
 	<div class="rowTab">
-		<div class="sectionTab"><h2>2) set additional parameters:</h2></div>
+		<div class="sectionTab"><h2>Additional parameters:</h2></div>
 	</div>
 
 	<div class="rowTab">
@@ -96,12 +96,26 @@
 		<div class="threeTab"><input type="text" name="crawldepth" max="2" value="<?php echo (isset($_POST["crawldepth"])) ? $_POST["crawldepth"]:1; ?>" /></div>
 		<div class="fourTab">(values are 0, 1 or 2)</div>
 	</div>
-	
-	<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
-	
+
 	<div class="rowTab">
 		<div class="oneTab"></div>
-		<div class="fourTab"><input type="submit" /></div>
+		<div class="twoTab">Related videos:</div>
+		<div class="threeTab"><input type="text" name="maxrelated" max="2" value="<?php echo (isset($_POST["maxrelated"])) ? $_POST["maxrelated"]:50; ?>" /></div>
+		<div class="fourTab">(how many related videos to get per video, max is 50)</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="sectionTab"><h2>Run:</h2></div>
+	</div>
+
+	<div class="rowTab">
+		<div class="oneTab">
+			<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
+		</div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="oneTab"><input type="submit" /></div>
 	</div>
 
 	</form>
@@ -135,11 +149,17 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 
 	$mode = $_POST["mode"];
 	$crawldepth = $_POST["crawldepth"];
+	$maxrelated = $_POST["maxrelated"];
 	$nodes = array();
 	$edges = array();
 	
 	if($_POST["crawldepth"] > 2 || preg_match("/\D/", $crawldepth)) {
-		echo "<br /><br />Wrong crawldepth.";
+		echo "<br /><br />Wrong crawl depth.";
+		exit;
+	}
+
+	if($_POST["maxrelated"] > 50 || preg_match("/\D/", $maxrelated)) {
+		echo "<br /><br />Wrong number of related videos.";
 		exit;
 	}
 
@@ -167,6 +187,7 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		}
 		
 		$ids = getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after);
+		$seeds = $ids;
 		
 		$no_seeds = count($ids);
 		
@@ -186,6 +207,7 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		$seeds = trim($seeds);
 		
 		$ids = explode(",",$seeds);
+		$seeds = $ids;
 		
 		$no_seeds = count($ids);
 		
@@ -229,13 +251,13 @@ function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date
 		}
 	}
 	
-	return $ids;
+	return array_values(array_unique($ids));
 }
 	
 	
 function makeNetworkFromIds($depth) {
 	
-	global $nodes,$edges,$ids,$crawldepth;
+	global $nodes,$edges,$ids,$crawldepth,$maxrelated;
 	
 	echo "<br /><br />getting details for ".count($ids)." videos at depth ".$depth.": ";
 	
@@ -250,6 +272,8 @@ function makeNetworkFromIds($depth) {
 		
 		$reply = doAPIRequest($restquery);
 
+		//print_r($reply);
+
 		if(isset($reply->items[0])) {
 
 			$video = $reply->items[0];
@@ -263,7 +287,8 @@ function makeNetworkFromIds($depth) {
 			$row["channelId"] = $video->snippet->channelId;
 			$row["channelTitle"] = preg_replace("/\s+/", " ",$video->snippet->channelTitle);
 			$row["videoId"] = $video->id;
-			$row["publishedAt"] = strtotime($video->snippet->publishedAt);
+			$row["publishedAtUnix"] = strtotime($video->snippet->publishedAt);
+			$row["publishedAtSQL"] = date("Y-m-d H:m:s", $row["publishedAtUnix"]);
 			$row["videoTitle"] = preg_replace("/\s+/", " ",$video->snippet->title);
 			$row["videoDescription"] = preg_replace("/\s+/", " ",$video->snippet->description);
 			$row["videoCategoryId"] = $video->snippet->categoryId;
@@ -272,6 +297,8 @@ function makeNetworkFromIds($depth) {
 			$row["dimension"] = $video->contentDetails->dimension;
 			$row["definition"] = $video->contentDetails->definition;
 			$row["caption"] = $video->contentDetails->caption;
+			$row["defaultLanguage"] = $video->snippet->defaultLanguage;
+			$row["defaultAudioLanguage"] = $video->snippet->defaultAudioLanguage;
 			$row["licensedContent"] = $video->contentDetails->licensedContent;
 			$row["viewCount"] = $video->statistics->viewCount;
 			$row["dislikeLikeRatio"] = (isset($video->statistics->likeCount) && isset($video->statistics->dislikeCount) && $video->statistics->likeCount > 0) ? $video->statistics->dislikeCount / $video->statistics->likeCount:"";
@@ -279,6 +306,8 @@ function makeNetworkFromIds($depth) {
 			$row["dislikeCount"] = (isset($video->statistics->dislikeCount)) ? $video->statistics->dislikeCount:"";
 			$row["favoriteCount"] = $video->statistics->favoriteCount;
 			$row["commentCount"] = (isset($video->statistics->commentCount)) ? $video->statistics->commentCount:"";
+
+			//print_r($row);
 
 			$nodes[$vid] = $row;
 
@@ -320,16 +349,16 @@ function makeNetworkFromIds($depth) {
 		//$run = true;
 		//$nextpagetoken = null;
 		
-		$jsonfn = "./cache/videorelated_" . $vid . ".json";
+		$jsonfn = "./cache/videorelated_" . $vid . "_" . $maxrelated . ".json";
 
 		// 2 hours caching
-		if (file_exists($jsonfn) && time()-filemtime($jsonfn) < (60 * 60 * 2)) {
+		if (file_exists($jsonfn) && time()-filemtime($jsonfn) < (60 * 60 * 10)) {
 
 			$reply = json_decode(file_get_contents($jsonfn));
 			
 		} else {
 
-			$restquery = "https://www.googleapis.com/youtube/v3/search?part=id&maxResults=50&relatedToVideoId=".$vid."&type=video";
+			$restquery = "https://www.googleapis.com/youtube/v3/search?part=id&maxResults=".$maxrelated."&relatedToVideoId=".$vid."&type=video";
 
 			$reply = doAPIRequest($restquery);
 
@@ -433,18 +462,30 @@ function makeNetworkFromIds($depth) {
 
 function renderNetwork() {
 	
-	global $nodes,$edges,$lookup,$no_seeds,$mode,$folder;
-	
+	global $nodes,$edges,$lookup,$seeds,$no_seeds,$mode,$folder;
+
 	// to generate channel network
 	$ch_nodes = array();
 	$ch_edges = array();
 	
+	// examine edges to see who links back to seeds
+	$back_nodes = array();
+	foreach($edges as $edgeid => $edgedata) {
+		$tmp = explode("_|_|X|_|_",$edgeid);
+		if(in_array($tmp[1],$seeds)) {
+			$back_nodes[] = $tmp[0];
+		}
+	}
 	
 	// generate related video network and extract data for related channel network
-	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,publishedAt INT,channelTitle VARCHAR,channelId VARCHAR,videoCategoryLabel VARCHAR,viewCount INT,likeCount INT,dislikeCount INT,dislikeLikeRatio FLOAT,favoriteCount INT,commentCount INT\n";
+	$nodegdf = "nodedef>name VARCHAR,label VARCHAR,isSeed VARCHAR,seedRank INT,linksSeed VARCHAR,publishedAtUnix INT,publishedAtSQL VARCHAR,channelTitle VARCHAR,channelId VARCHAR,videoCategoryLabel VARCHAR,defaultLanguage VARCHAR,defaultAudioLanguage VARCHAR,viewCount INT,likeCount INT,dislikeCount INT,dislikeLikeRatio FLOAT,favoriteCount INT,commentCount INT\n";
 	foreach($nodes as $nodeid => $nodedata) {
 
-		$nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata["videoTitle"]) . "," . $nodedata["isSeed"] . "," . $nodedata["seedRank"] . "," . $nodedata["publishedAt"] . "," . preg_replace("/,|\"|\'/"," ",$nodedata["channelTitle"]) . "," . $nodedata["channelId"] . "," . preg_replace("/,|\"|\'/"," ",$nodedata["videoCategoryLabel"]) . "," .$nodedata["viewCount"] . "," . $nodedata["likeCount"] . "," . $nodedata["dislikeCount"] . "," . $nodedata["dislikeLikeRatio"] . "," . $nodedata["favoriteCount"] . "," . $nodedata["commentCount"] . "," . "\n";
+		//print_r($nodedata);
+
+		$linksseed = (in_array($nodeid,$back_nodes)) ? "yes":"no";
+
+		$nodegdf .= $nodeid . "," . preg_replace("/,|\"|\'/"," ",$nodedata["videoTitle"]) . "," . $nodedata["isSeed"] . "," . $nodedata["seedRank"] . "," . $linksseed . "," . $nodedata["publishedAtUnix"] . "," . $nodedata["publishedAtSQL"] . "," .  preg_replace("/,|\"|\'/"," ",$nodedata["channelTitle"]) . "," . $nodedata["channelId"] . "," . preg_replace("/,|\"|\'/"," ",$nodedata["videoCategoryLabel"]) . "," .$nodedata["defaultLanguage"]. "," .$nodedata["defaultAudioLanguage"]. "," .$nodedata["viewCount"] . "," . $nodedata["likeCount"] . "," . $nodedata["dislikeCount"] . "," . $nodedata["dislikeLikeRatio"] . "," . $nodedata["favoriteCount"] . "," . $nodedata["commentCount"] . "," . "\n";
 
 		if(!isset($ch_nodes[$nodedata["channelId"]])) {
 			$tmpnode = array();
@@ -507,7 +548,7 @@ function renderNetwork() {
 	
 	echo '<br /><br />The script has created a net with  '.count($nodes).' videos from '.$no_seeds.' seeds.<br /><br />
 
-	your files:<br />
+	Your files:<br />
 	<a href="'.$folder.$filename.'.gdf" download>'.$filename.'.gdf</a> (the related video network)<br />
 	<a href="'.$folder.$ch_filename.'.gdf" download>'.$ch_filename.'.gdf</a> (the extracted channel network)<br />';
 }

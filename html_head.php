@@ -37,17 +37,21 @@ require_once "common.php";
 		</div>
 	</div>
 	
+	<?php 
+
+		$fn = basename($_SERVER['REQUEST_URI']);
+
+	?>
 	
 	<div class="rowTab">
 		<div class="sectionTab">
-			<a href="index.php" class="navlink">Home</a>
-			<a href="mod_channel_info.php" class="navlink">Channel Info</a>
-			<a href="mod_channels_search.php" class="navlink">Channel Search</a>
-			<a href="mod_channels_net.php" class="navlink">Channel Network</a>
-			<a href="mod_videos_list.php" class="navlink">Video List</a>
-			<a href="mod_videos_net.php" class="navlink">Video Network</a>
-			<a href="mod_video_info.php" class="navlink">Video Info</a>
-			<a href="faq.php" class="navlink">FAQ</a>
+			<a href="index.php" class="navlink" <?php if($fn == "index.php" || $fn == "youtube") { echo('style="background-color:#0B3C5D"'); } ?>>Home</a>
+			<a href="mod_channel_info.php" class="navlink" <?php if($fn == "mod_channel_info.php") { echo('style="background-color:#0B3C5D"'); } ?>>Channel Info</a>
+			<a href="mod_channels_list.php" class="navlink" <?php if($fn == "mod_channels_list.php") { echo('style="background-color:#0B3C5D"'); } ?>>Channel List</a>
+			<a href="mod_channels_net.php" class="navlink" <?php if($fn == "mod_channels_net.php") { echo('style="background-color:#0B3C5D"'); } ?>>Channel Network</a>
+			<a href="mod_videos_list.php" class="navlink" <?php if($fn == "mod_videos_list.php") { echo('style="background-color:#0B3C5D"'); } ?>>Video List</a>
+			<a href="mod_videos_net.php" class="navlink" <?php if($fn == "mod_videos_net.php") { echo('style="background-color:#0B3C5D"'); } ?>>Video Network</a>
+			<a href="mod_video_comments.php" class="navlink" <?php if($fn == "mod_video_comments.php") { echo('style="background-color:#0B3C5D"'); } ?>>Video Comments</a>
+			<a href="faq.php" class="navlink" <?php if($fn == "faq.php") { echo('style="background-color:#0B3C5D"'); } ?>>FAQ</a>
 		</div>
 	</div>
-	

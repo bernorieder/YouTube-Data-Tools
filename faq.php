@@ -44,7 +44,7 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			There is currently no publication on YTDT. But the different citation standards provide guidelines for how to cite software, e.g. APA:
-			Rieder, Bernhard (2015). YouTube Data Tools (Version 1.23) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.
+			Rieder, Bernhard (2015). YouTube Data Tools (Version 1.31) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.
 						
 			<p>Alternatively, you can cite this <a href="http://thepoliticsofsystems.net/2015/05/exploring-youtube/">blog post</a>.</p>
 			
@@ -95,8 +95,8 @@
 			
 			<p>For example, in the URL <span class="grey">https://www.youtube.com/watch?v=</span><b>BNM4kEUEcp8</b> the strange code after the "=" sign is the video id.</p>
 			
-			<p>Channel ids can be found either directly in the channel URL (e.g. <span class="grey">https://www.youtube.com/channel/</span><b>UCtxGqPJPPi8ptAzB029jpYA</b>)
-			or by pasting the full channel URL <a href="https://commentpicker.com/youtube-channel-id.php" target="_blank">here</a>.</p>
+			<p>Channel ids have a format similar to <b>UCtxGqPJPPi8ptAzB029jpYA</b> and can be found via the <a href="mod_channel_info.php" target="_blank">channel info module</a>. Just paste the 
+			channel URL into the form, the channel id will be in the result.</p>
 		</div>
 	</div>
 
