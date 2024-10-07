@@ -44,7 +44,7 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			There is currently no publication on YTDT. But the different citation standards provide guidelines for how to cite software, e.g. APA:
-			Rieder, Bernhard (2015). YouTube Data Tools (Version 1.31) [Software]. Available from https://tools.digitalmethods.net/netvizz/youtube/.
+			Rieder, Bernhard (2015). YouTube Data Tools (Version 1.42) [Software]. Available from https://ytdt.digitalmethods.net.
 						
 			<p>Alternatively, you can cite this <a href="http://thepoliticsofsystems.net/2015/05/exploring-youtube/">blog post</a>.</p>
 			
@@ -60,7 +60,8 @@
 	<div class="rowTab">
 		<div class="fullTab">
 			It creates network files in <a href="https://gephi.org/users/supported-graph-formats/gdf-format/" target="_blank">gdf format</a> (a simple text format that specifies a graph) as well as
-			statistical files using a <a href="http://en.wikipedia.org/wiki/Tab-separated_values">tab-separated format</a>. You can easily change TSV to CSV by searching and replacing all tabs with commas.
+			statistical files in <a href="https://www.howtogeek.com/348960/what-is-a-csv-file-and-how-do-i-open-it/" target="_blank">CSV</a> or 
+			<a href="https://en.wikipedia.org/wiki/Tab-separated_values" target="_blank">TAB</a> format.
 			
 			<p>These files can then be analyzed and visualized using graph visualization software such as the powerful and very easy to use <a href="http://gephi.org/" target="_blank">gephi</a>
 			platform or statistical tools such as R, Excel, SPSS, or others.</p>
@@ -74,13 +75,13 @@
 	
 	<div class="rowTab">
 		<div class="fullTab">
-			There is an <a href="https://www.youtube.com/watch?v=sbErTW2MzCY" target="_blank">introductory video</a> and the interface for
+			There is an <a href="https://www.youtube.com/playlist?list=PLVTuM_sR1CecX8pgQaTfnDvxo9g_j_RO0" target="_blank">collection of introductory videos</a> and the interface for
 			each data module contains a description of what is does and links to the relevant sections of the API. Most importantly, to make sense of the data, a good
 			understanding of YouTube's basic architecture is required. The <a href="https://developers.google.com/youtube/v3/"  target="_blank">
 			documentation</a> for YouTube's API has comprehensive descriptions of entities and metrics.
 			
-			<p>We provide user support through a <a href="https://www.reddit.com/r/CAT4SMR/" target="_blank">subreddit</a> and a
-			<a href="https://www.facebook.com/groups/678943026381479" target="_blank">Facebook Group</a>.</p>
+			<p>We provide user support through <a href="https://github.com/bernorieder/YouTube-Data-Tools/issues" target="_blank">GitHub</a> and a
+			<a href="https://www.facebook.com/groups/678943026381479" target="_blank">Facebook Group</a>. Please do not use Twitter or email.</p>
 		</div>
 	</div>
 	
@@ -102,12 +103,23 @@
 
 
 	<div class="rowTab">
+		<div class="sectionTab"><h2>Where is the video network module?</h2></div>
+	</div>
+	
+	<div class="rowTab">
+		<div class="fullTab">
+			YouTube removed the "relatedVideos" API endpoint in August 2023 and, as a consequence, this module had to be retired.
+		</div>
+	</div>
+
+
+	<div class="rowTab">
 		<div class="sectionTab"><h2>The tool does not work (correctly)!</h2></div>
 	</div>
 	
 	<div class="rowTab">
 		<div class="fullTab">
-			While this is very simple software, this can happen for all kinds of reasons. Most problems are due to limitations or bugs in YouTube's Web-API and
+			While the YTDT is very simple software, this can happen for all kinds of reasons. Most problems are due to limitations or bugs in YouTube's Web-API and
 			cannot be solved easily on our side, though. Sometimes the tool will fail because users have been using it too heavily.
 	
 			<p>High quality bug reports are much appreciated. If you have no experience with reporting bugs effectively, please read
@@ -116,9 +128,8 @@
 			screenshot of the interface output, the data files, and a description of what you have been doing and how the problem manifests itself. Without extensive
 			information it can be very hard to replicate a problem and subsequently fix it.</p>
 			
-			<p>Please submit bug reports via our <a href="https://www.reddit.com/r/CAT4SMR/" target="_blank">subreddit</a>,
-			<a href="https://www.facebook.com/groups/678943026381479" target="_blank">Facebook Group</a>, or (ideally) <a href="https://github.com/bernorieder/YouTube-Data-Tools/issues" target="_blank">github</a>.
-			Please do not use Twitter - we need more information than 280 characters can provide.
+			<p>Please submit issues or bug reports via our <a href="https://www.facebook.com/groups/678943026381479" target="_blank">Facebook Group</a> or (ideally) <a href="https://github.com/bernorieder/YouTube-Data-Tools/issues" target="_blank">GitHub</a>.
+			Please do not use Twitter or email.
 			</p>
 		</div>
 	</div>
@@ -143,8 +154,8 @@
 	
 	<div class="rowTab">
 		<div class="fullTab">
-			We cannot make any guarantees, but if you post a feature request in our <a href="https://www.reddit.com/r/CAT4SMR/" target="_blank">subreddit</a> or
-			<a href="https://www.facebook.com/groups/678943026381479" target="_blank">Facebook Group</a>, we will definitely consider it.
+			We cannot make any guarantees, but if you post a feature request in our
+			<a href="https://www.facebook.com/groups/678943026381479" target="_blank">Facebook Group</a> or on <a href="https://github.com/bernorieder/YouTube-Data-Tools" target="_blank">GitHub</a>, we will definitely consider it. Please do not use Twitter or email.
 		</div>
 	</div>
 	
@@ -155,7 +166,7 @@
 	
 	<div class="rowTab">
 		<div class="fullTab">
-			The full source code is available on <a href="https://github.com/bernorieder/YouTube-Data-Tools" target="_blank">github</a>. You'll also find installation instructions there.
+			The full source code is available on <a href="https://github.com/bernorieder/YouTube-Data-Tools" target="_blank">GitHub</a>. You'll also find installation instructions there.
 		</div>
 	</div>		
 			

@@ -49,11 +49,24 @@ function doAPIRequest($url) {
 					exit;
 				} elseif($reply->error->errors[0]->reason == "notFound") {
 					echo("<br /><br />YouTube's API reported 'notFound'. The tool will skip this item.<br /><br />");
-					sleep(1);
+					return $reply;
+				} elseif($reply->error->errors[0]->reason == "forbidden") {
+					echo("<br /><br />YouTube's API reported 'forbidden'. The tool will skip this item.<br /><br />");
+					return $reply;
+				} elseif($reply->error->errors[0]->reason == "videoNotFound") {
+					echo("<br /><br />YouTube's API reported 'videoNotFound'. The tool will skip this item.<br /><br />");
+					return $reply;
+				} elseif($reply->error->errors[0]->reason == "commentsDisabled") {
+					//echo("<br /><br />YouTube's API reported 'commentsDisabled'. The tool will skip this item.<br /><br />");
+					return $reply;
+				} elseif($reply->error->errors[0]->reason == "processingFailure") {
+					echo("<br /><br />YouTube's API reported 'processingFailure'. The tool will skip this item.<br /><br />");
 					return $reply;
 				} elseif($reply->error->errors[0]->reason == "playlistNotFound") {
 					echo("<br /><br />YouTube's API reported 'playlistNotFound'. The tool will skip this item.<br /><br />");
-					sleep(1);
+					return $reply;
+				} elseif($reply->error->errors[0]->reason == "channelNotFound") {
+					echo("<br /><br />YouTube's API reported 'channelNotFound'. The tool will skip this item.<br /><br />");
 					return $reply;
 				} elseif($reply->error->errors[0]->reason != "subscriptionForbidden") {
 					echo("<br /><br />The request failed. YouTube's API gave the following error: " . $reply->error->errors[0]->reason);

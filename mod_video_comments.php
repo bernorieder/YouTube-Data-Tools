@@ -63,6 +63,13 @@
 	</div>
 
 	<div class="rowTab">
+		<div class="leftTab">Pseudonymize:</div>
+		<div class="rightTab">
+			<input type="checkbox" name="pseudo" <?php if($_GET["pseudo"] == "on") { echo "checked"; } ?> /> (replaces usernames and comment ids with irreversible hashes)
+		</div>
+	</div>
+
+	<div class="rowTab">
 		<div class="leftTab">File format:</div>
 		<div class="rightTab">
 			csv <input type="radio" name="output" value="csv" checked /> / 
@@ -76,7 +83,7 @@
 
 	<div class="rowTab">
 		<div class="oneTab">
-			<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
+			<div class="g-recaptcha" data-sitekey="<?php echo $sitekey; ?>"></div>
 		</div>
 	</div>
 	
@@ -126,9 +133,8 @@ if(isset($_GET["videolist"])) {
 	
 	foreach($videolist as $video) {
 		$filename = "videoinfo_".$video["channelId"]."_".$video["videoId"]."_".date("Y_m_d-H_i_s");
-		getComments($video["videoId"]);
+		getComments($video["videoId"],0);
 	}
-	
 	
 } else if(isset($_GET["videohash"])) {
 
@@ -137,6 +143,7 @@ if(isset($_GET["videolist"])) {
 		 </div>
 		 <div class="rowTab">';
 	
+	//if(false) {
 	if(RECAPTCHA) {
 		if($_GET["g-recaptcha-response"] == "") {
 			echo "Recaptcha missing.";
@@ -155,10 +162,9 @@ if(isset($_GET["videolist"])) {
 		exit;
 	}
 
-	echo 'Processing:';
-
 	$videohash = $_GET["videohash"];
 	$html = $_GET["htmloutput"];
+	$pseudo = $_GET["pseudo"];
 	$commentonly = $_GET["commentonly"];
 	$output = $_GET["output"];
 	$filename = "videoinfo_".$videohash."_".date("Y_m_d-H_i_s");
@@ -168,11 +174,12 @@ if(isset($_GET["videolist"])) {
 		$toplimit = 0;
 	}
 
+
 	$video = getInfo($videohash);
 	$nodecomments = getComments($videohash,$toplimit);
 	$commenters = getCommenters($nodecomments);
-	makeNetwork($nodecomments);
-	
+	$nodecomments = makeNetwork($nodecomments);
+
 	echo '<br /><br />The following files have been generated:<br />';
 	echo '<a href="./data/'.$filename.'_basicinfo.'.$output.'" download>'.$filename.'_basicinfo.'.$output.'</a><br />';
 	echo '<a href="./data/'.$filename.'_comments.'.$output.'" download>'.$filename.'_comments.'.$output.'</a><br />';
@@ -182,7 +189,7 @@ if(isset($_GET["videolist"])) {
 	
 
 	if($html == "on") {
-	
+
 		echo "<hr /><br />";
 	
 		// output basic video info table
@@ -241,11 +248,11 @@ function getInfo($videohash) {
 	global $html,$filename,$folder,$output;
 
 	// forbidden: fileDetails,processingDetails,suggestions
-	$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet,status,topicDetails&id=".$videohash;
+	$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet,status&id=".$videohash;
 
 	$reply = doAPIRequest($restquery);
 	if(count($reply->items) == 0) {
-		echo "<br /><br />No results found. You are probably not using a valid video id."; exit;
+		echo "No results found. You are probably not using a valid video id."; exit;
 	}
 	$reply = $reply->items[0];
 	$video = array();
@@ -295,7 +302,7 @@ function getInfo($videohash) {
 
 function getComments($videohash,$toplimit) {
 	
-	global $html,$filename,$folder,$output;
+	global $filename,$folder,$output,$html,$pseudo,$realauthors;
 
 	
 	// get toplevel comments first
@@ -305,14 +312,14 @@ function getComments($videohash,$toplimit) {
 	$counter = 0;
 	$comments = array();
 	
-	echo "<br /><br />Getting comments: "; flush(); ob_flush();
+	echo "Getting comments: "; flush(); ob_flush();
 
 	while($run == true) {
 
 		if($toplimit > 0) {
-			$restquery = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&maxResults=100&order=relevance&videoId=".$videohash;
+			$restquery = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&textFormat=plainText&maxResults=100&order=relevance&videoId=".$videohash;
 		} else {
-			$restquery = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&maxResults=100&videoId=".$videohash;
+			$restquery = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&textFormat=plainText&maxResults=100&videoId=".$videohash;
 		}
 
 		if($nextpagetoken != null) {
@@ -341,15 +348,20 @@ function getComments($videohash,$toplimit) {
 	// work through top level comments and get replies
 	
 	$nodecomments = array();
+	$realauthors = array();
 	$counter = 0;
 	
 	echo "<br /><br/>Digging into thread structure: "; flush(); ob_flush();
 	
 	foreach($comments as $comment) {
 		
-		echo " " . $counter; flush(); ob_flush();
+		if($counter % 10 == 0) {
+			echo " " . $counter; flush(); ob_flush();
+		}
 		$counter++;
 		
+		if(!isset($realauthors[$comment->snippet->topLevelComment->snippet->authorDisplayName])) { $realauthors[$comment->snippet->topLevelComment->snippet->authorDisplayName] = 0;  }
+
 		$tmp = array();
 		$tmp["id"] = $comment->id;
 		$tmp["replyCount"] = $comment->snippet->totalReplyCount;
@@ -362,8 +374,13 @@ function getComments($videohash,$toplimit) {
 		$tmp["isReply"] = 0;
 		$tmp["isReplyTo"] = "";
 		$tmp["isReplyToName"] = "";
-		
-		//print_r($tmp);
+
+		if($pseudo) {
+			$tmp["id"] = sha1($tmp["id"]);
+			$tmp["authorName"] = sha1($tmp["authorName"]);
+			unset($tmp["authorChannelId"]);
+			unset($tmp["authorChannelUrl"]);
+		}
 		
 		$nodecomments[] = $tmp;
 		
@@ -375,7 +392,7 @@ function getComments($videohash,$toplimit) {
 		
 			while($run == true) {
 				
-				$restquery = "https://www.googleapis.com/youtube/v3/comments?part=snippet&textFormat=plainText&maxResults=100&parentId=".$tmp["id"];
+				$restquery = "https://www.googleapis.com/youtube/v3/comments?part=snippet&textFormat=plainText&maxResults=100&parentId=".$comment->id;
 				
 				if($nextpagetoken != null) {
 					$restquery .= "&pageToken=".$nextpagetoken;
@@ -406,9 +423,17 @@ function getComments($videohash,$toplimit) {
 				$tmp2["authorChannelId"] = $reply->snippet->authorChannelId->value;
 				$tmp2["authorChannelUrl"] = $reply->snippet->authorChannelUrl;
 				$tmp2["isReply"] = 1;
-				$tmp2["isReplyToId"] = $tmp["id"];
+				$tmp2["isReplyToId"] = $comment->id;
 				$tmp2["isReplyToName"] = $tmp["authorName"];
 				
+				if($pseudo) {
+					$tmp2["authorName"] = sha1($tmp2["authorName"]);
+					$tmp2["id"] = sha1($tmp2["id"]);
+					$tmp2["isReplyToId"] = sha1($tmp2["isReplyToId"]);
+					unset($tmp2["authorChannelId"]);
+					unset($tmp2["authorChannelUrl"]);
+				}
+
 				$nodecomments[] = $tmp2;	
 			}	
 		}		
@@ -416,7 +441,6 @@ function getComments($videohash,$toplimit) {
 	
 	echo '<br /><br/>The script retrieved '.count($nodecomments).' comments from '.count($comments).' top level comments.'; 
 	
-
 	$fp = fopen("./".$folder.$filename."_comments.".$output, 'w');
 	$separator = ($output == "tab") ? "\t":",";
 	$fieldnames = array_keys($nodecomments[0]);
@@ -426,19 +450,22 @@ function getComments($videohash,$toplimit) {
 		fputcsv($fp, $comment, $separator);
 	}
 
-	fclose($fp);	
-	
+	fclose($fp);
+
 	return $nodecomments;
 }
 
 
 function getCommenters($nodecomments) {
 	
-	global $filename,$folder,$output;
-	
+	global $filename,$pseudo,$folder,$output;
+
 	$authors = array();
 	
 	foreach($nodecomments as $comment) {
+
+		if($pseudo) { $comment["authorName"] = sha1($comment["authorName"]); }
+		
 		if(!isset($authors[$comment["authorName"]])) {
 			$authors[$comment["authorName"]] = 0;
 		}
@@ -463,35 +490,56 @@ function getCommenters($nodecomments) {
 
 function makeNetwork($nodecomments) {
 	
-	global $filename,$folder;
+	global $filename,$pseudo,$realauthors,$folder;
 	
+	echo "<br /><br />Generating network."; flush(); ob_flush();
+
 	$nodes = array();
 	$edges = array();
 	
-	foreach($nodecomments as $nodecomment) {
+	for($i = 0; $i < count($nodecomments); $i++) {
 		
+		$nodecomment = $nodecomments[$i];
+
 		if(!isset($nodes[$nodecomment["authorName"]])) {
 			$nodes[$nodecomment["authorName"]] = 0;
 		}
 		$nodes[$nodecomment["authorName"]]++;
 		
-		$tmp = preg_match_all("/oid=\"\d+\">(.*)<\/a>/U",$nodecomment["text"],$out);
+		//$tmp = preg_match_all("/oid=\"\d+\">(.*)<\/a>/U",$nodecomment["text"],$out);
+		//$flattened = "\@" . implode('|\@', array_keys($realauthors));
+		//$tmp = preg_match("/".$flattened."/U",$nodecomment["text"]);
 		
-		if(count($out[1]) > 0) {
+		/*
+		if($tmp > 0) {
 			
-			foreach($out[1] as $ref) {
-				if(!isset($nodes[$ref])) {
-					$nodes[$ref] = 0;
+			foreach(array_keys($realauthors) as $realauthor) {
+
+				$tmp2 = preg_match("/\@".$realauthor."/U",$nodecomment["text"]);
+
+				if($tmp2 > 0) {
+
+					if($pseudo) {
+						$nodecomments[$i]["text"] = preg_replace("/\@".$realauthor."/U","",$nodecomment["text"]);
+						$realauthor = sha1($realauthor);
+					}
+
+					if(!isset($nodes[$realauthor])) {
+						$nodes[$realauthor] = 0;
+					}
+						
+					$edgeid = $nodecomment["authorName"] . "_|_|X|_|_" . $realauthor;
+					if(!isset($edges[$edgeid])) {
+						$edges[$edgeid] = 0;
+					}
+					$edges[$edgeid]++;
 				}
-				
-				$edgeid = $nodecomment["authorName"] . "_|_|X|_|_" . $ref;
-				if(!isset($edges[$edgeid])) {
-					$edges[$edgeid] = 0;
-				}
-				$edges[$edgeid]++;
 			}
 			
-		} else if ($nodecomment["isReply"] == 1) {
+		} else
+		*/
+
+		if ($nodecomment["isReply"] == 1) {
 			
 			if(!isset($nodes[$nodecomment["isReplyToName"]])) {
 				$nodes[$nodecomment["isReplyToName"]] = 0;
@@ -522,6 +570,8 @@ function makeNetwork($nodecomments) {
 	$gdf = $nodegdf . $edgegdf;
 	
 	writefile("./".$folder.$filename."_commentnetwork.gdf",$gdf);
+
+	return $nodecomments;
 }
 
 ?>

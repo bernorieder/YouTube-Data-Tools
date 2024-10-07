@@ -3,6 +3,10 @@
 require_once "config.php";
 require_once "common.php";
 
+//ini_set('display_errors', '1');
+//ini_set('display_startup_errors', '1');
+//error_reporting(E_ALL);
+
 $folder = DATAFOLDER;
 
 // allow for direct URL parameters
@@ -91,7 +95,7 @@ if(isset($argv)) {
 		<div class="fourTab">
 			(this is passed to the search endpoint, check the "q" parameter <a href="https://developers.google.com/youtube/v3/docs/search/list" target="_blank">here</a> for how to use boolean operators)
 			<p>optional <a href="http://www.loc.gov/standards/iso639-2/php/code_list.php" target="_blank">ISO 639-1</a> relevance language: <input type="text" name="language" style="width:20px;" value="<?php if(isset($_POST["language"])) { echo $_POST["language"]; }; ?>" /></p>
-			<p>optional <a href="https://www.iso.org/obp/ui/#search" target="_blank">ISO 3166-1 alpha-2</a> region code: <input type="text" name="regioncode" style="width:20px;" value="<?php if(isset($_POST["regioncode"])) { echo $_POST["regioncode"]; }; ?>" /> (default = US)</p>
+			<p>optional <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2" target="_blank">ISO 3166-1 alpha-2</a> region code: <input type="text" name="regioncode" style="width:20px;" value="<?php if(isset($_POST["regioncode"])) { echo $_POST["regioncode"]; }; ?>" /> (default = US)</p>
 		</div>
 	</div>
 	
@@ -115,7 +119,6 @@ if(isset($argv)) {
 		</div>
 	</div>
 	
-	
 	<div class="rowTab">
 		<div class="oneTab"></div>
 		<div class="twoTab">Rank by:</div>
@@ -130,7 +133,18 @@ if(isset($argv)) {
 			</select>
 		</div>
 	</div>
+
+	<div class="rowTab">
+		<div class="oneTab"></div>
+		<div class="twoTab">Location:</div>
+		<div class="fourTab">
+			<input type="checkbox" name="location" <?php if(isset($_POST["location"])) { echo "checked"; } ?> /> search for videos that specify location in their metadata:
+			<p>point: <input type="text" name="location_point" value="<?php echo (isset($_POST["location_point"])) ? $_POST["location_point"]:""; ?>" /> (latitude/longitude coordinates, e.g. 37.42307,-122.08427)</p>
+			<p>radius: <input type="text" name="location_radius" value="<?php echo (isset($_POST["location_radius"])) ? $_POST["location_radius"]:""; ?>" /> (radius in m, km, ft, or mi, e.g. 10km)</p>
+		</div>
+	</div>
 	
+
 	<div class="rowTab">
 		<div class="sectionTab"><hr /></div>
 	</div>
@@ -170,7 +184,7 @@ if(isset($argv)) {
 
 	<div class="rowTab">
 		<div class="oneTab">
-			<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
+			<div class="g-recaptcha" data-sitekey="<?php echo $sitekey; ?>"></div>
 		</div>
 	</div>
 	
@@ -202,6 +216,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 
 	$mode = $_POST["mode"];
 	$output = $_POST["output"];
+	$cotag = isset($_POST["cotag"]);
 
 	if($mode == "channel") {
 
@@ -253,7 +268,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		
 	} else if($mode == "search") {
 		
-		if($_POST["query"] == "") {
+		if($_POST["query"] == "" && !isset($_POST["location"])) {
 			out("<br /><br />Missing query.");
 			exit;
 		}
@@ -268,15 +283,25 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		$query = $_POST["query"];
 		$iterations = $_POST["iterations"];
 		$daymode = isset($_POST["daymode"]);
-		$cotag = isset($_POST["cotag"]);
 		$date_before = $date_after = false;
 		if(isset($_POST["timeframe"])) {
 			$date_before = $_POST["date_before"];
 			$date_after = $_POST["date_after"];
 		}
 		$rankby = $_POST["rankby"];
+		$locationmode = isset($_POST["location"]);
+		if($locationmode == true) {
+			if($_POST["location_point"] != "" && $_POST["location_radius"] != "") {
+				$location_point = $_POST["location_point"];
+				$location_radius = $_POST["location_radius"];
+			} else {
+				out("missing location parameters");
+			}
+		} else {
+			$location_point = $location_radius = "";
+		}
 		
-		$ids = getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after,$daymode);
+		$ids = getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$daymode,$date_before,$date_after,$locationmode,$location_point,$location_radius);
 
 		makeStatsFromIds($ids);
 		
@@ -294,7 +319,7 @@ if(isset($_POST["channel"]) || isset($_POST["seeds"]) || isset($_POST["query"]))
 		
 		$ids = explode(",",$seeds);
 		
-		$ids = array_unique($ids);
+		$ids = array_values(array_unique($ids));
 		
 		makeStatsFromIds($ids);
 		
@@ -389,13 +414,11 @@ function getIdsFromPlaylist($uplistid) {
 }
 
 
-
-function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date_before,$date_after,$daymode) {
+function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$daymode,$date_before,$date_after,$locationmode,$location_point,$location_radius) {
 	
 	$nextpagetoken = null;
 	$datespans = array();
 	$ids = array();
-	
 	
 	if($daymode) {
 		
@@ -412,6 +435,8 @@ function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date
 		
 		$datespans[] = array("after" => $date_after,"before" => $date_before);
 	}
+
+	//print_r($datespans);
 	
 	out("<br /><br />Executing searches (".count($datespans)."): ");
 	$counter = 0;
@@ -432,20 +457,26 @@ function getIdsFromSearch($query,$iterations,$rankby,$language,$regioncode,$date
 			
 			if($language != "") { $restquery .= "&relevanceLanguage=" . $language; }
 			if($regioncode != "") { $restquery .= "&regionCode=" . $regioncode; }
-			
-			//echo $restquery;
+			if($locationmode) { $restquery .= "&type=video&location=" . $location_point . "&locationRadius=" . $location_radius; }
 			
 			if($nextpagetoken != null) {
 				$restquery .= "&pageToken=".$nextpagetoken;
 			}
+
+			//echo $restquery;
 			
 			$reply = doAPIRequest($restquery);
-			$nextpagetoken = $reply->nextPageToken;
-			
+
 			//print_r($reply);
 			
 			foreach($reply->items as $item) {
 				$ids[] = $item->id->videoId;
+			}
+
+			if(isset($reply->nextPageToken)) {
+				$nextpagetoken = $reply->nextPageToken;
+			} else {
+				break;
 			}
 		}
 	}
@@ -469,10 +500,11 @@ function makeStatsFromIds($ids) {
 		$vid = $ids[$i];
 		$lookup[$vid] = $i;
 		
-		$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet&id=".$vid;
+		$restquery = "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails,snippet,recordingDetails,topicDetails&id=".$vid;
+
+		//print($restquery);
 
 		$reply = doAPIRequest($restquery);
-		
 		//print_r($reply);
 		
 		$vid = $reply->items[0];
@@ -487,18 +519,19 @@ function makeStatsFromIds($ids) {
 		// collect categories
 		if(!in_array($vid->snippet->categoryId,$categoryIds)) { $categoryIds[] = $vid->snippet->categoryId; }
 		
-		
 		$row = array();
 		$row["channelId"] = $vid->snippet->channelId;
 		$row["channelTitle"] = $vid->snippet->channelTitle;
-		$row["videoId"] = $vid->id;
+		$row["videoId"] = $ids[$i];
 		$row["publishedAt"] = $vid->snippet->publishedAt;
-		$row["publishedAtSQL"] = date("Y-m-d H:i:s", strtotime($vid->snippet->publishedAt));
+		$row["publishedAtSQL"] = ($vid->snippet->publishedAt == "") ? "":date("Y-m-d H:i:s", strtotime($vid->snippet->publishedAt));
 		$row["videoTitle"] = preg_replace("/\s+/", " ",$vid->snippet->title);
 		$row["videoDescription"] = preg_replace("/\s+/", " ",$vid->snippet->description);
-		$row["tags"] = implode(",",$vid->snippet->tags);
+		$row["tags"] = (isset($vid->snippet->tags)) ? implode(",",$vid->snippet->tags):"";
 		$row["videoCategoryId"] = $vid->snippet->categoryId;
 		$row["videoCategoryLabel"] = "";
+		$row["topicCategories"] = (isset($vid->topicDetails->topicCategories)) ? implode(",",$vid->topicDetails->topicCategories):"";
+		$row["topicCategories"] = preg_replace("/https\:\/\/en\.wikipedia\.org\/wiki\//i","",$row["topicCategories"]);
 		$row["duration"] = $vid->contentDetails->duration;
 		$row["durationSec"] = $seconds;
         $row["dimension"] = $vid->contentDetails->dimension;
@@ -508,6 +541,9 @@ function makeStatsFromIds($ids) {
 		$row["defaultLAudioLanguage"] = $vid->snippet->defaultAudioLanguage;
         $row["thumbnail_maxres"] = $vid->snippet->thumbnails->maxres->url;
         $row["licensedContent"] = $vid->contentDetails->licensedContent;
+		$row["locationDescription"] = $vid->recordingDetails->locationDescription;
+		$row["latitude"] = $vid->recordingDetails->location->latitude;
+		$row["longitude"] = $vid->recordingDetails->location->longitude;
         $row["viewCount"] = $vid->statistics->viewCount;
         $row["likeCount"] = $vid->statistics->likeCount;
         $row["dislikeCount"] = $vid->statistics->dislikeCount;
@@ -515,7 +551,6 @@ function makeStatsFromIds($ids) {
         $row["commentCount"] = $vid->statistics->commentCount;
 		
 		$vids[] = $row;
-		
 		//print_r($row); exit;
 		
 		out($i . " ");
@@ -610,7 +645,7 @@ function makeStatsFromIds($ids) {
 
 	outweb('your files:<br />');
 	if($cotag) {
-		outweb('T<a href="'.$folder.$filenamegdf.'" download>' . $filenamegdf . '</a><br />');
+		outweb('<a href="'.$folder.$filenamegdf.'" download>' . $filenamegdf . '</a><br />');
 	}
 
 	outweb('<a href="'.$folder.$filename.'" download>' . $filename . '</a>

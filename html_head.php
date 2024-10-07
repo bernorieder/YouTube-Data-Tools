@@ -45,12 +45,13 @@ require_once "common.php";
 	
 	<div class="rowTab">
 		<div class="sectionTab">
-			<a href="index.php" class="navlink" <?php if($fn == "index.php" || $fn == "youtube") { echo('style="background-color:#0B3C5D"'); } ?>>Home</a>
+			<a href="index.php" class="navlink" <?php if($fn == "index.php" || $fn == "") { echo('style="background-color:#0B3C5D"'); } ?>>Home</a>
 			<a href="mod_channel_info.php" class="navlink" <?php if($fn == "mod_channel_info.php") { echo('style="background-color:#0B3C5D"'); } ?>>Channel Info</a>
 			<a href="mod_channels_list.php" class="navlink" <?php if($fn == "mod_channels_list.php") { echo('style="background-color:#0B3C5D"'); } ?>>Channel List</a>
 			<a href="mod_channels_net.php" class="navlink" <?php if($fn == "mod_channels_net.php") { echo('style="background-color:#0B3C5D"'); } ?>>Channel Network</a>
 			<a href="mod_videos_list.php" class="navlink" <?php if($fn == "mod_videos_list.php") { echo('style="background-color:#0B3C5D"'); } ?>>Video List</a>
-			<a href="mod_videos_net.php" class="navlink" <?php if($fn == "mod_videos_net.php") { echo('style="background-color:#0B3C5D"'); } ?>>Video Network</a>
+			<!-- <a href="mod_videos_net.php" class="navlink" <?php if($fn == "mod_videos_net.php") { echo('style="background-color:#0B3C5D"'); } ?>>Video Network</a> -->
+			<a href="mod_videos_comments_net.php" class="navlink" <?php if($fn == "mod_videos_comments_net.php") { echo('style="background-color:#0B3C5D"'); } ?>>Video Co-commenting Network</a>
 			<a href="mod_video_comments.php" class="navlink" <?php if($fn == "mod_video_comments.php") { echo('style="background-color:#0B3C5D"'); } ?>>Video Comments</a>
 			<a href="faq.php" class="navlink" <?php if($fn == "faq.php") { echo('style="background-color:#0B3C5D"'); } ?>>FAQ</a>
 		</div>

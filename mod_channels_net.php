@@ -21,7 +21,7 @@
 		<div class="sectionTab"><h1>Parameters</h1></div>
 	</div>
 	
-	<form action="mod_channels_net_tmp.php" method="post">
+	<form action="mod_channels_net.php" method="post">
 	
 	<div class="rowTab">
 		<div class="sectionTab"><h2>Starting point:</h2></div>
@@ -97,7 +97,7 @@
 
 	<div class="rowTab">
 		<div class="oneTab">
-			<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
+			<div class="g-recaptcha" data-sitekey="<?php echo $sitekey; ?>"></div>
 		</div>
 	</div>
 	
@@ -127,6 +127,7 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		exit;
 	}
 	
+	//if(false) {
 	if(RECAPTCHA) {
 		if($_POST["g-recaptcha-response"] == "") {
 			echo "<br /><br />Recaptcha missing.";
@@ -165,7 +166,8 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		$seeds = preg_replace("/\s+/","",$seeds);
 		$seeds = trim($seeds);
 		
-		$ids = explode(",",$seeds);
+		$ids = explode(",",$seeds);		
+		$ids = array_values(array_unique($ids));
 		
 		$no_seeds = count($ids);
 		
@@ -216,6 +218,8 @@ function makeNetworkFromIds($depth) {
 	
 	global $nodes,$edges,$ids,$crawldepth,$subscriptions;
 	
+	// getting channel infos and caching them
+
 	echo "<br /><br />getting details for ".count($ids)." channels at depth ".$depth.": ";
 	
 	$newids = array();
@@ -258,18 +262,21 @@ function makeNetworkFromIds($depth) {
 		echo $i . " "; flush(); ob_flush();
 	}
 
-	#UCUmEPYxmnyQDeRUcFkslmQw
-
 	if($subscriptions == "on") {
-		echo "<br />getting subscriptions for ".count($ids)." channels at depth ".$depth.": ";
+		echo "<br />getting linked channels for ".count($ids)." channels at depth ".$depth.": ";
 		$counter = 0;
 	}
 	
+	// getting featured channels
+
 	foreach($nodes as $nodeid => $nodedata) {
 		
 		$restquery = "https://www.googleapis.com/youtube/v3/channelSections?part=contentDetails&channelId=".$nodedata->id;
-
 		$reply = doAPIRequest($restquery);
+
+		if(isset($reply->error)) {
+			continue;
+		}
 
 		foreach($reply->items as $item) {
 
@@ -300,32 +307,7 @@ function makeNetworkFromIds($depth) {
 			}
 		}
 
-		/*
-		if(isset($nodedata->brandingSettings->channel->featuredChannelsUrls)) {
-				
-			foreach($nodedata->brandingSettings->channel->featuredChannelsUrls as $featid) {
-								
-				if(!isset($nodes[$featid])) {
-					
-					if(!in_array($featid, $newids)) {
-						
-						$newids[] = $featid;
-					}
-					
-					if($depth < $crawldepth) {
-						$edgeid = $nodeid . "_|_|X|_|_" . $featid;
-						$edges[$edgeid] = true;
-					}
-					
-				} else {
-	
-					$edgeid = $nodeid . "_|_|X|_|_" . $featid;
-					$edges[$edgeid] = true;
-				}
-			}	
-		}
-		*/
-		
+		// getting subscriptions
 		
 		if($subscriptions == "on" && $nodedata->done == false) {
 	
@@ -345,10 +327,12 @@ function makeNetworkFromIds($depth) {
 				
 				$reply = doAPIRequest($restquery);
 				
-				
-				
-				//print_r($reply); exit;
-				
+				// API now throws an error when subscriptions are private
+				if(isset($reply->error)) {
+					$run = false;
+					continue;
+				}
+	
 				if(count($reply->items) > 0) {
 									
 					foreach($reply->items as $item) {

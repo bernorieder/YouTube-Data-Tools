@@ -47,7 +47,7 @@ include("html_head.php");
 
 	<div class="rowTab">
 		<div class="oneTab">
-			<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
+			<div class="g-recaptcha" data-sitekey="<?php echo $sitekey; ?>"></div>
 		</div>
 	</div>
 	
@@ -105,7 +105,7 @@ function getInfo($hash) {
 	foreach($reply->items[0] as $key => $var) {
 		echo '<tr class="resulttable">';
 		echo '<td class="resulttableHi"><b>'.$key.'</b></td>';
-		if(gettype($var) != "object" && gettype($var2) != "array") { 
+		if(gettype($var) != "object" && gettype($var) != "array") { 
 			echo '<td class="resulttable">'.$var.'</td>';
 		} else {
 			

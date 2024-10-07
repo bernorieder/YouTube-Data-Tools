@@ -63,7 +63,7 @@ if(isset($argv)) {
 		<div class="fourTab">
 			(this is passed to the search endpoint)
 			<p>optional <a href="http://www.loc.gov/standards/iso639-2/php/code_list.php" target="_blank">ISO 639-1</a> relevance language: <input type="text" name="language" style="width:20px;" value="<?php if(isset($_POST["language"])) { echo $_POST["language"]; }; ?>" /></p>
-			<p>optional <a href="https://www.iso.org/obp/ui/#search" target="_blank">ISO 3166-1 alpha-2</a> region code: <input type="text" name="regioncode" style="width:20px;" value="<?php if(isset($_POST["regioncode"])) { echo $_POST["regioncode"]; }; ?>" /> (default = US)</p>
+			<p>optional <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2" target="_blank">ISO 3166-1 alpha-2</a> region code: <input type="text" name="regioncode" style="width:20px;" value="<?php if(isset($_POST["regioncode"])) { echo $_POST["regioncode"]; }; ?>" /> (default = US)</p>
 		</div>
 	</div>
 	
@@ -133,7 +133,7 @@ if(isset($argv)) {
 	
 	<div class="rowTab">
 		<div class="oneTab">
-			<div class="g-recaptcha" data-sitekey="6Lf093MUAAAAAIRLVzHqfIq9oZcOnX66Dju7e8sr"></div>
+			<div class="g-recaptcha" data-sitekey="<?php echo $sitekey; ?>"></div>
 		</div>
 	</div>
 	
@@ -214,7 +214,7 @@ if(isset($_POST["query"]) || isset($_POST["seeds"])) {
 		
 		$ids = explode(",",$seeds);
 		
-		$ids = array_unique($ids);
+		$ids = array_values(array_unique($ids));
 		
 		makeStatsFromIds($ids);
 
@@ -294,7 +294,7 @@ function makeStatsFromIds($ids) {
 		//print_r($reply);
 		
 		$channel = array();
-		$channel["id"] = $reply->items[0]->id;
+		$channel["id"] = $ids[$i];
 		$channel["title"] = preg_replace("/\s+/", " ",$reply->items[0]->snippet->title);
 		$channel["description"] = preg_replace("/\s+/", " ",$reply->items[0]->snippet->description);
 		$channel["publishedAt"] = $reply->items[0]->snippet->publishedAt;
